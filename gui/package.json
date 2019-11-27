@@ -19,6 +19,7 @@
     }
   },
   "dependencies": {
+    "bootstrap": "^4.4.0",
     "electron": "^7.1.2",
     "electron-is-dev": "^1.1.0",
     "electron-utils": "^1.0.9",
