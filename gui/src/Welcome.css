@@ -1,0 +1,12 @@
+.accountAvi {
+    position: absolute;
+    height: 145px;
+    width: 105px;
+    float: left;
+    border: 1px solid #000000;
+}
+
+.accountInfo {
+    margin-left: 12%;
+
+}

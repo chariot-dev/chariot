@@ -5,33 +5,33 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 function Login() {
   return (
-    <div>
-      <h1 class="container text-center">Welcome to Chariot</h1>
+    <div class="container">
+      <h1 class="text-center">Welcome to Chariot</h1>
       <br></br>
       <form>
-        <div class="form-group container">
-          If you already have an account, please log in.
+        <div class="form-group">
+          <text>If you already have an account, please log in.</text>
         </div>
-        <div class="form-group container">
-          <label for="usernameInput">Username:</label>
+        <div class="form-group">
+          <label for="usernameInput" class="font-weight-bold">Username:</label>
           <input class="form-control" id="usernameInput" placeholder="Enter username" />
         </div>
-        <div class="form-group container">
-          <label for="passwordInput">Password:</label>
+        <div class="form-group">
+          <label for="passwordInput" class="font-weight-bold">Password:</label>
           <input type="password" class="form-control" id="passwordInput" placeholder="Enter password" />
         </div>
-        <div class="container">
+        <div>
           <Link to="/Welcome">
-            <button type="submit" class="btn btn-primary container">Login</button>
+            <button type="submit" class="btn btn-primary">Login</button>
           </Link>
         </div>
       </form>
       <br></br>
 
-      <div class="container">
-        Dont have an account?
+      <div>
+        <text>Dont have an account? </text>
         <Link to="/Register">
-          <a id="createAccountLink"> Create one here</a>
+          <text id="createAccountLink">Create one here</text>
         </Link>
       </div>
     </div>

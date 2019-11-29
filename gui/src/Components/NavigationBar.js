@@ -6,8 +6,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 function NavigationBar() {
   return (
     <nav class="navbar navbar-expand-lg">
-        <h3>Chariot</h3>
-
         <ul class="navbar-nav">
           <Link to="/" class="nav-item nav-link">
             <li>Home/Login</li>
