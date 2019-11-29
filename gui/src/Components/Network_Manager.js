@@ -16,14 +16,21 @@ function Network_Manager() {
         </Link>
         <br></br>
         <br></br>
-        <Link to="/">
+        <Link to="/Delete_Network">
           <text>Delete a Network</text>
         </Link>
         <br></br>
         <br></br>
-        <Link to="/">
+        <Link to="/Manage_Existing_Networks">
           <text>Manage Existing Networks</text>
         </Link>
+
+        <br></br>
+        <br></br>
+
+        <Link to="/welcome">
+          <input type="button" class="btn btn-primary float-left" value="Back"/>
+        </Link>   
 
     </div>
   );

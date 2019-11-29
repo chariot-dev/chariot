@@ -17,13 +17,14 @@ function Add_Network() {
           </div>
           <div class="form-group">
             <label for="networkDescriptionInput" class="font-weight-bold">Description:</label>
-            <input class="form-control" id="networkDescriptionInput"/>
+            <textarea class="form-control" id="networkDescriptionInput" rows="5"></textarea>
           </div>
-          <div>
-            <Link to="/">
-              <input type="submit" class="btn btn-primary float-right" value="Next"/>
-            </Link>
-          </div>
+          <Link to="/network_manager">
+            <input type="button" class="btn btn-primary float-left" value="Back"/>
+          </Link>         
+          <Link to="/add_network_confirm">
+            <input type="submit" class="btn btn-primary float-right" value="Next"/>
+          </Link>
       </form>
 
     </div>
