@@ -8,7 +8,7 @@ function Register() {
       <h1>Create an Account</h1>
       <form>
         <div class="form-group">
-          To create an account, fill in the required fields, then click "Next."
+          <text>To create an account, fill in the required fields, then click "Next."</text>
         </div>
         <div class="form-group">
           <label for="ownerCreate" class="font-weight-bold">Name:</label>
@@ -21,10 +21,14 @@ function Register() {
         <div class="form-group">
             <label for="passwordCreate" class="font-weight-bold">Password:</label>
             <input type="password" class="form-control" id="passwordCreate" placeholder="Password" />
+            <input type="checkbox" id="showPassword1" />
+            <label for="togglePassword"> Show Password</label>
         </div>
         <div class="form-group">
             <label for="reenterPasswordCreate" class="font-weight-bold">Reenter Password:</label>
             <input type="password" class="form-control" id="reenterPasswordCreate" placeholder="Reenter Password" />
+            <input type="checkbox" id="showPassword2" />
+            <label for="togglePassword"> Show Password</label>
         </div>
         <div class="form-group">
             <label for="emailCreate" class="font-weight-bold">Email:</label>
@@ -49,8 +53,10 @@ function Register() {
       <br></br>
       <input type="submit" class="btn btn-primary float-right" value="Next"/>
       <br></br>
+      <br></br>
     </div>
   );
 }
+
 
 export default Register;
