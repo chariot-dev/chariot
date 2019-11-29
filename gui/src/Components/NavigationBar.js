@@ -16,6 +16,12 @@ function NavigationBar() {
           <Link to="/Welcome" class="nav-item nav-link">
             <li>Welcome</li>
           </Link>
+          <Link to="/Network_Manager" class="nav-item nav-link">
+            <li>Network_Manager</li>
+          </Link>
+          <Link to="/Add_Network" class="nav-item nav-link">
+            <li>Add_Network</li>
+          </Link>
         </ul>
     </nav>
   );

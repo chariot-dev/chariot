@@ -57,7 +57,7 @@ function Welcome() {
       <br></br>
 
       <Link to="/">
-        <button class="btn btn-primary container">Perform Data Analysis</button>
+        <button class="btn btn-primary container">Begin Data Collection</button>
       </Link>
 
     </div>
