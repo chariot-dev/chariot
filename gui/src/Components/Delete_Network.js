@@ -1,6 +1,5 @@
 import React from "react";
 
-import 'bootstrap/dist/css/bootstrap.css';
 
 function Delete_Network() {
   return (

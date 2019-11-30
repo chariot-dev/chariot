@@ -11,8 +11,6 @@ import Delete_Network from "./Components/Delete_Network";
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
-import 'bootstrap/dist/css/bootstrap.css';
-
 function App() {
   return (
     <Router>

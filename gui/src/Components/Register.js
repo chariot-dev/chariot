@@ -1,7 +1,5 @@
 import React from "react";
 
-import 'bootstrap/dist/css/bootstrap.css';
-
 function Register() {
   return (
     <div class="container">

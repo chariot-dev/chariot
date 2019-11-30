@@ -1,8 +1,6 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 
-import 'bootstrap/dist/css/bootstrap.css';
-
 function Network_Manager() {
   return (
     <div class="container">

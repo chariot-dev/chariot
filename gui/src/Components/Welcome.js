@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 
-import 'bootstrap/dist/css/bootstrap.css';
 import './Welcome.css'
 
 function Welcome() {
@@ -56,7 +55,7 @@ function Welcome() {
       <br></br>
       <br></br>
 
-      <Link to="/Manage_Existing_Networks">
+      <Link to="/">
         <button type="button" class="btn btn-primary container">Begin Data Collection</button>
       </Link>
 

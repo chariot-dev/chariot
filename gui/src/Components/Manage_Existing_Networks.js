@@ -1,7 +1,5 @@
 import React from "react";
 
-import 'bootstrap/dist/css/bootstrap.css';
-
 function Manage_Existing_Networks() {
   return (
     <div class="container">
