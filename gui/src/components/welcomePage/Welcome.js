@@ -56,7 +56,7 @@ function Welcome() {
       <br></br>
       <br></br>
 
-      <Link to="/Manage_Existing_Networks">
+      <Link to="/Choose_Network">
         <button type="button" class="btn btn-primary container">Begin Data Collection</button>
       </Link>
 
