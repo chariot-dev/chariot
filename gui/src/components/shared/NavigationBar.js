@@ -1,8 +1,6 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 
-import 'bootstrap/dist/css/bootstrap.css';
-
 function NavigationBar() {
   return (
     <nav class="navbar navbar-expand-lg">

@@ -10,10 +10,9 @@ import Manage_Existing_Networks from "./components/networkManagement/Manage_Exis
 import Delete_Network from "./components/networkManagement/Delete_Network";
 import Choose_Network from "./components/networkManagement/Choose_Network";
 import Database_Connection from './components/databaseConnection/DatabaseContainer'
+import Register_Confirm from "./components/registerPage/Register_Confirm";
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-
-import 'bootstrap/dist/css/bootstrap.css';
 
 function App() {
   return (
@@ -31,6 +30,7 @@ function App() {
           <Route path="/delete_network" component={Delete_Network} />
           <Route path="/choose_network" component={Choose_Network} />
           <Route path="/databaseContainer" component={Database_Connection} />
+          <Route path="/register_confirm" component={Register_Confirm} />
         </Switch>
       </div>
     </Router>
