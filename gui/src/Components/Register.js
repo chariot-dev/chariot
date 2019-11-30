@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 
 function Register() {
   return (
@@ -49,7 +50,9 @@ function Register() {
       </form>
 
       <br></br>
-      <input type="submit" class="btn btn-primary float-right" value="Next"/>
+      <Link to="Register_Confirm">
+        <input type="submit" class="btn btn-primary float-right" value="Next"/>
+      </Link>
       <br></br>
       <br></br>
     </div>

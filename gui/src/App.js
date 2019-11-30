@@ -8,6 +8,7 @@ import Add_Network from "./Components/Add_Network";
 import Add_Network_Confirm from "./Components/Add_Network_Confirm";
 import Manage_Existing_Networks from "./Components/Manage_Existing_Networks";
 import Delete_Network from "./Components/Delete_Network";
+import Register_Confirm from "./Components/Register_Confirm";
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
@@ -25,6 +26,7 @@ function App() {
           <Route path="/add_network_confirm" component={Add_Network_Confirm} />
           <Route path="/manage_existing_networks" component={Manage_Existing_Networks} />
           <Route path="/delete_network" component={Delete_Network} />
+          <Route path="/register_confirm" component={Register_Confirm} />
         </Switch>
       </div>
     </Router>
