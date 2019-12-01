@@ -56,7 +56,7 @@ function Welcome() {
       <br></br>
 
       <Link to="/Choose_Network">
-        <button type="button" class="btn btn-primary container">Begin Data Collection</button>
+        <button type="button" class="btn btn-primary container">Configure Data Collection</button>
       </Link>
 
     </div>

@@ -2,8 +2,6 @@ import React from "react";
 import Dropdown from '../shared/dropdown'
 import { Link } from 'react-router-dom';
 
-import 'bootstrap/dist/css/bootstrap.css';
-
 function Choose_Network() {
   return (
     <div class="container">
@@ -13,7 +11,7 @@ function Choose_Network() {
       <Dropdown> </Dropdown>
 
       <Link to="/databaseContainer">
-        <button type="button" class="btn btn-primary container">Next</button>
+              <button type="button" class="btn btn-primary btn-lg float-right">Next</button>
       </Link>
     </div>
   );

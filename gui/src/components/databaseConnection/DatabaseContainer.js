@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import 'bootstrap/dist/css/bootstrap.css';
-
 class DatabaseContainer extends Component {
     constructor(props) {
         super(props);
@@ -53,31 +51,44 @@ class DatabaseContainer extends Component {
 
     render() {
         return (
-            //<form onSubmit={this.handleSubmit}></form>
-            <form class="container">
+            <div>
+                <div class="text-center">
+                    <h1> Database Connection </h1>
+                    <p> Please fill the following fields to connect to a database to store data to</p>
+                </div>
+                <div class="text-center">
+                    <form>
+                        <div class="form-group">
+                            <label>Host name:</label>
+                            <input type="text"
+                                name="ipAddress"
+                                value={this.state.formControls.ipAddress.value}
+                                onChange={this.changeHandler}
+                            />
+                        </div>
 
-                <label>Host name/address:</label>
-                <input type="text"
-                    name="ipAddress"
-                    value={this.state.formControls.ipAddress.value}
-                    onChange={this.changeHandler}
-                />
-
-                <label>Username:</label>
-                <input type="text"
-                    name="name"
-                    value={this.state.formControls.name.value}
-                    onChange={this.changeHandler}
+                        <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text"
+                            name="name"
+                            value={this.state.formControls.name.value}
+                            onChange={this.changeHandler}
                     
-                />
+                            />
+                        </div>
 
-                <label>Password:</label>
-                <input type="password"
-                    name="password"
-                    value={this.state.formControls.password.value}
-                    onChange={this.changeHandler}
-                />
-            </form>
+                        <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password"
+                            name="password"
+                            value={this.state.formControls.password.value}
+                            onChange={this.changeHandler}
+                            />
+                        </div>
+                    </form>
+                </div>
+                <button type="button" class="btn btn-primary btn-lg">Connect</button>
+            </div>
         );
     }
 
