@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
 class DatabaseContainer extends Component {
     constructor(props) {
@@ -14,22 +15,27 @@ class DatabaseContainer extends Component {
                 password: {
                     value: ''
                 }
-            }
+            },
+            successMessage : ''
         }
 
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.testConnection = this.testConnection.bind(this);
     }
 
     /*
     Currently using the handleSubmit method to try to establish a TCP connection with a database
-         if the connection is successful, then show success modal. Otherwise, show failure modal and do
+         if the connection is successful, then show success message. Otherwise, show failure message and do
          not proceed to next screen
     */
-    handleSubmit(event) {
-        //currently assuming that connection will always be established
+    testConnection(event) {
+        //currently assuming that connection will always be established, display that connection is successful for 3 seconds
+        setTimeout(() => this.setState({ message: 'Connection Successful!' }), 3000);
+    }
+
+    setSuccessMessage(message) {
         this.setState({
-            show: true
-          });
+            successMessage: message
+        });
     }
 
     changeHandler = event => {
@@ -51,8 +57,8 @@ class DatabaseContainer extends Component {
 
     render() {
         return (
-            <div>
-                <div class="text-center">
+            <div class="container">
+                <div>
                     <h1> Database Connection </h1>
                     <p> Please fill the following fields to connect to a database to store data to</p>
                 </div>
@@ -87,7 +93,10 @@ class DatabaseContainer extends Component {
                         </div>
                     </form>
                 </div>
-                <button type="button" class="btn btn-primary btn-lg">Connect</button>
+                <Link to="/choose_network">
+                    <button type="button" class="btn btn-primary btn-lg float-left">Back</button>
+                </Link>
+                <button type="button" class="btn btn-primary btn-lg float-right">Connect</button>
             </div>
         );
     }
