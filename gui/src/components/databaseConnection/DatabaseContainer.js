@@ -65,7 +65,7 @@ class DatabaseContainer extends Component {
                 <div class="text-center">
                     <form>
                         <div class="form-group">
-                            <label>Host name:</label>
+                            <label>Host name: </label>
                             <input type="text"
                                 name="ipAddress"
                                 value={this.state.formControls.ipAddress.value}
@@ -74,7 +74,7 @@ class DatabaseContainer extends Component {
                         </div>
 
                         <div class="form-group">
-                        <label>Username:</label>
+                        <label>Username: </label>
                         <input type="text"
                             name="name"
                             value={this.state.formControls.name.value}
@@ -84,7 +84,7 @@ class DatabaseContainer extends Component {
                         </div>
 
                         <div class="form-group">
-                        <label>Password:</label>
+                        <label>Password: </label>
                         <input type="password"
                             name="password"
                             value={this.state.formControls.password.value}
@@ -94,9 +94,9 @@ class DatabaseContainer extends Component {
                     </form>
                 </div>
                 <Link to="/choose_network">
-                    <button type="button" class="btn btn-primary btn-lg float-left">Back</button>
+                    <button type="button" class="btn btn-primary float-left">Back</button>
                 </Link>
-                <button type="button" class="btn btn-primary btn-lg float-right">Connect</button>
+                <button type="button" class="btn btn-primary float-right">Connect</button>
             </div>
         );
     }

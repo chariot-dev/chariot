@@ -18,10 +18,10 @@ function Network_Manager() {
       <br></br>
       
       <Link to="/add_network">
-        <input type="button" class="btn btn-primary float-left" value="Back"/>
+        <button type="button" class="btn btn-primary float-left" value="Back"/>
       </Link>   
       <Link to="/network_manager">
-        <input type="submit" class="btn btn-primary float-right" value="Confirm"/>
+        <button type="submit" class="btn btn-primary float-right" value="Confirm"/>
       </Link>
       
 

@@ -7,11 +7,18 @@ function Choose_Network() {
     <div class="container">
       <h1>Choose a Network</h1>
       <text>Select a network to begin data collection process.</text>
+      <br></br>
+      <br></br>
 
       <Dropdown> </Dropdown>
 
+      <br></br>
+      <br></br>
+      <Link to="/welcome">
+        <button type="button" class="btn btn-primary float-left" value="Back"/>
+      </Link>   
       <Link to="/databaseContainer">
-              <button type="button" class="btn btn-primary btn-lg float-right">Next</button>
+        <button type="button" class="btn btn-primary float-right">Next</button>
       </Link>
     </div>
   );
