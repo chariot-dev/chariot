@@ -6,19 +6,19 @@ class Login extends Component {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
       <h1 class="text-center">Welcome to Chariot</h1>
       <br></br>
       <form>
         <div class="form-group">
-          <text>If you already have an account, please log in.</text>
+          If you already have an account, please log in.
         </div>
         <div class="form-group">
-          <label for="usernameInput" class="font-weight-bold">Username:</label>
+          <label class="font-weight-bold">Username:</label>
           <input class="form-control" id="usernameInput" placeholder="Enter username" />
         </div>
         <div class="form-group">
-          <label for="passwordInput" class="font-weight-bold">Password:</label>
+          <label class="font-weight-bold">Password:</label>
           <input type="password" class="form-control" id="passwordInput" placeholder="Enter password" />
         </div>
         <div>
@@ -31,7 +31,7 @@ class Login extends Component {
 
       <div>
         <text>Dont have an account? </text>
-        <Link to="/Register">
+        <Link to="/register">
           <text id="createAccountLink">Create one here</text>
         </Link>
       </div>

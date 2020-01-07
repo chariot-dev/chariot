@@ -5,7 +5,7 @@ class AddNetworkConfirm extends Component {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         <h1>Add a New Network</h1>
         <text>Please confirm that the information about the network is correct, then click "Create Network".</text>
         <br></br>

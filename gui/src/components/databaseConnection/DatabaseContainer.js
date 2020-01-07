@@ -57,7 +57,7 @@ class DatabaseContainer extends Component {
 
     render() {
         return (
-            <div class="container">
+            <div className="container">
                 <div>
                     <h1> Database Connection </h1>
                     <p> Please fill the following fields to connect to a database to store data to</p>

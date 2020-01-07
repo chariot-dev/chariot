@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 class ManageExistingNetworks extends Component {
   render() {
     return (
-      <div class="container">
+      <div className="container">
         <h1>Manage Existing Networks</h1>
         <text>Select a network to modify its existing configuration settings.</text>
         <br></br>

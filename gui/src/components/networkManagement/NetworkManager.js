@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 class NetworkManager extends Component {
   render() {
     return (
-      <div class="container">
+      <div className="container">
         <h1>Network Manager</h1>
           <text>Add, delete, or manage a network.</text>
           <br></br>

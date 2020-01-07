@@ -1,34 +1,41 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-
+import Register from './Register';
 
 class RegisterConfirm extends Component {
+  constructor (props) {
+    super(props);
+  }
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         <h1>Confirm Account Information</h1>
-          <text>Please confirm that the information about your account is correct, then click "Confirm" to create the account.</text>        
+          <p>Please confirm that the information about your account is correct, then click "Confirm" to create the account.</p>        
         <br></br>
         <br></br>
 
-        <text class="font-weight-bold">Name:</text>
+        <p>
+          <b>Name:</b> {this.props.params.fullname}
         <br></br>
-        <text class="font-weight-bold">Username:</text>
+        <b>Username:</b> {this.props.params.username}
         <br></br>
-        <text class="font-weight-bold">Password:</text>
+        <b>Password:</b> {this.props.params.password}
         <br></br>
-        <text class="font-weight-bold">Email Address:</text>
+        <b>Email Address:</b> {this.props.params.email}
         <br></br>
-        <text class="font-weight-bold">Security Question:</text>
+        <b>Security Question:</b> {this.props.params.securityQuestion}
         <br></br>
-        <text class="font-weight-bold">Security Question Answer:</text>
+        <b>Security Question Answer:</b> {this.props.params.securityQuestionAnswer}
+        </p>
         <br></br>
         <br></br>
         <br></br>
-
+        <Link to="/register">
+          <button className="btn btn-primary float-left">Back</button>
+        </Link>
         <Link to="/">
-          <button class="btn btn-primary float-right">Confirm</button>
+          <button className="btn btn-primary float-right">Confirm</button>
         </Link>
       </div>
     );

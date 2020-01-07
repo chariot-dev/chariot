@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 class DeleteNetwork extends Component {
   render() {
     return (
-      <div class="container">
+      <div className="container">
         <h1>Delete an Existing Network</h1>
           <text>Select a network to delete.</text>
         <br></br>

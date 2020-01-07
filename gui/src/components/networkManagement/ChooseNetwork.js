@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 class ChooseNetwork extends Component {
   render() {
     return (
-      <div class="container">
+      <div className="container">
         <h1>Choose a Network</h1>
         <text>Select a network to begin data collection process.</text>
         <br></br>
