@@ -79,7 +79,6 @@ class DatabaseContainer extends Component {
                             name="name"
                             value={this.state.formControls.name.value}
                             onChange={this.changeHandler}
-                    
                             />
                         </div>
 
@@ -93,10 +92,10 @@ class DatabaseContainer extends Component {
                         </div>
                     </form>
                 </div>
-                <Link to="/choose_network">
-                    <button type="button" class="btn btn-primary float-left">Back</button>
+                <Link to="/chooseNetwork">
+                    <button class="btn btn-primary float-left">Back</button>
                 </Link>
-                <button type="button" class="btn btn-primary float-right">Connect</button>
+                <button class="btn btn-primary float-right">Connect</button>
             </div>
         );
     }

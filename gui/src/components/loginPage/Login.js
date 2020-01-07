@@ -1,10 +1,12 @@
-import React from "react";
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 
-function Login() {
-  return (
-    <div class="container">
+class Login extends Component {
+
+  render() {
+    return (
+      <div class="container">
       <h1 class="text-center">Welcome to Chariot</h1>
       <br></br>
       <form>
@@ -33,8 +35,12 @@ function Login() {
           <text id="createAccountLink">Create one here</text>
         </Link>
       </div>
+
     </div>
-  );
+    );
+  }
+  
 }
+
 
 export default Login; 
