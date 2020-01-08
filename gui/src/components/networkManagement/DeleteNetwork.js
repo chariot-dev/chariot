@@ -6,11 +6,11 @@ class DeleteNetwork extends Component {
     return (
       <div className="container">
         <h1>Delete an Existing Network</h1>
-          <text>Select a network to delete.</text>
+        <p>Select a network to delete.</p>
         <br></br>
-        <br></br>
-        <Link to="/welcome">
-          <button class="btn btn-primary float-left">Back</button>
+        
+        <Link to="/networkManager">
+          <button className="btn btn-primary float-left">Back</button>
         </Link>
       </div>
     );

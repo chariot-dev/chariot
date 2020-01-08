@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import RegisterConfirm from './RegisterConfirm';
+import hiddenPasswordImg from "../images/hiddenPassword.PNG";
+import showPasswordImg from "../images/showPassword.PNG";
 
 class Register extends Component {
   constructor(props) {
@@ -12,11 +14,14 @@ class Register extends Component {
       emailAddress: "",
       securityQuestion: "",
       securityQuestionAnswer: "",
-      isSubmitted: false
+      isSubmitted: false,
+      passwordVisible: false,
+      passwordImg: hiddenPasswordImg
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.changePasswordVisibility = this.changePasswordVisibility.bind(this);
   }
 
   handleChange(event) {
@@ -29,9 +34,22 @@ class Register extends Component {
     event.preventDefault();
   }
   
+  changePasswordVisibility() {
+    console.log(this.state.passwordImg);
+
+    if (this.state.passwordImg === hiddenPasswordImg) {
+      this.setState({passwordImg: showPasswordImg});
+      this.setState({passwordVisible: true});
+    } 
+    else {
+      this.setState({passwordImg: hiddenPasswordImg});
+      this.setState({passwordVisible: false});
+    }
+
+    console.log(this.state.passwordImg);
+  }
   
   render() {
-    console.log(this.state.isSubmitted);
     if (this.state.isSubmitted) {
       return (
         <RegisterConfirm params={this.state}></RegisterConfirm>
@@ -46,33 +64,24 @@ class Register extends Component {
             To create an account, fill in the required fields, then click "Next."
           </div>
           <div className="form-group">
-            <label className="font-weight-bold">Name:</label>
-            <input type="text" className="form-control" id="fullname" name="fullname" placeholder="Full Name" onChange={this.handleChange}/>
+            <input required type="text" className="form-control" id="fullname" name="fullname" placeholder="Full Name" onChange={this.handleChange}/>
           </div>
           <div className="form-group">
-            <label className="font-weight-bold">Username:</label>
-            <input type="username" className="form-control" id="usernameCreate" name="username" placeholder="Username" onChange={this.handleChange}/>
+            <input required type="text" className="form-control" id="username" name="username" placeholder="Username" onChange={this.handleChange}/>
+          </div>
+          <div className="form-group input-group">
+              <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="password" name="password" placeholder="Password" />
+              <span className="input-group-addon">&nbsp;&nbsp;</span>
+              <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="confirmPassword" name="password" placeholder="Confirm Password" onChange={this.handleChange}/>
+              <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
           </div>
           <div className="form-group">
-              <label className="font-weight-bold">Password:</label>
-              <input type="password" className="form-control" id="passwordCreate" name="password" placeholder="Password" />
-              <input type="checkbox" id="showPassword1" />
-              <label> Show Password</label>
+              <input required type="email" className="form-control" id="emailAddress" name="emailAddress" placeholder="Email Address" onChange={this.handleChange}/>
+              You'll need to verify that this email belongs to you.
           </div>
           <div className="form-group">
-              <label className="font-weight-bold">Reenter Password:</label>
-              <input type="password" className="form-control" id="reenterPasswordCreate" name="password" placeholder="Reenter Password" onChange={this.handleChange}/>
-              <input type="checkbox" id="showPassword2" />
-              <label> Show Password</label>
-          </div>
-          <div className="form-group">
-              <label className="font-weight-bold">Email:</label>
-              <input type="email" className="form-control" id="emailCreate" name="emailAddress" placeholder="Email Address" onChange={this.handleChange}/>
-          </div>
-          <div className="form-group">
-              <label className="font-weight-bold">Security Question:</label>
-              <select id="securityQuestionSelect" className="form-control" name="securityQuestion" onChange={this.handleChange}>
-                <option selected disabled hidden>Select a security question</option>
+              <select required className="form-control" id="securityQuestion" name="securityQuestion" onChange={this.handleChange}>
+                <option selected disabled hidden value="">Select a Security Question</option>
                 <option>What was your first pet's name?</option>
                 <option>What is your dad's middle name?</option>
                 <option>What city were you born in?</option>
@@ -80,11 +89,13 @@ class Register extends Component {
               </select>
           </div>
           <div className="form-group">
-              <label className="font-weight-bold">Security Question Answer:</label>
-              <input type="securityQuestionAnswer" className="form-control" id="securityQuestionAnswer" name="securityQuestionAnswer" placeholder="Security Question Answer" onChange={this.handleChange}/>
+              <input required type="text" className="form-control" id="securityQuestionAnswer" name="securityQuestionAnswer" placeholder="Security Question Answer" onChange={this.handleChange}/>
           </div>
           <br></br>
           <button type="submit" className="btn btn-primary float-right">Next</button>
+          <div className="float-left">
+            Already have a Chariot account? <Link to="/"> Log In</Link>
+          </div>
           <br></br>
           <br></br>
         </form>

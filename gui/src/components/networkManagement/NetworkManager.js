@@ -6,29 +6,22 @@ class NetworkManager extends Component {
     return (
       <div className="container">
         <h1>Network Manager</h1>
-          <text>Add, delete, or manage a network.</text>
+          <p>Add, delete, or manage a network.</p>
+          <br></br>
+          
+          <Link to="/addNetwork">Add a Network</Link>
           <br></br>
           <br></br>
-          <br></br>
-          <Link to="/addNetwork">
-            <text>Add a Network</text>
-          </Link>
+          <Link to="/deleteNetwork">Delete a Network</Link>
           <br></br>
           <br></br>
-          <Link to="/deleteNetwork">
-            <text>Delete a Network</text>
-          </Link>
-          <br></br>
-          <br></br>
-          <Link to="/manageExistingNetworks">
-            <text>Manage Existing Networks</text>
-          </Link>
+          <Link to="/manageExistingNetworks">Manage Existing Networks</Link>
 
           <br></br>
           <br></br>
 
           <Link to="/welcome">
-            <button class="btn btn-primary float-left">Back</button>
+            <button className="btn btn-primary float-left">Back</button>
           </Link>   
 
       </div>

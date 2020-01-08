@@ -6,23 +6,21 @@ class AddNetwork extends Component {
     return (
       <div className="container">
         <h1>Add a New Network</h1>
-          <text>Please fill in the fields below to create a network. Then, click "Next".</text>
+          <p>Please fill in the fields below to create a network. Then, click "Next".</p>
           <br></br>
-          <br></br>
+          
           <form id="createNetworkForm">
-            <div class="form-group">
-              <label for="networkNameInput" class="font-weight-bold">Name:</label>
-              <input class="form-control" id="networkNameInput"/>
+            <div className="form-group">
+              <input className="form-control" id="networkNameInput" placeholder="Name"/>
             </div>
-            <div class="form-group">
-              <label for="networkDescriptionInput" class="font-weight-bold">Description:</label>
-              <textarea class="form-control" id="networkDescriptionInput" rows="5"></textarea>
+            <div className="form-group">
+              <textarea className="form-control" id="networkDescriptionInput" rows="5" placeholder="Description"></textarea>
             </div>
             <Link to="/networkManager">
-              <button class="btn btn-primary float-left">Back</button>
+              <button className="btn btn-primary float-left">Back</button>
             </Link>         
             <Link to="/addNetworkConfirm">
-              <button class="btn btn-primary float-right">Next</button>
+              <button className="btn btn-primary float-right">Next</button>
             </Link>
         </form>
       </div>

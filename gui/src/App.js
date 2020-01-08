@@ -11,6 +11,10 @@ import DeleteNetwork from "./components/networkManagement/DeleteNetwork";
 import ChooseNetwork from "./components/networkManagement/ChooseNetwork";
 import DatabaseConnection from './components/databaseConnection/DatabaseContainer'
 import RegisterConfirm from "./components/registerPage/RegisterConfirm";
+import DataAnalysisMain from "./components/dataAnalysis/DataAnalysisMain";
+import NetworkConfigsMain from "./components/networkConfigs/NetworkConfigsMain";
+import DeviceConfigsMain from "./components/deviceConfigs/DeviceConfigsMain";
+import DataOutputConfigsMain from "./components/dataOutputConfigs/DataOutputConfigsMain";
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
@@ -30,6 +34,10 @@ function App() {
           <Route path="/chooseNetwork" component={ChooseNetwork} />
           <Route path="/databaseContainer" component={DatabaseConnection} />
           <Route path="/registerConfirm" component={RegisterConfirm} />
+          <Route path="/dataAnalysisMain" component={DataAnalysisMain} />
+          <Route path="/networkConfigsMain" component={NetworkConfigsMain} />
+          <Route path="/deviceConfigsMain" component={DeviceConfigsMain} />
+          <Route path="/dataOutputConfigsMain" component={DataOutputConfigsMain} />
         </Switch>
       </div>
     </Router>

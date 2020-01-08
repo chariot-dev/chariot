@@ -7,7 +7,7 @@ class ChooseNetwork extends Component {
     return (
       <div className="container">
         <h1>Choose a Network</h1>
-        <text>Select a network to begin data collection process.</text>
+        Select a network to begin data collection process.
         <br></br>
         <br></br>
 
@@ -16,10 +16,10 @@ class ChooseNetwork extends Component {
         <br></br>
         <br></br>
         <Link to="/welcome">
-          <button class="btn btn-primary float-left">Back</button>
+          <button className="btn btn-primary float-left">Back</button>
         </Link>
         <Link to="/databaseContainer">
-          <button class="btn btn-primary float-right">Next</button>
+          <button className="btn btn-primary float-right">Next</button>
         </Link>
       </div>
     );

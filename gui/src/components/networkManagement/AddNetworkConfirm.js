@@ -7,22 +7,21 @@ class AddNetworkConfirm extends Component {
     return (
       <div className="container">
         <h1>Add a New Network</h1>
-        <text>Please confirm that the information about the network is correct, then click "Create Network".</text>
-        <br></br>
+        <p>Please confirm that the information about the network is correct, then click "Create Network".</p>
         <br></br>
 
-        <text class="font-weight-bold">Name:</text>
+        <b>Name:</b>
         <br></br>
-        <text class="font-weight-bold">Description:</text>
+        <b>Description:</b>
         <br></br>
         <br></br>
         <br></br>
         
         <Link to="/addNetwork">
-          <button class="btn btn-primary float-left">Back</button>
+          <button className="btn btn-primary float-left">Back</button>
         </Link>   
         <Link to="/networkManager">
-          <button class="btn btn-primary float-right">Next</button>
+          <button className="btn btn-primary float-right">Create Network</button>
         </Link>
       </div>
     );

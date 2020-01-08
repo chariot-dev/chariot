@@ -10,16 +10,16 @@ class RunConfirmationComponent extends Component {
                 <h1> Data Collection Configuration Confirmation </h1>
                 <p> You have selected the following configuration for the data collection episode: </p>
             </div>
-            <div class="text-center">
+            <div className="text-center">
                 <p> Network Name: </p>
             </div>
-            <div class="text-center">
+            <div className="text-center">
                 <p> Database Details </p>
             </div>
             <Link to="/databaseContainer">
-                <button class="btn btn-primary btn-lg float-left">Back</button>
+                <button className="btn btn-primary btn-lg float-left">Back</button>
             </Link>
-            <button class="btn btn-primary btn-lg float-right">Begin Collection</button>
+            <button className="btn btn-primary btn-lg float-right">Begin Collection</button>
         </div>
     );
   }
