@@ -22,7 +22,7 @@ class RegisterConfirm extends Component {
         <br></br>
         <b>Password:</b> {this.props.params.password}
         <br></br>
-        <b>Email Address:</b> {this.props.params.email}
+        <b>Email Address:</b> {this.props.params.emailAddress}
         <br></br>
         <b>Security Question:</b> {this.props.params.securityQuestion}
         <br></br>
