@@ -5,7 +5,6 @@ import Register from './components/registerPage/Register';
 import NavigationBar from "./components/shared/NavigationBar";
 import NetworkManager from "./components/networkManagement/NetworkManager";
 import AddNetwork from "./components/networkManagement/AddNetwork";
-import AddNetworkConfirm from "./components/networkManagement/AddNetworkConfirm";
 import ManageExistingNetworks from "./components/networkManagement/ManageExistingNetworks";
 import DeleteNetwork from "./components/networkManagement/DeleteNetwork";
 import ChooseNetwork from "./components/networkManagement/ChooseNetwork";
@@ -28,7 +27,6 @@ function App() {
           <Route path="/register" component={Register} />
           <Route path="/networkManager" component={NetworkManager} />
           <Route path="/addNetwork" component={AddNetwork} />
-          <Route path="/addNetworkConfirm" component={AddNetworkConfirm} />
           <Route path="/manageExistingNetworks" component={ManageExistingNetworks} />
           <Route path="/deleteNetwork" component={DeleteNetwork} />
           <Route path="/chooseNetwork" component={ChooseNetwork} />
