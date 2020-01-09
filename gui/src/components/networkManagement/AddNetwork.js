@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
 class AddNetwork extends Component {
   constructor(props) {
@@ -39,10 +40,10 @@ class AddNetwork extends Component {
               <textarea className="form-control" id="networkDescriptionInput" rows="5" name="newNetworkDescription" placeholder="Description"></textarea>
             </div>
             <Link to="/networkManager">
-              <button className="btn btn-primary float-left">Back</button>
+              <Button variant="primary" className="float-left">Back</Button>
             </Link>         
             <Link to="/addNetworkConfirm">
-              <button type="submit" className="btn btn-primary float-right">Next</button>
+              <Button variant="primary" className="float-right">Next</Button>
             </Link>
         </form>
       </div>

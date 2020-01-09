@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 import hiddenPasswordImg from "../images/hiddenPassword.PNG";
 import showPasswordImg from "../images/showPassword.PNG";
 
@@ -69,7 +70,9 @@ class Login extends Component {
                   <input type="checkbox" id="rememberMe"/> Remember Me
                 </div>
                 <br></br>
-                <button type="submit" className="btn btn-primary">Login</button>
+                <Button variant="primary" type="submit">
+                  Login
+                </Button>
               </form>
               <br></br>
 

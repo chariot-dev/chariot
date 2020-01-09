@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
 class RunConfirmationComponent extends Component {
 
@@ -17,9 +18,9 @@ class RunConfirmationComponent extends Component {
                 <p> Database Details </p>
             </div>
             <Link to="/databaseContainer">
-                <button className="btn btn-primary btn-lg float-left">Back</button>
+                <Button variant="primary" className="float-left">Back</Button>
             </Link>
-            <button className="btn btn-primary btn-lg float-right">Begin Collection</button>
+            <Button variant="primary" className="float-right">Begin Collection</Button>
         </div>
     );
   }

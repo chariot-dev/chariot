@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
 class NetworkManager extends Component {
   render() {
@@ -21,7 +22,7 @@ class NetworkManager extends Component {
           <br></br>
 
           <Link to="/welcome">
-            <button className="btn btn-primary float-left">Back</button>
+            <Button variant="primary" className="float-left">Back</Button>
           </Link>   
 
       </div>

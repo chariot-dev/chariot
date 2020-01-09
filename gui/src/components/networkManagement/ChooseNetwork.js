@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import Dropdown from '../shared/dropdown'
+import Dropdown from '../shared/dropdown';
+import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
 class ChooseNetwork extends Component {
@@ -16,10 +17,10 @@ class ChooseNetwork extends Component {
         <br></br>
         <br></br>
         <Link to="/welcome">
-          <button className="btn btn-primary float-left">Back</button>
+          <Button variant="primary" className="float-left">Back</Button>
         </Link>
         <Link to="/databaseContainer">
-          <button className="btn btn-primary float-right">Next</button>
+          <Button variant="primary" className="float-right">Next</Button>
         </Link>
       </div>
     );

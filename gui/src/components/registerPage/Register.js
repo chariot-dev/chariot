@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 import RegisterConfirm from './RegisterConfirm';
 import hiddenPasswordImg from "../images/hiddenPassword.PNG";
 import showPasswordImg from "../images/showPassword.PNG";
@@ -97,7 +98,8 @@ class Register extends Component {
                     <input required type="text" className="form-control" id="securityQuestionAnswer" name="securityQuestionAnswer" placeholder="Security Question Answer" onChange={this.handleChange}/>
                 </div>
                 <br></br>
-                <button type="submit" className="btn btn-primary float-right">Next</button>
+                
+                <Button type="submit" variant="primary" className="float-right">Next</Button>
                 <div className="float-left">
                   Already have a Chariot account? <Link to="/"> Log In</Link>
                 </div>

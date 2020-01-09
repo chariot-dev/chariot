@@ -20,17 +20,6 @@ class AddNetworkConfirm extends Component {
   }
 
   render() {
-    /*
-    if (this.state.isOpen) {
-      return (
-      <SuccessModal show={this.state.isOpen}
-        onClose={this.toggleModal}>
-        Here's some content for the modal
-      </SuccessModal> 
-      );
-    }
-    */
-
     return [
       <div className="container" key="one">
         <h1>Add a New Network</h1>
@@ -45,9 +34,9 @@ class AddNetworkConfirm extends Component {
         <br></br>
         
         <Link to="/addNetwork">
-          <button className="btn btn-primary float-left">Back</button>
+          <Button variant="primary" className="float-left">Back</Button>
         </Link>   
-        <button className="btn btn-primary float-right" onClick={this.toggleModal}>Create Network</button>
+        <Button variant="primary" className="float-right" onClick={this.toggleModal}>Create Network</Button>
       </div>,
 
       <Modal show={this.state.isOpen} key="two">
@@ -56,8 +45,6 @@ class AddNetworkConfirm extends Component {
           <Button variant="primary" className="float-right">Continue</Button>
         </Link>
       </Modal>
-     
-
     ]
   }
 

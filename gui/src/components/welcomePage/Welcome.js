@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
 import './Welcome.css';
 
@@ -24,7 +25,7 @@ class Welcome extends Component {
           <br></br>
           <div>
             <Link to="/">
-              <button className="btn btn-primary">Log Out</button>
+              <Button variant="primary">Log Out</Button>
             </Link>
           </div>
         </div>
@@ -49,7 +50,7 @@ class Welcome extends Component {
         <br></br>
 
         <Link to="/chooseNetwork">
-          <button type="button" className="btn btn-primary container">Configure Data Collection</button>
+          <Button variant="primary" className="container">Configure Data Collection</Button>
         </Link>
 
       </div>

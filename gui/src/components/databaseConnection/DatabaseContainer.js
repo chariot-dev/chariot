@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
 class DatabaseContainer extends Component {
     constructor(props) {
@@ -93,9 +94,9 @@ class DatabaseContainer extends Component {
                     </form>
                 </div>
                 <Link to="/chooseNetwork">
-                    <button className="btn btn-primary float-left">Back</button>
+                    <Button variant="primary" className="float-left">Back</Button>
                 </Link>
-                <button className="btn btn-primary float-right">Connect</button>
+                <Button variant="primary" className="float-right">Connect</Button>
             </div>
         );
     }
