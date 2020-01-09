@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import hiddenPasswordImg from "../images/hiddenPassword.PNG";
 import showPasswordImg from "../images/showPassword.PNG";
 
-import './Login.css';
+import '../../App.css';
 
 class Login extends Component {
   constructor(props) {
@@ -45,40 +45,44 @@ class Login extends Component {
 
   render() {
     return (
-      <div className="container">
-        <div className="text-center banner">
-          <br></br>
-          <h1>Chariot</h1>
-          <p>Collect and analyze data from multiple IoT devices</p>
-          <br></br>
-        </div>
-        <br></br>
-        <form onSubmit={this.handleSubmit}>
-          <div className="form-group">
-            To get started, please log in.
+      <div className="general-component-bg">
+        <div className="container">
+          <div className="text-center">
+            <h1 className="chariot-header">Chariot</h1>
+            <p>Collect and analyze data from multiple IoT devices</p>
+            <br></br>
           </div>
-          <div className="form-group">
-            <input required className="form-control" id="usernameInput" name="username" placeholder="Username or Email" />
-          </div>
-          <div className="form-group input-group">
-            <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="passwordInput" name="password" placeholder="Password" />
-            <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
-          </div>
-          <div>
-            <input type="checkbox" id="rememberMe"/> Remember Me
-          </div>
-          <br></br>
-          <button type="submit" className="btn btn-primary">Login</button>
-        </form>
-        <br></br>
+          <div className="card">
+            <div className="card-body">
+              <form onSubmit={this.handleSubmit}>
+                <div className="form-group">
+                  To get started, please log in.
+                </div>
+                <div className="form-group">
+                  <input required className="form-control" id="usernameInput" name="username" placeholder="Username or Email" />
+                </div>
+                <div className="form-group input-group">
+                  <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="passwordInput" name="password" placeholder="Password" />
+                  <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
+                </div>
+                <div>
+                  <input type="checkbox" id="rememberMe"/> Remember Me
+                </div>
+                <br></br>
+                <button type="submit" className="btn btn-primary">Login</button>
+              </form>
+              <br></br>
 
-        <div>
-          Dont have an account? <Link to="/register" id="createAccountLink"> Create one here</Link>
-        </div>
-        <div>
-          <Link to="/" id="forgotPasswordLink"> 
-            Forgot password?
-          </Link>
+              <div>
+                Dont have an account? <Link to="/register" id="createAccountLink"> Create one here</Link>
+              </div>
+              <div>
+                <Link to="/" id="forgotPasswordLink"> 
+                  Forgot password?
+                </Link>
+              </div>  
+            </div>
+          </div>
         </div>
       </div>
     );

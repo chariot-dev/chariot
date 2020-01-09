@@ -1,6 +1,4 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import successImg from "../images/success.png";
+import React, { Component } from 'react';
 
 class SuccessModal extends React.Component {
   render() {
@@ -10,8 +8,9 @@ class SuccessModal extends React.Component {
     }
 
     return (
-      <div>
-          <img id="successModal" src={successImg} alt="Success"></img>
+      <div className="modal-content">
+        <span className="close">&times;</span>
+        <p>Some text in the Modal..</p>
       </div>
     );
   }
