@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import successImg from "../images/success.png";
 
 class SuccessModal extends React.Component {

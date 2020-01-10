@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
 class DeviceConfigsMain extends Component {
 
@@ -10,8 +11,10 @@ class DeviceConfigsMain extends Component {
         <h1>Your Device Configs</h1>
           <p></p>
           <br></br>
-          
-
+           
+          <Link to="/welcome">
+            <Button variant="primary" className="float-left">Back</Button>
+          </Link>        
       </div>
     );
   }

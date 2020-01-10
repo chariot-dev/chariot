@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
 class NetworkConfigsMain extends Component {
 
@@ -11,7 +12,9 @@ class NetworkConfigsMain extends Component {
           <p></p>
           <br></br>
           
-
+          <Link to="/welcome">
+            <Button variant="primary" className="float-left">Back</Button>
+          </Link>
       </div>
     );
   }

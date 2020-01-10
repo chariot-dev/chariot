@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import RegisterConfirm from './RegisterConfirm';
+
 import hiddenPasswordImg from "../images/hiddenPassword.PNG";
 import showPasswordImg from "../images/showPassword.PNG";
 
@@ -17,7 +18,9 @@ class Register extends Component {
       securityQuestionAnswer: "",
       isSubmitted: false,
       passwordVisible: false,
-      passwordImg: hiddenPasswordImg
+      passwordImg: hiddenPasswordImg,
+      confirmIsOpen: false,
+      successIsOpen: false
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -30,9 +33,20 @@ class Register extends Component {
   }
 
   handleSubmit(event) {
-    console.log("Submitted");
-    this.setState({ isSubmitted: true });
+    this.setState({
+      isSubmitted: !this.state.isSubmitted,
+      confirmIsOpen: !this.state.confirmIsOpen
+    });    
     event.preventDefault();
+  }
+
+  toggleSuccessModal = () => {
+    this.setState({
+      confirmIsOpen: false
+    });
+    this.setState({
+      successIsOpen: !this.state.successIsOpen
+    });
   }
   
   changePasswordVisibility() {
@@ -51,14 +65,8 @@ class Register extends Component {
   }
   
   render() {
-    if (this.state.isSubmitted) {
-      return (
-        <RegisterConfirm params={this.state}></RegisterConfirm>
-      );
-    }
-
-    return (
-      <div className="general-component-bg">
+    return [
+      <div className="general-component-bg" key="registerForm">
         <div className="container">
           <div className="card">
             <div className="card-header">
@@ -109,8 +117,41 @@ class Register extends Component {
             </div>
           </div>
         </div>
-      </div>
-    );
+      </div>,
+
+      <Modal show={this.state.confirmIsOpen} key="registerConfirmModal">
+        <Modal.Body>
+          Is this information for your account correct?
+          <p>
+            <b>Name:</b> {this.state.fullname}
+            <br></br>
+            <b>Username:</b> {this.state.username}
+            <br></br>
+            <b>Password:</b> {this.state.password}
+            <br></br>
+            <b>Email Address:</b> {this.state.emailAddress}
+            <br></br>
+            <b>Security Question:</b> {this.state.securityQuestion}
+            <br></br>
+            <b>Security Question Answer:</b> {this.state.securityQuestionAnswer}
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
+          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
+        </Modal.Footer>
+      </Modal>,
+
+      <Modal show={this.state.successIsOpen} key="registerSuccessModal">
+        <Modal.Body>Please check your email to complete the account creation process.</Modal.Body>
+        <Modal.Footer>
+          <Link to="/">
+            <Button variant="primary" className="float-right">Continue</Button>
+          </Link>
+        </Modal.Footer>
+      </Modal>
+
+    ]
   }
 
 }
