@@ -25,9 +25,10 @@ Keep in mind that we enforce the use of python3 type hints as much as possible, 
 Optionally, though strongly recommended, is to install Python's virtual environment (venv) module which will help with package management and dependency isolation. The rest of this tutorial assumes you have chosen to use a venv. 
 
 Follow these steps to finish setting up:
-1. Spin up a venv in the core folder, and activate it using any equivalent shell command to bash's `source ./bin/activate`.
-2. Install all dependencies using `pip install -r requirements.txt`.
-3. (WIP but intended workflow) run linters, typechecks and tests with the command `tox`. It will run using the configuration in the `tox.ini` file. If every test passes, you are ready to start contributing.
+1. Create a new virtual environment using the command `python3 -m venv .` in the `core` folder.
+2. Activate the newly created venv using any equivalent shell command to bash's `source ./bin/activate`.
+3. Install all dependencies using `pip install -r requirements.txt`.
+4. (WIP but intended workflow) run linters, typechecks and tests with the command `tox`. It will run using the configuration in the `tox.ini` file. If every test passes, you are ready to start contributing.
 
 ### Pushing changes
 
