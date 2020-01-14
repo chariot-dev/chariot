@@ -9,8 +9,7 @@ class NetworkConfigsMain extends Component {
     return (
       <div className="container">
         <h1>Your Network Configs</h1>
-          <p></p>
-          <br></br>
+          <p className="screenInfo">Click on a network config to modify.</p>
           
           <Link to="/welcome">
             <Button variant="primary" className="float-left">Back</Button>

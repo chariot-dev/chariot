@@ -50,8 +50,7 @@ class Login extends Component {
         <div className="container">
           <div className="text-center">
             <h1 className="chariot-header">Chariot</h1>
-            <p>Collect and analyze data from multiple IoT devices</p>
-            <br></br>
+            <p className="screenInfo">Collect and analyze data from multiple IoT devices</p>
           </div>
           <div className="card">
             <div className="card-body">

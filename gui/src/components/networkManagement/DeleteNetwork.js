@@ -7,8 +7,7 @@ class DeleteNetwork extends Component {
     return (
       <div className="container">
         <h1>Delete an Existing Network</h1>
-        <p>Select a network to delete.</p>
-        <br></br>
+        <p className="screenInfo">Select a network to delete.</p>
         
         <Link to="/networkManager">
           <Button variant="primary" className="float-left">Back</Button>

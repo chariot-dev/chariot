@@ -7,8 +7,7 @@ class ManageExistingNetworks extends Component {
     return (
       <div className="container">
         <h1>Manage Existing Networks</h1>
-        <p>Select a network to modify its existing configuration settings.</p>
-        <br></br>
+        <p className="screenInfo">Select a network to modify its existing configuration settings.</p>
         
         <Link to="/networkManager">
           <Button variant="primary" className="float-left">Back</Button>

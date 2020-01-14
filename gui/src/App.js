@@ -12,13 +12,14 @@ import DataAnalysisMain from "./components/dataAnalysis/DataAnalysisMain";
 import NetworkConfigsMain from "./components/networkConfigs/NetworkConfigsMain";
 import DeviceConfigsMain from "./components/deviceConfigs/DeviceConfigsMain";
 import DataOutputConfigsMain from "./components/dataOutputConfigs/DataOutputConfigsMain";
+import AddDeviceHome from "./components/deviceManagement/AddDeviceHome";
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 function App() {
   return (
     <Router>
-      <div>
+      <div className="chariot-bg">
         <Switch>
           <Route path="/" exact component={Login} />
           <Route path="/welcome" component={Welcome} />
@@ -33,6 +34,7 @@ function App() {
           <Route path="/networkConfigsMain" component={NetworkConfigsMain} />
           <Route path="/deviceConfigsMain" component={DeviceConfigsMain} />
           <Route path="/dataOutputConfigsMain" component={DataOutputConfigsMain} />
+          <Route path="/addDeviceHome" component={AddDeviceHome} />
         </Switch>
       </div>
     </Router>

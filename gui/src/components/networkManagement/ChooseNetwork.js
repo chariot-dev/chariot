@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dropdown from '../shared/dropdown';
+import Dropdown from '../shared/Dropdown';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
@@ -8,9 +8,7 @@ class ChooseNetwork extends Component {
     return (
       <div className="container">
         <h1>Choose a Network</h1>
-        Select a network to begin data collection process.
-        <br></br>
-        <br></br>
+        <p className="screenInfo">Select a network to begin data collection process.</p>
 
         <Dropdown> </Dropdown>
 

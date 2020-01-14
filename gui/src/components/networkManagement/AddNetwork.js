@@ -19,7 +19,6 @@ class AddNetwork extends Component {
   }
 
   handleNetworkAdd(event) {
-    console.log("Submitted");
     this.setState({ isSubmitted: true });
     event.preventDefault();
   }
@@ -47,15 +46,14 @@ class AddNetwork extends Component {
     return [
       <div className="container" key="addNetworkForm">
         <h1>Add a New Network</h1>
-          <p>Please fill in the fields below to create a network. Then, click "Next".</p>
-          <br></br>
+          <p className="screenInfo">Please fill in the fields below to create a network. Then, click "Next".</p>
           
           <form id="createNetworkForm" onSubmit={this.handleNetworkAdd}>
             <div className="form-group">
-              <input className="form-control" id="networkNameInput" name="newNetworkName" placeholder="Name" onChange={this.handleChange}/>
+              <input className="form-control" id="networkNameInput" name="newNetworkName" placeholder="New Network Name" onChange={this.handleChange}/>
             </div>
             <div className="form-group">
-              <textarea className="form-control" id="networkDescriptionInput" rows="5" name="newNetworkDescription" placeholder="Description" onChange={this.handleChange}></textarea>
+              <textarea className="form-control" id="networkDescriptionInput" rows="5" name="newNetworkDescription" placeholder="New Network Description" onChange={this.handleChange}></textarea>
             </div>
             <Link to="/networkManager">
               <Button variant="primary" className="float-left">Back</Button>
@@ -67,6 +65,7 @@ class AddNetwork extends Component {
       <Modal show={this.state.confirmIsOpen} key="addNetworkConfirmation">
         <Modal.Body>
           Is this information for your network correct?
+          <br></br>
           <b>Name:</b> {this.state.newNetworkName}
           <br></br>
           <b>Description:</b> {this.state.newNetworkDescription}
@@ -78,10 +77,15 @@ class AddNetwork extends Component {
       </Modal>,
 
       <Modal show={this.state.successIsOpen} key="addNetworkSuccessModal">
-        <Modal.Body>Your network was succesfully added!</Modal.Body>
-        <Link to="/networkManager">
-          <Button variant="primary" className="float-right">Continue</Button>
-        </Link>
+        <Modal.Body>Your network was succesfully added! Would you like to add a device to this network as well?</Modal.Body>
+        <Modal.Footer>
+          <Link to="/networkManager">
+            <Button variant="primary" className="float-left">No</Button>
+          </Link>
+          <Link to="/addDeviceHome">
+            <Button variant="primary" className="float-right">Yes</Button>
+          </Link>
+        </Modal.Footer>
       </Modal>
     ]
   }

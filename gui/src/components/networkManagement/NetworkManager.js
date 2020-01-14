@@ -7,8 +7,7 @@ class NetworkManager extends Component {
     return (
       <div className="container">
         <h1>Network Manager</h1>
-          <p>Add, delete, or manage a network.</p>
-          <br></br>
+          <p className="screenInfo">Add, delete, or manage a network.</p>
           
           <Link to="/addNetwork">Add a Network</Link>
           <br></br>
@@ -23,8 +22,7 @@ class NetworkManager extends Component {
 
           <Link to="/welcome">
             <Button variant="primary" className="float-left">Back</Button>
-          </Link>   
-
+          </Link>
       </div>
     );
   }

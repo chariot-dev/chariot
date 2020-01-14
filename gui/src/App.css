@@ -22,12 +22,16 @@
 }
 
 .card{
-  margin-top: 10px;
+  margin-top: 6px;
   background-color: rgba(243, 241, 241, 0.87) !important;
 }
 
 .chariot-header {
   margin-top: 10px;
+}
+
+.container {
+  padding-top: 30px;
 }
 
 .general-component-bg {
@@ -40,4 +44,23 @@
   top:0px;
   left:0px;
   z-index:1000;
+}
+
+.chariot-bg {
+  background-color: #2d3436;
+  background-image: linear-gradient(315deg, #2d3436 0%, #d3d3d3 80%);  
+  position:fixed;
+  width:100%;
+  height:100%;
+  top:0px;
+  left:0px;
+  z-index:1000;
+}
+
+.link {
+  border-top: 20px;
+}
+
+.screenInfo {
+  padding-bottom: 20px;
 }

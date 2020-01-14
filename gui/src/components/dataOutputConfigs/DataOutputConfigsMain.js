@@ -8,8 +8,8 @@ class DataOutputConfigsMain extends Component {
     return (
       <div className="container">
         <h1>Your Data Output Configs</h1>
-          <p></p>
-          <br></br>
+          <p className="screenInfo">Click a data output config to modify.</p>
+          
           <Link to="/welcome">
             <Button variant="primary" className="float-left">Back</Button>
           </Link>

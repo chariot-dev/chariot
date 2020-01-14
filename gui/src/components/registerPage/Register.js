@@ -71,12 +71,10 @@ class Register extends Component {
           <div className="card">
             <div className="card-header">
               <h1>Create an Account</h1>
+              <p>To create an account, fill in the required fields, then click "Next."</p>
             </div>
             <div className="card-body">
               <form onSubmit={this.handleSubmit}>
-                <div className="form-group">
-                  To create an account, fill in the required fields, then click "Next."
-                </div>
                 <div className="form-group">
                   <input required type="text" className="form-control" id="fullname" name="fullname" placeholder="Full Name" onChange={this.handleChange}/>
                 </div>
@@ -143,7 +141,7 @@ class Register extends Component {
       </Modal>,
 
       <Modal show={this.state.successIsOpen} key="registerSuccessModal">
-        <Modal.Body>Please check your email to complete the account creation process.</Modal.Body>
+        <Modal.Body>To complete the account creation process, please check your email to complete the account creation process.</Modal.Body>
         <Modal.Footer>
           <Link to="/">
             <Button variant="primary" className="float-right">Continue</Button>

@@ -9,8 +9,7 @@ class DeviceConfigsMain extends Component {
     return (
       <div className="container">
         <h1>Your Device Configs</h1>
-          <p></p>
-          <br></br>
+          <p className="screenInfo">Click on a device config to modify.</p>
            
           <Link to="/welcome">
             <Button variant="primary" className="float-left">Back</Button>

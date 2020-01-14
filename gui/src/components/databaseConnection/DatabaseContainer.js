@@ -61,7 +61,7 @@ class DatabaseContainer extends Component {
             <div className="container">
                 <div>
                     <h1> Database Connection </h1>
-                    <p> Please fill the following fields to connect to a database to store data to</p>
+                    <p className="screenInfo"> Please fill the following fields to connect to a database to store data to</p>
                 </div>
                 <div class="text-center">
                     <form>
