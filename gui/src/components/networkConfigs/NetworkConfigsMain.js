@@ -12,7 +12,7 @@ class NetworkConfigsMain extends Component {
           <p className="screenInfo">Click on a network config to modify.</p>
           
           <Link to="/welcome">
-            <Button variant="primary" className="float-left">Back</Button>
+            <Button variant="primary" className="float-left footer-button">Back</Button>
           </Link>
       </div>
     );

@@ -18,9 +18,9 @@ class RunConfirmationComponent extends Component {
                 <p> Database Details </p>
             </div>
             <Link to="/databaseContainer">
-                <Button variant="primary" className="float-left">Back</Button>
+                <Button variant="primary" className="float-left footer-button">Back</Button>
             </Link>
-            <Button variant="primary" className="float-right">Begin Collection</Button>
+            <Button variant="primary" className="float-right footer-button">Begin Collection</Button>
         </div>
     );
   }

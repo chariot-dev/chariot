@@ -21,15 +21,13 @@ class Welcome extends Component {
             <br></br>
             <Link className="link" to="/dataOutputConfigsMain" id="dataOutputConfigsMainLink">View Data Output Configs</Link>
           </div>
-          <br></br>
+          
           <div>
             <Link to="/">
-              <Button variant="primary">Log Out</Button>
+              <Button className="logout-button" variant="primary">Log Out</Button>
             </Link>
           </div>
         </div>
-        <br></br>
-        <br></br>
 
         <div>
           <Link className="link" to="/networkManager">Network Manager</Link>
@@ -45,13 +43,9 @@ class Welcome extends Component {
           Select a storage unit and perform data analysis.
         </div>
 
-        <br></br>
-        <br></br>
-
         <Link to="/chooseNetwork">
-          <Button variant="primary">Configure Data Collection</Button>
+          <Button className="footer-button" variant="primary">Configure Data Collection</Button>
         </Link>
-
       </div>
     );
   }

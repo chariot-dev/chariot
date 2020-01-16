@@ -68,12 +68,10 @@ class Login extends Component {
                 <div>
                   <input type="checkbox" id="rememberMe"/> Remember Me
                 </div>
-                <br></br>
-                <Button variant="primary" type="submit">
+                <Button className="login-button" variant="primary" type="submit">
                   Login
                 </Button>
               </form>
-              <br></br>
 
               <div>
                 Dont have an account? <Link to="/register" id="createAccountLink"> Create one here</Link>

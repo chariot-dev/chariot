@@ -12,13 +12,11 @@ class ChooseNetwork extends Component {
 
         <Dropdown> </Dropdown>
 
-        <br></br>
-        <br></br>
         <Link to="/welcome">
-          <Button variant="primary" className="float-left">Back</Button>
+          <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
         <Link to="/databaseContainer">
-          <Button variant="primary" className="float-right">Next</Button>
+          <Button variant="primary" className="float-right footer-button">Next</Button>
         </Link>
       </div>
     );

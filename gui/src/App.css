@@ -21,6 +21,11 @@
   color: #09d3ac;
 }
 
+.footer-button {
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+
 .card{
   margin-top: 6px;
   background-color: rgba(243, 241, 241, 0.87) !important;
@@ -32,6 +37,10 @@
 
 .container {
   padding-top: 30px;
+}
+
+.overflow-case {
+  overflow-y: scroll;
 }
 
 .general-component-bg {
@@ -59,6 +68,16 @@
 
 .link {
   border-top: 20px;
+}
+
+.login-button {
+  margin-top: 15px;
+  margin-bottom: 40px; 
+}
+
+.logout-button {
+  margin-top: 25px;
+  margin-bottom: 65px; 
 }
 
 .screenInfo {

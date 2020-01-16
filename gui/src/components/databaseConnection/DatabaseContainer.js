@@ -94,9 +94,9 @@ class DatabaseContainer extends Component {
                     </form>
                 </div>
                 <Link to="/chooseNetwork">
-                    <Button variant="primary" className="float-left">Back</Button>
+                    <Button variant="primary" className="float-left footer-button">Back</Button>
                 </Link>
-                <Button variant="primary" className="float-right">Connect</Button>
+                <Button variant="primary" className="float-right footer-button">Connect</Button>
             </div>
         );
     }

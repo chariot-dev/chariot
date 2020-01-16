@@ -10,7 +10,7 @@ class DeleteNetwork extends Component {
         <p className="screenInfo">Select a network to delete.</p>
         
         <Link to="/networkManager">
-          <Button variant="primary" className="float-left">Back</Button>
+          <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
       </div>
     );

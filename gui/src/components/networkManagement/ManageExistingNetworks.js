@@ -10,7 +10,7 @@ class ManageExistingNetworks extends Component {
         <p className="screenInfo">Select a network to modify its existing configuration settings.</p>
         
         <Link to="/networkManager">
-          <Button variant="primary" className="float-left">Back</Button>
+          <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
       </div>
     );

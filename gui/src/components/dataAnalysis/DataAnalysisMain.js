@@ -11,7 +11,7 @@ class DataAnalysisMain extends Component {
           <p className="screenInfo">Configure your data analysis options.</p>
           
           <Link to="/welcome">
-            <Button variant="primary" className="float-left">Back</Button>
+            <Button variant="primary" className="float-left footer-button">Back</Button>
           </Link>        
       </div>
     );

@@ -19,7 +19,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 function App() {
   return (
     <Router>
-      <div className="chariot-bg">
+      <div className="chariot-bg overflow-case">
         <Switch>
           <Route path="/" exact component={Login} />
           <Route path="/welcome" component={Welcome} />

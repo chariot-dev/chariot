@@ -56,9 +56,9 @@ class AddNetwork extends Component {
               <textarea className="form-control" id="networkDescriptionInput" rows="5" name="newNetworkDescription" placeholder="New Network Description" onChange={this.handleChange}></textarea>
             </div>
             <Link to="/networkManager">
-              <Button variant="primary" className="float-left">Back</Button>
+              <Button variant="primary" className="float-left footer-button">Back</Button>
             </Link>
-            <Button variant="primary" className="float-right" onClick={this.toggleConfirmationModal}>Next</Button>
+            <Button variant="primary" className="float-right footer-button" onClick={this.toggleConfirmationModal}>Next</Button>
         </form>
       </div>,
 

@@ -109,8 +109,6 @@ class Register extends Component {
                 <div className="float-left">
                   Already have a Chariot account? <Link to="/"> Log In</Link>
                 </div>
-                <br></br>
-                <br></br>
               </form>
             </div>
           </div>
@@ -120,6 +118,7 @@ class Register extends Component {
       <Modal show={this.state.confirmIsOpen} key="registerConfirmModal">
         <Modal.Body>
           Is this information for your account correct?
+          <br></br>
           <p>
             <b>Name:</b> {this.state.fullname}
             <br></br>

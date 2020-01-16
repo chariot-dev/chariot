@@ -9,19 +9,18 @@ class NetworkManager extends Component {
         <h1>Network Manager</h1>
           <p className="screenInfo">Add, delete, or manage a network.</p>
           
-          <Link to="/addNetwork">Add a Network</Link>
-          <br></br>
-          <br></br>
-          <Link to="/deleteNetwork">Delete a Network</Link>
-          <br></br>
-          <br></br>
-          <Link to="/manageExistingNetworks">Manage Existing Networks</Link>
-
-          <br></br>
-          <br></br>
+          <div>
+            <Link to="/addNetwork">Add a Network</Link>
+            <br></br>
+            <br></br>
+            <Link to="/deleteNetwork">Delete a Network</Link>
+            <br></br>
+            <br></br>
+            <Link to="/manageExistingNetworks">Manage Existing Networks</Link>
+          </div>
 
           <Link to="/welcome">
-            <Button variant="primary" className="float-left">Back</Button>
+            <Button variant="primary" className="float-left footer-button">Back</Button>
           </Link>
       </div>
     );
