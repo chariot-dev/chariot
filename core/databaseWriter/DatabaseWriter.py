@@ -7,8 +7,12 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         methods that all subclasses that write to databases must have
     """
 
+    def __init__(self, db_path='database.db', flush=False):
+        self.db_path = db_path
+        self.flush = flush
+
     @abc.abstractmethod
-    def writeToDB(self):
+    def initializeDB(self):
         pass
 
     @abc.abstractmethod
@@ -17,4 +21,12 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def disconnectFromDB(self):
+        pass
+
+    @abc.abstractmethod
+    def insertRow(self, data):
+        pass
+
+    @abc.abstractmethod
+    def flushDB(self):
         pass
