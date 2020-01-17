@@ -1,24 +1,29 @@
+from typing import Any, Dict, Union
 from .DeviceConfiguration import DeviceConfiguration
 
 class DeviceAdapter:
     def __init__(self, _id: str, name: str, config: DeviceConfiguration):
-        self.id = _id
-        self.name = name
+        self.id: str = _id
+        self.name: str = name
+        self.nickname: str = str()
         self.unpackConfig(config)
 
      # get a packet of data from the device 
-     def captureData():
+    def captureData(self) -> Dict[str, Union[str, Dict[str, Any]]]:
         pass
 
     # gracefully close the connection to the device
-    def cleanup():
+    def cleanup(self) -> None:
         pass
 
     # any procedures necessary to start capturing data from the device
-    def initialize():
+    def initialize(self) -> None:
         pass
 
     # all fields the class requires should be guaranteed to exist, so we set them without error checking
     # for optional fields, they are set as None if not set
-    def unpackConfig(config: DeviceConfiguration):
+    def unpackConfig(self, config: DeviceConfiguration) -> None:
         self.nickname = config.nickname
+
+
+__all__ = ['DeviceAdapter']

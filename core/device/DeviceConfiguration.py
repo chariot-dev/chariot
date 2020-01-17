@@ -1,28 +1,32 @@
 from typing import Dict, List
 from json import dumps
+from core.device import ConfigValue
 
 class DeviceConfiguration:
-    def __init__(self, configMap: Dict[str, Any]):
-        self._required_fields: List[str] = ['nickname']
-        self._optional_fields: List[str] = []
-        
-        for field in self._required_fields:
+    def __init__(self, configMap: Dict[str, ConfigValue]):
+        self._requiredFields: List[str] = ['nickname']
+        self._optionalFields: List[str] = []
+      
+        for field in self._requiredFields:
             try:
                 setattr(self, field, configMap[field])
-            except: 
+            except:
                 # handle error for missing required configuration
                 pass
 
-        for field in self._optional_fields:
-                value = configMap[field] if field in configMap else None
-                setattr(self, field, value)
+        for field in self._optionalFields:
+            value = configMap[field] if field in configMap else None
+            setattr(self, field, value)
 
     def __str__(self) -> str:
         output: Dict[str, str] = dict()
         # can probably make this more pythonian by using dict comprehension
         # but this is more convenient for debugging
-        for field in self._required_fields:
+        for field in self._requiredFields:
             output[field] = getattr(self, field, None)
-        for field in self._optional_fields:
+        for field in self._optionalFields:
             output[field] = getattr(self, field, None)
         return dumps(output)
+
+
+__all__ = ['DeviceConfiguration']
