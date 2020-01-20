@@ -1,71 +1,99 @@
-from typing import List
+from typing import Dict, List
+from flask import Flask, request, app, jsonify, request
 
-from core.dataCollectionFramework import Network
+from core.network.Network import Network
 
 
 class NetworkManager:
-    # userNetworks: List[Network] = [] #hold all user defined networks
+    __instance = None
+
+    @staticmethod
+    def getInstance(cls):
+        if NetworkManager.__instance is None:
+            NetworkManager()
+        return NetworkManager.__instance
 
     def __init__(self):
-        self.userNetworks: List[Network] = []  # hold all user defined networks
+        # TODO: load all networks for a user upon instantiation
+        if NetworkManager.__instance is None:
+            # hold all user defined networks. This will be a dictionary in which
+            # each key is the name of the network (Network names are unique).
+            self.userNetworks: Dict[str, Network] = {}
+            NetworkManager.__instance = self
 
     # This method gives a new network name to an already defined network. Find the network by name
     def modifyNetworkNameByName(self, newName: str, toFind: str):
+        # check that newName is unique to avoid data overwrites
+        if self.isNetworkNameUnique(newName) is False:
+            # throw error saying that name is not unique
+            pass
+
         network: Network = self.findNetworkByNetworkName(toFind)
-        if network:
+
+        if network is not None:
+            # update network instance
             network.modifyNetworkName(newName)
+            # update collection, make new key and delete the old one
+            self.userNetworks[network.getNetworkName()] = self.userNetworks[toFind]
+            del self.userNetworks[toFind]
+        else:
+            # throw exception that network name is not found in collection
+            pass
 
-    # This method gives a new network name to an already defined network. Find the network by name
-    def modifyNetworkNameByIndex(self, newName: str, index: int):
-        self.userNetworks[index].modifyNetworkName(newName)
-
+    # This method modifies a network's description.
     def modifyNetworkDescriptionByName(self, newDesc: str, networkName: str):
         network: Network = self.findNetworkByNetworkName(networkName)
-        if network:
+        if network is not None:
             network.modifyNetworkDesc(newDesc)
-
-    def modifyNetworkDescriptionByIndex(self, newDesc: str, index: int, ):
-        if index - 1 > len(self.userNetworks) or index < 0:
-            print("Invalid index given for deletion of network.")
         else:
-            self.userNetworks[index].modifyNetworkDesc(newDesc)
+            # throw exception that network name is not found in collection
+            pass
 
-    # This method adds a Network object to the list of Networks that this class manages
-    #   this version of adding a Network just appends to the end
-    def addNetwork(self, network: Network):
-        self.userNetworks.append(network)
+    # This method adds a Network object to the dictionary of Networks that this class manages
+    def addNetwork(self, networkName: str, networkDesc: str):
+        if networkName is None:
+            # raise expection here
+            pass
 
-    # This method deletes a Network object via index from list of Networks that this class manages
-    def deleteNetworkByIndex(self, index: int):
-        if index - 1 > len(self.userNetworks) or index < 0:
-            print("Invalid index given for deletion of network.")
+        # When adding a key, if the same key is in the dict, the values are overriden. Avoid this.
+        if self.isNetworkNameUnique(networkName):
+            network = Network(networkName, networkDesc)
+            self.userNetworks[networkName] = network
         else:
-            del self.userNetworks[index - 1]
+            # network name is not unique, throw correct exception
+            pass
 
-    # This method deletes a Network object via name from list of Networks that this class manages
+    # This method deletes a Network object via name from the nested dictionary of Networks that this class manages
     def deleteNetworkByName(self, netName: int):
-        # iterate through list and find the network name to delete
-        startingLength: int = len(self.userNetworks)
-        i: int = 0
-        while i < len(self.userNetworks):
-            if self.userNetworks[i].getNetworkName() == netName:
-                del self.userNetworks[i]
-        if startingLength == len(self.userNetworks):
-            print('{} not found in collection. Deletion unsuccessful!', netName)
+        networkToDel: Network = self.findNetworkByNetworkName(netName)
+        if networkToDel is not None:
+            del self.userNetworks[networkToDel.getNetworkName()]
 
     # Convenience method used to return a Network object via a given network name
-    # TODO: figure out best way to return if Network is not found
-    def findNetworkByNetworkName(self, netName: str) -> Network:
-        i: int = 0
-        while i < len(self.userNetworks):
-            if self.userNetworks[i].getNetworkName() == netName:
-                return self.userNetworks[i]
+    def findNetworkByNetworkName(self, netNameToFind: str) -> Network:
+        # since the collection is nested dictionaries, find the name with .get()
+        try:
+            network: Network = self.userNetworks.get(netNameToFind)
+        except KeyError:
+            # figure out best way to handle
+            pass
+        return network
 
-    def getNetworkByIndex(self, index: int) -> Network:
-        if index - 1 > len(self.userNetworks) or index < 0:
-            print("Invalid index given for deletion of network.")
-        else:
-            return self.userNetworks[index]
+    # Convenience method that checks whether a network by the same name exists in the collection
+    def isNetworkNameUnique(self, uniqueName: str) -> bool:
+        found: bool = False
+        if self.findNetworkByNetworkName(uniqueName) is not None:
+            found = True
+        return found
 
-    #def importNetworkConfiguration
-    #def exportNetworkConfiguration
+    # Returns a list of networks names found in the userNetworks
+    def getAllNetworkNames(self) -> List[str]:
+        allNames: List[str] = []
+        for key in self.userNetworks:
+            allNames.append(key)
+
+        return allNames
+
+    # def importNetworkConfiguration
+    # def exportNetworkConfiguration
+    # https://blog.miguelgrinberg.com/index/page/3
