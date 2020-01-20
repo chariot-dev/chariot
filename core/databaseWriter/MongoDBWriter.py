@@ -1,7 +1,7 @@
-# TODO figure out import as module
 from DatabaseWriter import DatabaseWriter
 from tinymongo import TinyMongoClient
 import os
+from datetime import datetime
 
 
 class MongoDBWriter(DatabaseWriter):
@@ -11,29 +11,20 @@ class MongoDBWriter(DatabaseWriter):
 
     Usage:
     mongoWriter = MongoDBWriter()
-
+    mongoWriter.insertRow(1000, "json")
     """
 
     def __init__(self, db_path='mongo_database', flush=False):
         DatabaseWriter.__init__(self, db_path=db_path, flush=flush)
         self.connectToDB()
 
-    def initializeDB(self, conn):
-        """
-        Creates a new collection.
-        """
-        self.db = conn.mydb
+    def initializeDB(self):
+        self.db = self.conn.mydb
         self.collection = self.db.mycoll
         if self.flush:
             self.flushDB()
 
     def connectToDB(self):
-        """
-        Create a new database if it does not exist, and generates a connection.
-
-        Returns:
-            A connection to the database.
-        """
         try:
             os.mkdir(self.db_path)
         except FileExistsError:
@@ -41,46 +32,21 @@ class MongoDBWriter(DatabaseWriter):
         os.chmod(self.db_path, 0o700)
 
         self.conn = TinyMongoClient(self.db_path)
-        self.initializeDB(self.conn)
-
-        return self.conn
+        self.initializeDB()
 
     def disconnectFromDB(self):
-        """
-        Deletes connection to the database.
-        """
         if self.conn:
             self.conn = None
 
-    def insertRow(self, data):
-        """
-        Insert a row into the database.
-
-        Args:
-            data: A Python dict.
-        """
-        self.collection.insert_one(data)
+    def insertRow(self, relative_time, freeform):
+        row = dict()
+        row['relative_time'] = relative_time
+        row['freeform'] = freeform
+        abs_time = datetime.now()
+        row['abs_time'] = abs_time
+        self.collection.insert_one(row)
 
     def flushDB(self):
-        """
-        Remove all entries from the database.
-        """
         self.collection.delete_many(query=None)
 
-
-if __name__ == "__main__":
-    entry = dict()
-    entry["time"] = 15.1
-    entry["freeform"] = dict()
-    entry["freeform"]["temp"] = 72.0
-
-    entry2 = dict()
-    entry2["time"] = 16.0
-    entry2["freeform"] = dict()
-    entry2["freeform"]["balance"] = 120
-
-    db = MongoDBWriter()
-    db.connectToDB()
-    db.insertRow(entry)
-    db.insertRow(entry2)
-    db.disconnectFromDB()
+    # def prettyPrint(self):
