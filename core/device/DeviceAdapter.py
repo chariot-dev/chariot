@@ -1,5 +1,6 @@
 from typing import Any, Dict, Union
-from .DeviceConfiguration import DeviceConfiguration
+from core.device import ConfigValue
+from core.device.DeviceConfiguration import DeviceConfiguration
 
 class DeviceAdapter:
     def __init__(self, _id: str, name: str, config: DeviceConfiguration):

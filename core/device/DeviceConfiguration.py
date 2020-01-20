@@ -1,11 +1,11 @@
 from typing import Dict, List
 from json import dumps
-from core.device import ConfigValue
 
 class DeviceConfiguration:
     def __init__(self, configMap: Dict[str, ConfigValue]):
         self._requiredFields: List[str] = ['nickname']
         self._optionalFields: List[str] = []
+        self.nickname: str = str()
       
         for field in self._requiredFields:
             try:
