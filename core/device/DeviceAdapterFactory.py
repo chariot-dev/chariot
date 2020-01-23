@@ -1,34 +1,33 @@
-from typing import Dict
+from typing import Dict, Type
 from json import load
 from os import path
-from core.device import ConfigObject
-from core.device.DeviceAdapter import DeviceAdapter
-
+from core.JSONTypes import JSONDict
+from core.device.adapter.DeviceAdapter import DeviceAdapter
+from core.device.configuration.DeviceConfiguration import DeviceConfiguration
+from core.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
+from core.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
 
 class DeviceAdapterFactory:
     def __init__(self):
+        self.deviceMap: Dict[str, Type[DeviceAdapter]] = {
+            'ImpinjXArray': ImpinjXArrayAdapter,
+            'ImpinjR420': ImpinjR420Adapter
+            }
         currentPath = path.dirname(path.abspath(__file__))
         with open(f'{currentPath}/drivers/supportedDevices.json') as deviceList:
-            self.supportedDevices: ConfigObject = load(deviceList)
+            self.supportedDevices: JSONDict = load(deviceList)
 
-    def createInstance(self, configMap: ConfigObject) -> DeviceAdapter:
-        pass
-
-    def getInstance(self, configMap: ConfigObject) -> DeviceAdapter:        
-        if 'deviceType' not in configMap:
-            # raise InvalidDeviceConfigurationError
-            pass
- 
-        if configMap['deviceType'] not in self.supportedDevices:
+    def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:   
+        if config.deviceType not in self.supportedDevices:
             # raise UnsupportedDeviceError
-            pass
+            raise AssertionError
 
-        # this is the condition for adding a new device 
-        # any other device would have already had a nickname
-        
-        if configMap['nickname'] not in self.supportedDevices:
-            device: DeviceAdapter = self.createInstance(configMap)
+        instance: Type[DeviceAdapter] = self.deviceMap[config.deviceType](config)
+        return instance
+
+
+# return a singleton instance
+DeviceAdapterFactory = DeviceAdapterFactory()
 
 
 __all__ = ['DeviceAdapterFactory']
-  
