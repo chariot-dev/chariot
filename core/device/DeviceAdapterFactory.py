@@ -10,11 +10,11 @@ from core.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
 class DeviceAdapterFactory:
     def __init__(self):
         self.deviceMap: Dict[str, Type[DeviceAdapter]] = {
-            'ImpinjXArray': ImpinjXArrayAdapter,
-            'ImpinjR420': ImpinjR420Adapter
+            'Impinj xArray': ImpinjXArrayAdapter,
+            'Impinj Speedway R420': ImpinjR420Adapter
             }
         currentPath = path.dirname(path.abspath(__file__))
-        with open(f'{currentPath}/drivers/supportedDevices.json') as deviceList:
+        with open(f'{currentPath}/driver/supportedDevices.json') as deviceList:
             self.supportedDevices: JSONDict = load(deviceList)
 
     def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:   
