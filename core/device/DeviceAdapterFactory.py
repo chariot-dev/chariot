@@ -7,27 +7,32 @@ from core.device.configuration.DeviceConfiguration import DeviceConfiguration
 from core.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
 from core.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
 
-class DeviceAdapterFactory:
+
+class _DeviceAdapterFactory:
     def __init__(self):
         self.deviceMap: Dict[str, Type[DeviceAdapter]] = {
             'Impinj xArray': ImpinjXArrayAdapter,
             'Impinj Speedway R420': ImpinjR420Adapter
-            }
+        }
+
         currentPath = path.dirname(path.abspath(__file__))
         with open(f'{currentPath}/driver/supportedDevices.json') as deviceList:
-            self.supportedDevices: JSONDict = load(deviceList)
+            self.__supportedDevices: JSONDict = load(deviceList)
 
-    def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:   
-        if config.deviceType not in self.supportedDevices:
+    def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:
+        if config.deviceType not in self.__supportedDevices:
             # raise UnsupportedDeviceError
             raise AssertionError
 
         instance: Type[DeviceAdapter] = self.deviceMap[config.deviceType](config)
         return instance
 
+    def getsupportedDevices(self) -> JSONDict:
+        return self.__supportedDevices
+
 
 # return a singleton instance
-DeviceAdapterFactory = DeviceAdapterFactory()
+DeviceAdapterFactory = _DeviceAdapterFactory()
 
 
 __all__ = ['DeviceAdapterFactory']
