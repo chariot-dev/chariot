@@ -1,7 +1,8 @@
 from abc import ABC
-from typing import Dict
+from typing import Dict, Type
 from json import dumps
 from core.JSONTypes import JSONDict, JSONObject
+
 
 class DeviceConfiguration(ABC):
     def __init__(self, configMap: JSONDict):
@@ -11,7 +12,8 @@ class DeviceConfiguration(ABC):
         self.nickname: str = configMap['nickname']
 
     def _validateConfig(self, configMap: JSONDict) -> None:
-        fields: Dict[str, Type[JSONObject]] = {'id': str, 'deviceType': str, 'nickname': str}
+        fields: Dict[str, Type[JSONObject]] = {
+            'id': str, 'deviceType': str, 'nickname': str}
         for field in fields:
             if not field in configMap or not isinstance(configMap[field], fields[field]):
                 raise ValueError
@@ -25,5 +27,6 @@ class DeviceConfiguration(ABC):
 
     def toJSON(self) -> str:
         return self.__str__()
+
 
 __all__ = ['DeviceConfiguration']
