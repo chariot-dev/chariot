@@ -1,3 +1,4 @@
+from core.JSONTypes import JSONObject
 from core.device.DeviceAdapter import DeviceAdapter
 from core.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
 
