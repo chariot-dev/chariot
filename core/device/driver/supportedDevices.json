@@ -16,10 +16,10 @@
             {
                 "title": "Itemsense Recipe Name",
                 "alias": "recipeName",
-                "description": "Which recipe to run",
+                "description": "Which recipe to run. This is optional, except when using multiple facilities",
                 "type": "String",
                 "inputType": "text",
-                "required": true
+                "required": false
             },
             {
                 "title": "Itemsense Job Name",
@@ -281,7 +281,7 @@
                         "inputType": "checkbox",
                         "required": false
                     }
-                ] 
+                ]
             },
             {
                 "title": "Impinj Tag Selector",
