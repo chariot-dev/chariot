@@ -17,10 +17,10 @@ class _DeviceAdapterFactory:
 
         currentPath = path.dirname(path.abspath(__file__))
         with open(f'{currentPath}/driver/supportedDevices.json') as deviceList:
-            self.__supportedDevices: JSONDict = load(deviceList)
+            self._supportedDevices: JSONDict = load(deviceList)
 
     def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:
-        if config.deviceType not in self.__supportedDevices:
+        if config.deviceType not in self._supportedDevices:
             # raise UnsupportedDeviceError
             raise AssertionError
 
@@ -28,7 +28,13 @@ class _DeviceAdapterFactory:
         return instance
 
     def getsupportedDevices(self) -> JSONDict:
-        return self.__supportedDevices
+        return self._supportedDevices
+
+    def getDeviceInformation(self, deviceName: str) -> JSONDict:
+        if deviceName not in self._supportedDevices:
+            # raise UnsupportedDeviceError
+            raise AssertionError
+        return self._supportedDevices[deviceName]
 
 
 # return a singleton instance
