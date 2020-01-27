@@ -235,7 +235,7 @@
                     },
                     {
                         "title": "Enable Peak RSSI",
-                        "alias": "EnablePeakRSSI",
+                        "alias": "EnablePeakRSSI_General",
                         "description": "",
                         "type": "Boolean",
                         "inputType": "checkbox",
@@ -272,14 +272,6 @@
                         "type": "Boolean",
                         "inputType": "checkbox",
                         "required": false
-                    },
-                    {
-                        "title": "Enable Tag Seen Count",
-                        "alias": "EnableTagSeenCount",
-                        "description": "",
-                        "type": "Boolean",
-                        "inputType": "checkbox",
-                        "required": false
                     }
                 ]
             },
@@ -289,7 +281,7 @@
                 "settingsList": [
                     {
                         "title": "Enable Peak RSSI",
-                        "alias": "EnablePeakRSSI",
+                        "alias": "EnablePeakRSSI_Impinj",
                         "description": "",
                         "type": "Boolean",
                         "inputType": "checkbox",
