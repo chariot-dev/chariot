@@ -4,7 +4,34 @@ from core.device.configuration.DeviceConfiguration import DeviceConfiguration
 
 
 class ImpinjR420Configuration(DeviceConfiguration):
+    requiredFields: Dict[str, Type[JSONObject]] = {
+        'ipAddress': str,
+        'tag_population': int,
+    }
+    optionalFields: Dict[str, Type[JSONObject]] = {
+        'antennas': List[int],
+        'report_every_n_tags': int,
+        'tx_power': int,
+        'session': int,
+        'start_inventory': bool,
+        'mode_identifier': bool,
+        'EnableROSpecID': bool,
+        'EnableSpecIndex': bool,
+        'EnableInventoryParameterSpecID': bool,
+        'EnableAntennaID': bool,
+        'EnableChannelIndex': bool,
+        'EnablePeakRSSI_General': bool,
+        'EnableFirstSeenTimestamp': bool,
+        'EnableTagSeenCount': bool,
+        'EnableAccessSpecID': bool,
+        'EnablePeakRSSI_Impinj': bool,
+        'EnableRFPhaseAngle': bool,
+        'EnableRFDopplerFrequency': bool,
+    }
+
     def __init__(self, configMap: JSONDict):
+        self.requiredFields.update(super().requiredFields)
+        self.optionalFields.update(super().optionalFields)
         super().__init__(self._flattenSettingsGroups(configMap))
 
     def _flattenSettingsGroups(self, configMap: JSONDict) -> JSONDict:
@@ -19,29 +46,6 @@ class ImpinjR420Configuration(DeviceConfiguration):
         super()._validateConfig(configMap)
         if configMap['deviceType'] != 'Impinj Speedway R420':
             raise AssertionError
-
-        requiredFields: Dict[str, Type[JSONObject]] = {
-            'ipAddress': str,
-            'tag_population': int,
-        }
-        optionalFields: Dict[str, Type[JSONObject]] = {
-            'antennas': List[int],
-            'report_every_n_tags': int,
-            'tx_power': int,
-            'session': int,
-            'start_inventory': bool,
-            'mode_identifier': bool,
-            'reportToMessageQueueEnabled': bool,
-            'useOtherJobData': bool,
-        }
-
-        for field, fieldType in requiredFields:
-            if not field in configMap or not isinstance(configMap[field], fieldType):
-                raise ValueError
-
-        for field, fieldType in optionalFields:
-            if field in configMap and not isinstance(configMap[field], fieldType):
-                raise ValueError
 
 
 __all__ = ['ImpinjR420Configuration']
