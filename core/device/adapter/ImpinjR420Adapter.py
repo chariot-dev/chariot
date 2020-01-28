@@ -1,5 +1,5 @@
 from core.JSONTypes import JSONObject
-from core.device.DeviceAdapter import DeviceAdapter
+from core.device.adapter.DeviceAdapter import DeviceAdapter
 from core.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
 
 class ImpinjR420Adapter(DeviceAdapter):

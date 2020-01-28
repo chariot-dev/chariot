@@ -5,7 +5,7 @@ from core.device.configuration.DeviceConfiguration import DeviceConfiguration
 
 class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):
-        self.config: Type[DeviceConfiguration] = config
+        self._config: Type[DeviceConfiguration] = config
         self.connected = False
 
     # get a packet of data from the device
@@ -24,12 +24,10 @@ class DeviceAdapter(metaclass=ABCMeta):
         pass
 
     def getDeviceType(self) -> str:
-        return self.config.deviceType
+        return self._config.deviceType
 
     def getId(self) -> str:
-        return self.config.deviceId
+        return self._config.deviceId
 
-    def getNickname(self) -> str:
-        return self.config.nickname
 
 __all__ = ['DeviceAdapter']
