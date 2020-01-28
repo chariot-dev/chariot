@@ -42,8 +42,8 @@ class ImpinjR420Configuration(DeviceConfiguration):
                     configMap[key] = value
         return configMap
 
-    def _validateConfig(self, configMap: JSONDict) -> None:
-        super()._validateConfig(configMap)
+    def _validateInitialConfig(self, configMap: JSONDict) -> None:
+        super()._validateInitialConfig(configMap)
         if configMap['deviceType'] != 'Impinj Speedway R420':
             raise AssertionError
 
