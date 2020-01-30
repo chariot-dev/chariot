@@ -7,7 +7,7 @@ class ImpinjR420Adapter(DeviceAdapter):
         self.config: ImpinjR420Configuration = config
         self.connected: bool = False
 
-    def captureData(self) -> JSONObject:
+    def beginDataCollection(self, errorQueue) -> None:
         if not self.connected:
             # raise DeviceNotConnected(?)Error
             raise AssertionError

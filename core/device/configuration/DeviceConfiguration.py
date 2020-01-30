@@ -8,6 +8,7 @@ class DeviceConfiguration(ABC):
     requiredFields: Dict[str, Type[JSONObject]] = {
         'deviceId': str,
         'deviceType': str,
+        'pollDelay': str,
     }
     optionalFields: Dict[str, Type[JSONObject]] = {}
 
