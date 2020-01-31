@@ -125,6 +125,25 @@
                 "validationRegex": "TODO"
             },
             {
+                "title": "Port Number",
+                "alias": "port",
+                "description": "",
+                "type": "Number",
+                "inputType": "number",
+                "required": true,
+                "maxLength": 4,
+                "validationRegex": "TODO"
+            },
+            {
+                "title": "Tag Report Rate",
+                "alias": "report_every_n_tags",
+                "description": "The value of this field is how many tags will be collected before reporting",
+                "type": "Number",
+                "inputType": "number",
+                "required": false,
+                "validationRegex": "\\d+"
+            },
+            {
                 "title": "Antennas",
                 "alias": "antennas",
                 "description": "",

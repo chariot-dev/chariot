@@ -146,7 +146,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
     # gracefully close the connection to the device
     def disconnect(self) -> None:
         if not self.connected:
-             # raise DeviceNotConnected(?)Error
+            # raise DeviceNotConnected(?)Error
             raise AssertionError
         self._stopItemsenseJob()
         self._revokeAuthToken()
