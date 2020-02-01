@@ -1,9 +1,0 @@
-# python3 venv stuff
-Scripts/
-pyvenv.cfg
-share/
-lib*
-include/
-bin/
-.mypy_cache/
-
