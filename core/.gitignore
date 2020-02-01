@@ -7,3 +7,5 @@ include/
 bin/
 .mypy_cache/
 
+# python general stuff
+*.pyc
