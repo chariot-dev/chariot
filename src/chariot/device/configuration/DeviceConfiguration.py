@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Dict, Type
 from json import dumps
 
-from chariot.core.JSONTypes import JSONDict, JSONObject
+from chariot.JSONTypes import JSONDict, JSONObject
 
 
 class DeviceConfiguration(ABC):

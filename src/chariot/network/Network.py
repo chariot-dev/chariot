@@ -1,4 +1,4 @@
-from chariot.core.device.adapter.DeviceAdapter import DeviceAdapter
+from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 
 
 class Network:

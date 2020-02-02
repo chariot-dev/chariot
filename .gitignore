@@ -1,2 +1,14 @@
-__pycache__/
+# python3 venv
+src/bin/
+src/include/
+src/lib/
+src/lib64/
+src/pyvenv.cfg
+src/share/
+src/.mypy_cache/
+src/.tox
+src/chariot.egg-info
+
+# python
 *.py[cod]
+__pycache__/

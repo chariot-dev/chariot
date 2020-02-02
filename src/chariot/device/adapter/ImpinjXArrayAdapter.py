@@ -1,6 +1,6 @@
-from chariot.core.JSONTypes import JSONObject
-from chariot.core.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.core.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
+from chariot.JSONTypes import JSONObject
+from chariot.device.adapter.DeviceAdapter import DeviceAdapter
+from chariot.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
 
 
 class ImpinjXArrayAdapter(DeviceAdapter):

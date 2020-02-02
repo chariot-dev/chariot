@@ -1,8 +1,8 @@
 from typing import List
 from flask import Flask, request, app, jsonify, request
 
-from chariot.core.network.Network import Network
-from chariot.core.network.NetworkManager import NetworkManager
+from chariot.network.Network import Network
+from chariot.network.NetworkManager import NetworkManager
 
 
 nManagerBaseUrl: str = '/chariot/api/v1.0/networkManager'

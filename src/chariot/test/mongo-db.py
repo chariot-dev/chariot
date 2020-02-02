@@ -1,4 +1,4 @@
-from chariot.core.database.MongoDatabase import MongoDatabase
+from chariot.database.MongoDatabase import MongoDatabase
 
 mongo = MongoDatabase()
 mongo.insertRow(100, "hi")

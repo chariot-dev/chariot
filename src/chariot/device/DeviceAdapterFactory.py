@@ -2,11 +2,11 @@ from typing import Dict, Type
 from json import load
 from os import path
 
-from chariot.core.JSONTypes import JSONDict
-from chariot.core.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.core.device.configuration.DeviceConfiguration import DeviceConfiguration
-from chariot.core.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
-from chariot.core.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
+from chariot.JSONTypes import JSONDict
+from chariot.device.adapter.DeviceAdapter import DeviceAdapter
+from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
+from chariot.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
+from chariot.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
 
 
 class _DeviceAdapterFactory:

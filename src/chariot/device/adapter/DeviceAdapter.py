@@ -1,8 +1,8 @@
 from abc import ABCMeta, abstractmethod
 from typing import Type
 
-from chariot.core.JSONTypes import JSONObject
-from chariot.core.device.configuration.DeviceConfiguration import DeviceConfiguration
+from chariot.JSONTypes import JSONObject
+from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 
 
 class DeviceAdapter(metaclass=ABCMeta):

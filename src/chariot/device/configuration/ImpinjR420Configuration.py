@@ -1,7 +1,7 @@
 from typing import Dict, List, Type
 
-from chariot.core.JSONTypes import JSONDict, JSONObject
-from chariot.core.device.configuration.DeviceConfiguration import DeviceConfiguration
+from chariot.JSONTypes import JSONDict, JSONObject
+from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 
 
 class ImpinjR420Configuration(DeviceConfiguration):

@@ -1,7 +1,7 @@
 from typing import Dict, List
 from flask import Flask, request, app, jsonify, request
 
-from chariot.core.network.Network import Network
+from chariot.network.Network import Network
 
 
 class NetworkManager:

@@ -1,6 +1,6 @@
-from chariot.core.JSONTypes import JSONObject
-from chariot.core.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.core.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
+from chariot.JSONTypes import JSONObject
+from chariot.device.adapter.DeviceAdapter import DeviceAdapter
+from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
 
 
 class ImpinjR420Adapter(DeviceAdapter):
