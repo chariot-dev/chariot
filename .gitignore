@@ -1,13 +1,13 @@
 # python3 venv
-src/bin/
-src/include/
-src/lib/
-src/lib64
-src/pyvenv.cfg
-src/share/
-src/.mypy_cache/
-src/.tox
-src/chariot.egg-info
+bin/
+include/
+lib/
+lib64/
+pyvenv.cfg
+share/
+.mypy_cache/
+.tox
+chariot.egg-info
 
 # python
 *.py[cod]
