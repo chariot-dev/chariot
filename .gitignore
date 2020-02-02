@@ -1,0 +1,14 @@
+# python3 venv
+bin/
+include/
+lib/
+lib64/
+pyvenv.cfg
+share/
+.mypy_cache/
+.tox
+chariot.egg-info
+
+# python
+*.py[cod]
+__pycache__/
