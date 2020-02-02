@@ -2,7 +2,7 @@
 src/bin/
 src/include/
 src/lib/
-src/lib64/
+src/lib64
 src/pyvenv.cfg
 src/share/
 src/.mypy_cache/
