@@ -4,12 +4,11 @@ import Button from 'react-bootstrap/Button';
 
 class DeviceConfigsMain extends Component {
 
-
   render() {
     return (
       <div className="container">
-        <h1>Your Device Configs</h1>
-          <p className="screenInfo">Click on a device config to modify.</p>
+        <h1>Your Device Configurations</h1>
+          <p className="screenInfo">Click on a device configurations to modify.</p>
            
           <Link to="/welcome">
             <Button variant="primary" className="float-left">Back</Button>

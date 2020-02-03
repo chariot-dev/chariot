@@ -7,8 +7,8 @@ class DataOutputConfigsMain extends Component {
   render() {
     return (
       <div className="container">
-        <h1>Your Data Output Configs</h1>
-          <p className="screenInfo">Click a data output config to modify.</p>
+        <h1>Your Data Output Configurations</h1>
+          <p className="screenInfo">Click a data output configuration to modify.</p>
           
           <Link to="/welcome">
             <Button variant="primary" className="float-left">Back</Button>

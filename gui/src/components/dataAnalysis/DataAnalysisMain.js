@@ -1,3 +1,9 @@
+/*
+  DataAnalysisMain.js
+
+  This component is the first screen the user will see when intending to perform data analysis.
+*/
+
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';

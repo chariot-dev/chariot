@@ -1,5 +1,12 @@
+/*
+  AddDeviceVars.js
+
+  This component is shown inside the AddDeviceHome component containing the dynamically generated
+  configuration fields of a device depending on the user's choice of device.
+
+*/
+
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 
 class AddDeviceVars extends Component {
@@ -35,6 +42,8 @@ class AddDeviceVars extends Component {
       <div>
         <br></br>
         <p className="screenInfo">Now please fill in the configuration fields for the {this.props.params.newDeviceType} device.</p> 
+
+        
         <div className="form-group">
           <input className="form-control" id="newDeviceName" name="newDeviceName" placeholder="Name/IP Address" onChange={this.handleChange}/>
         </div>
@@ -45,9 +54,15 @@ class AddDeviceVars extends Component {
           <input className="form-control" id="newDevicePower" name="newDevicePower" placeholder="Power" onChange={this.handleChange}/>
         </div>
         <br></br>
+
+
+
+
         <h1>FIELDS WILL BE DYNAMIC ACCORDING TO API CALL FOR THE DEVICE SELECTED</h1>
         <br></br>
         <br></br>
+
+
         
         <Button type="submit" variant="primary" className="float-right footer-button" onClick={this.sendSpecificToForm}>Next</Button>
       </div>
