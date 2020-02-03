@@ -31,9 +31,19 @@ class _DeviceAdapterFactory:
     def getsupportedDevices(self) -> JSONDict:
         return self.__supportedDevices
 
+    # this method returns a specified device json file
+    def getSpecifiedDeviceTemplate(self, deviceName) -> JSONDict:
+        #build path to json file
+        currentPath = path.dirname(path.abspath(__file__))
+        try:
+            with open(f'{currentPath}/driver/{deviceName}.json') as deviceTemplate:
+                return load(deviceTemplate)
+        except:
+            # make custom exception for device not supported
+            pass
+
 
 # return a singleton instance
 DeviceAdapterFactory = _DeviceAdapterFactory()
-
 
 __all__ = ['DeviceAdapterFactory']

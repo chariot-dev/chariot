@@ -1,0 +1,207 @@
+{
+   "Impinj Speedway R420": {
+        "imgSrc": "some_imgur_link",
+        "description": "",
+        "settings": [
+            {
+                "title": "Device IP Address",
+                "alias": "ipAddress",
+                "description": "",
+                "type": "String",
+                "inputType": "text",
+                "required": true,
+                "maxLength": 14,
+                "validationRegex": "TODO"
+            },
+            {
+                "title": "Antennas",
+                "alias": "antennas",
+                "description": "",
+                "type": "Array",
+                "elementType": "Number",
+                "inputType": "numberArray",
+                "required": false,
+                "maxLength": 14,
+                "validationRegex": "\\d+"
+            },
+            {
+                "title": "Report Every N Tags",
+                "alias": "report_every_n_tags",
+                "description": "",
+                "type": "Number",
+                "inputType": "number",
+                "required": false,
+                "validationRegex": "\\d+"
+            },
+            {
+                "title": "Antenna Transmission Power",
+                "alias": "tx_power",
+                "description": "The transmisson power for one or more antennas",
+                "type": "Number",
+                "inputType": "number",
+                "required": false,
+                "maxValue": 91,
+                "validationRegex": "\\d+"
+            },
+            {
+                "title": "Session",
+                "alias": "session",
+                "description": "",
+                "type": "Number",
+                "inputType": "number",
+                "required": false,
+                "validationRegex": "\\d+"
+            },
+            {
+                "title": "Start Inventory",
+                "alias": "start_inventory",
+                "description": "",
+                "type": "Boolean",
+                "inputType": "checkbox",
+                "required": false
+            },
+            {
+                "title": "Mode Identifier",
+                "alias": "mode_identifier",
+                "description": "",
+                "type": "Number",
+                "inputType": "number",
+                "required": false,
+                "validationRegex": "\\d+"
+            },
+            {
+                "title": "Tag Population",
+                "alias": "tag_population",
+                "description": "",
+                "type": "Number",
+                "inputType": "number",
+                "required": true,
+                "validationRegex": "\\d+"
+            },
+            {
+                "title": "Tag Content Selector",
+                "settingsGroup": true,
+                "settingsList": [
+                    {
+                        "title": "Enable ROSpec ID",
+                        "alias": "EnableROSpecID",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable Spec Index",
+                        "alias": "EnableSpecIndex",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable Inventory Paramter Spec ID",
+                        "alias": "EnableInventoryParameterSpecID",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable Antenna ID",
+                        "alias": "EnableAntennaID",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable Channel Index",
+                        "alias": "EnableChannelIndex",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable Peak RSSI",
+                        "alias": "EnablePeakRSSI",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable First Seen Timestamp",
+                        "alias": "EnableFirstSeenTimestamp",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable Last Seen Timestamp",
+                        "alias": "EnableLastSeenTimestamp",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable Tag Seen Count",
+                        "alias": "EnableTagSeenCount",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable Access Spec ID",
+                        "alias": "EnableAccessSpecID",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable Tag Seen Count",
+                        "alias": "EnableTagSeenCount",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    }
+                ]
+            },
+            {
+                "title": "Impinj Tag Selector",
+                "settingsGroup": true,
+                "settingsList": [
+                    {
+                        "title": "Enable Peak RSSI",
+                        "alias": "EnablePeakRSSI",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable RF Phase Angle",
+                        "alias": "EnableRFPhaseAngle",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    },
+                    {
+                        "title": "Enable RF Doppler Frequency",
+                        "alias": "EnableRFDopplerFrequency",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
+                    }
+                ]
+            }
+        ]
+    }
+}
