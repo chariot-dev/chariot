@@ -1,4 +1,5 @@
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
+from src.chariot.device.adapter import DeviceAdapter
+from src.chariot.utility.exceptions import NameNotFoundError, DuplicateNameError
 
 
 class Network:
@@ -23,11 +24,12 @@ class Network:
 
     # figure out how much error-checking to do
     def addDevice(self, device: DeviceAdapter):
-        # Currently just restricting adding a device that already exists in
-        # collection
+        # Currently just restricting adding a device that already exists in collection
         if self.getDeviceByDeviceName(device.getDeviceName()) is None:
             self.devices.append(device)
-        # else: have a device by the same name already in collection
+        else:
+            # have a device by the same name already in collection
+            raise DuplicateNameError(device.getDeviceName, self.networkName)
 
     def getDeviceByDeviceName(self, nameToFind: str) -> DeviceAdapter:
         i: int = 0
@@ -51,7 +53,7 @@ class Network:
     def deleteDeviceByName(self, deviceName: str):
         deviceIndex: int = self.getDeviceIndexByName(deviceName)
         if deviceIndex == -1:
-            print(" Device {} not found in Network ", deviceName)
+            raise NameNotFoundError('device', deviceName, self.networkName)
         else:
             del self.devices[deviceIndex]
 
