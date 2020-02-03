@@ -1,4 +1,5 @@
-from core.device import DeviceAdapter
+from core.device.adapter.DeviceAdapter import DeviceAdapter
+from typing import List
 
 
 class Network:
@@ -7,7 +8,7 @@ class Network:
     def __init__(self, networkName: str, networkDesc: str):
         self.networkName = networkName
         self.networkDesc = networkDesc
-        self.devices: DeviceAdapter = []
+        self.devices: List[DeviceAdapter] = []
 
     def modifyNetworkName(self, newName: str):
         self.networkName = newName
@@ -46,6 +47,9 @@ class Network:
         if index - 1 > len(self.devices) or index < 0:
             print("Invalid index given for device lookup.")
         return self.devices[index]
+
+    def getDevices(self) -> List[DeviceAdapter]:
+        return self.devices
 
     def deleteDeviceByName(self, deviceName: str):
         deviceIndex: int = self.getDeviceIndexByName(deviceName)

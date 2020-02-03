@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from sys import exc_info
 from typing import Type
 from queue import Queue
-from core.JSONTypes import JSONObject
+from core.JSONTypes import JSONDict, JSONObject
 from core.device.configuration.DeviceConfiguration import DeviceConfiguration
 
 class DeviceAdapter(metaclass=ABCMeta):
@@ -27,6 +27,9 @@ class DeviceAdapter(metaclass=ABCMeta):
     def disconnect(self) -> None:
         pass
 
+    def getDataQueue(self) -> Queue:
+        return self.dataQueue
+    
     def getDeviceType(self) -> str:
         return self._config.deviceType
 
