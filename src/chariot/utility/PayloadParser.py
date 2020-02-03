@@ -1,4 +1,4 @@
-from src.chariot.utility.exceptions import NoIdentifierError
+from chariot.utility.exceptions import NoIdentifierError
 
 
 class PayloadParser:

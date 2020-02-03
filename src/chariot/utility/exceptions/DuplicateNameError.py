@@ -1,4 +1,4 @@
-from core.exceptions.ErrorStrings import ErrorStrings
+from chariot.utility.exceptions import ErrorStrings
 
 
 class NoIdentifierError(Exception):

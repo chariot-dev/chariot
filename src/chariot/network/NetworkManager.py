@@ -1,7 +1,9 @@
 from typing import Dict, List
 from flask import Flask, request, app, jsonify, request
-from src.chariot.utility.exceptions import DuplicateNameError, NameNotFoundError, NoIdentifierError
-from src.chariot.network.Network import Network
+from chariot.utility.exceptions import NoIdentifierError
+from chariot.utility.exceptions import DuplicateNameError
+from chariot.utility.exceptions import NameNotFoundError
+from chariot.network.Network import Network
 
 
 class NetworkManager:

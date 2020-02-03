@@ -1,5 +1,6 @@
-from src.chariot.device.adapter import DeviceAdapter
-from src.chariot.utility.exceptions import NameNotFoundError, DuplicateNameError
+from chariot.device.adapter import DeviceAdapter
+from chariot.utility.exceptions import DuplicateNameError
+from chariot.utility.exceptions import NameNotFoundError
 
 
 class Network:
