@@ -128,8 +128,8 @@ class AddDeviceHome extends Component {
           <div className="form-group">
               <select required className="form-control" id="securityQuestion" name="newDeviceType" onChange={this.handleDeviceTypeChange}>
                 <option selected disabled hidden value="">Select a Device Type</option>
-                <option>R420</option>
-                <option>X-Array</option>
+                <option>ImpinjSpeedwayR420</option>
+                <option>ImpinjxArray</option>
               </select>
           </div>
 
