@@ -1,9 +1,0 @@
-action: py36, msg: getenv
-cwd: /mnt/c/Users/ryanh/Documents/chariot/src/.tox
-cmd: /mnt/c/Users/ryanh/Documents/chariot/src/bin/python3 -m virtualenv --no-download --python /mnt/c/Users/ryanh/Documents/chariot/src/bin/python3 py36
-Already using interpreter /mnt/c/Users/ryanh/Documents/chariot/src/bin/python3
-Using base prefix '/usr'
-New python executable in /mnt/c/Users/ryanh/Documents/chariot/src/.tox/py36/bin/python3
-Also creating executable in /mnt/c/Users/ryanh/Documents/chariot/src/.tox/py36/bin/python
-Installing setuptools, pip, wheel...
-done.
