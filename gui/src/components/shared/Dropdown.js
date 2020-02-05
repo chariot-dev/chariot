@@ -1,3 +1,8 @@
+/*
+
+
+*/
+
 import React, { Component } from 'react';
 
 class Dropdown extends Component {
@@ -35,10 +40,7 @@ class Dropdown extends Component {
       <div>
         <div>
         <p>{message}</p>
-        <select
-            className="menu"
-            onChange={this.handleDropdownChange}
-        >
+        <select className="menu" onChange={this.handleDropdownChange}>
             <option value="AirLab Network">AirLab</option>
             <option value="Dr.Mongan Network">Dr. Mongan</option>
         </select>

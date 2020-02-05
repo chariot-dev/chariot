@@ -1,23 +1,34 @@
+/*
+  AddDeviceHome.js
+
+  This component is the first screen the user will see when creating a device.
+  This component handles the GUI for creating a device, as well as the modals 
+  that appear as the process is completed. In order to get the specific
+  device fields, AddDeviceVars is a child component.
+
+  Currently, only a single device can be created before the user is sent back
+  to the Welcome screen.
+*/
+
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import AddDeviceVars from './AddDeviceVars'
+import AddDeviceVars from './AddDeviceVars';
 
-// Figure out whether multiple device additions in one-go should be a thing
 
 class AddDeviceHome extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      newDeviceNickname: "",
-      newDeviceDescription: "",
-      newDeviceType: "",
-      showDeviceSpecificSettings: false,
-      isSubmitted: false,
-      confirmIsOpen: false,
-      successIsOpen: false,
-      deviceSpecificState: {},
+      newDeviceNickname: "", // Nickname attribute for device
+      newDeviceDescription: "", // Description for device
+      newDeviceType: "", // Type of device
+      showDeviceSpecificSettings: false, // Whether or not the type of device has been chosen by the user already
+      isSubmitted: false, // Whether or not the device information is ready to be sent to the server
+      confirmIsOpen: false, // Is the confirm modal open?
+      successIsOpen: false, // Is the success modal open?
+      deviceSpecificState: {}, // User-defined device attributes
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -42,11 +53,17 @@ class AddDeviceHome extends Component {
       confirmIsOpen: !this.state.confirmIsOpen
     }); 
   }
-  
+ 
+  /*
+    Updates prop values (device-related) as they are entered by the user.
+  */  
   handleChange(event) {
     this.setState({[event.target.name]: event.target.value});
   }
 
+  /*
+    As the device type the user selects changes, update that in the state.
+  */
   handleDeviceTypeChange(event) {
     // Update chosen device type
     this.setState({[event.target.name]: event.target.value});
@@ -57,6 +74,11 @@ class AddDeviceHome extends Component {
     });
   }
 
+  /*
+    Function that launches the success modal after the user confirms the device
+    information that they entered is correct. Also makes the POST request to the
+    server to create the new device.
+  */
   toggleSuccessModal = () => {
     this.setState({
       confirmIsOpen: false
@@ -64,8 +86,17 @@ class AddDeviceHome extends Component {
     this.setState({
       successIsOpen: !this.state.successIsOpen
     });
+
+
+
   }
 
+  /* 
+    Called when the user either submits the registration form by clicking "Next"
+    in the AddDeviceVars component or "No" on the confirmation modal. Will change the 
+    "isSubmitted" prop to true->false or false->true. Also will update the viewability
+    status of the confirmation modal
+  */
   handleSubmit(event) {
     this.setState({
       isSubmitted: !this.state.isSubmitted,
@@ -74,11 +105,18 @@ class AddDeviceHome extends Component {
     event.preventDefault();
   }
 
+  /*
+    Returns three separate objects with their unique keys. The first object
+    is the Device Creation screen itself. This screen contains the fields that
+    the user will have to fill in, in order to create a device. It also contains 
+    AddDeviceVars component, which contains the "Next" button that will lead the 
+    user to the other two objects, the confirmation and sucess modals.
+  */
   render() {
     return [
       <div className="container" key="newDeviceScreen">
         <h1>Configure New Device Settings</h1>
-        <p className="screenInfo">Please fill in the fields for your new device.</p>
+        <p className="screenInfo">Please fill in the configuration fields for your new device.</p>
 
         <form id="createDeviceForm" onSubmit={this.handleNewDeviceCreation}>
           <div className="form-group">
