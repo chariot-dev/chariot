@@ -1,7 +1,17 @@
-*.pyc
-src/bin/*
-src/include/*
-src/lib/*
-src/lib64/*
-src/pyvenv.cfg
-src/share/*
+# python3 venv
+bin/
+include/
+lib/
+lib64
+pyvenv.cfg
+share/
+.mypy_cache/
+.tox
+chariot.egg-info
+
+# python
+*.py[cod]
+__pycache__/
+
+# database
+data/
