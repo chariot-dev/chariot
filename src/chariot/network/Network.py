@@ -1,4 +1,4 @@
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
+from chariot.device import DeviceAdapter
 
 
 class Network:
@@ -23,8 +23,7 @@ class Network:
 
     # figure out how much error-checking to do
     def addDevice(self, device: DeviceAdapter):
-        # Currently just restricting adding a device that already exists in
-        # collection
+        # Currently just restricting adding a device that already exists in collection
         if self.getDeviceByDeviceName(device.getDeviceName()) is None:
             self.devices.append(device)
         # else: have a device by the same name already in collection

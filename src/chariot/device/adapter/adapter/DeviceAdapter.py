@@ -2,8 +2,8 @@ from abc import ABCMeta, abstractmethod
 from sys import exc_info
 from typing import Type
 from queue import Queue
-from core.JSONTypes import JSONObject
-from core.device.configuration.DeviceConfiguration import DeviceConfiguration
+from chariot.JSONTypes import JSONObject
+from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 
 class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):

@@ -1,6 +1,6 @@
 import signal
 
-from core.network import NetworkManager, Network
+from chariot.network import NetworkManager, Network
 
 
 class DataCollectionManager:
