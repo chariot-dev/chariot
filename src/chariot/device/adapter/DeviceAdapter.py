@@ -1,18 +1,20 @@
 from abc import ABCMeta, abstractmethod
+from sys import exc_info
 from typing import Type
-
+from queue import Queue
 from chariot.JSONTypes import JSONObject
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 
-
 class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):
-        self.config: Type[DeviceConfiguration] = config
-        self.connected = False
+        self._config: Type[DeviceConfiguration] = config
+        self.connected: bool = False
+        self.dataQueue: Queue = Queue()
+        self.inCollectionEpisode = False
 
-    # get a packet of data from the device
+    # this method should only be run as the target of a ProducerThread
     @abstractmethod
-    def captureData(self) -> JSONObject:
+    def beginDataCollection(self, errorQueue: Queue) -> None:
         pass
 
     # any procedures necessary to start capturing data from the device
@@ -26,13 +28,22 @@ class DeviceAdapter(metaclass=ABCMeta):
         pass
 
     def getDeviceType(self) -> str:
-        return self.config.deviceType
+        return self._config.deviceType
 
     def getId(self) -> str:
-        return self.config.deviceId
+        return self._config.deviceId
 
-    def getNickname(self) -> str:
-        return self.config.nickname
+    # https://stackoverflow.com/questions/2829329/catch-a-threads-exception-in-the-caller-thread-in-python
+    # "hack" to generate the entire stack trace since beginDataCollection is called in a different thread
+    # might add the thread's name explicitly so the DataCollectionManager knows which device produced the error
+    def _generateStackTrace(error: Exception):
+        try:
+            raise error
+        except Exception:
+            return exc_info()
+
+    def stopDataCollection(self) -> None:
+        self.inCollectionEpisode = False
 
 
 __all__ = ['DeviceAdapter']
