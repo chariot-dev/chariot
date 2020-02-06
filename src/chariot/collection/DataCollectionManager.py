@@ -2,12 +2,12 @@ from collections import OrderedDict
 from threading import Thread
 # unused right now, but will be useful for scaling past a couple of devices
 from multiprocessing.queues import Queue as ProcessQueue
-from typing import List, OrderedDict, Union
+from typing import List, OrderedDict, Type, Union
 from queue import Empty as QueueEmptyException, Queue as ThreadQueue
-from core.device.adapter.DeviceAdapter import DeviceAdapter
-from core.JSONTypes import JSONObject
-from core.network.Network import Network
-from core.network.NetworkManager import NetworkManager
+from chariot.device.adapter.DeviceAdapter import DeviceAdapter
+from chariot.JSONTypes import JSONObject
+from chariot.network.Network import Network
+from chariot.network.NetworkManager import NetworkManager
 
 
 class ProducerThread(Thread):
@@ -23,10 +23,13 @@ class DataCollectionManager:
     # is responsible for housing multiple user-defined networks. Once a network has been selected
     # for data collection, this class interacts with the NetworkManager to start and stop data collection
     # of all devices from the selected network
+    DEFAULT_TIMEOUT = 5
+    ERROR_CHECK_TIMEOUT = 0.5
     PRODUCERS_PER_CONSUMER = 2
 
-    # TODO: handleError method to continuously examine the error queue
+    # TODO: complete handleError method to continuously examine the error queue
     # TODO: when DatabaseWriter is implemented, remove quotes around type definition
+    # TODO: add __del__ method to stop data collection when this object goes out of scope
     def __init__(self, network: Union[Network, None], dbWriter: 'DatabaseWriter'):
         self.activeNetwork: Union[Network, None] = network
         self.devices: List[DeviceAdapter] = network.getDevices() if network is not None else []
@@ -44,12 +47,15 @@ class DataCollectionManager:
         device: DeviceAdapter = self.devices[deviceIdx]
         while self._inCollectionEpisode:
             output: List[JSONObject] = []
-            data: JSONObject = device.getDataQueue().get(block=True)
-            output.append(data)
+            try:
+                data: JSONObject = device.getDataQueue().get(block=True, timeout=DEFAULT_TIMEOUT)
+                output.append(data)
+            except QueueEmptyException:
+                pass
 
             while True:
                 try:
-                    data: JSONObject = device.getDataQueue().get(block=True)
+                    data: JSONObject = device.getDataQueue().get_nowait()
                     output.append(data)
                 except QueueEmptyException:
                     break
@@ -70,10 +76,32 @@ class DataCollectionManager:
                 if len(output) > 0:
                     self.dataQueue.put(output, block=True)
 
+    def _handleErrorsInQueue(self) -> None:
+        while self._inCollectionEpisode:
+            try:
+                error: Type[Exception] = self.errorQueue.get(block=True, timeout=ERROR_CHECK_TIMEOUT)
+                # handling error logic goes here - based on the type of the error we either continue
+                # or stop the whole episode
+            except QueueEmptyException:
+                continue
+
+    # use get then get_nowait logic here as well
     def _outputData(self) -> None:
         while self._inCollectionEpisode:
-            data: List[JSONObject] = self.dataQueue.get(block=True)
-            self.databaseWriter.insertRows(data)
+             output: List[JSONObject] = []
+            try:
+                data: JSONObject = self.dataQueue.get(block=True, timeout=DEFAULT_TIMEOUT)
+                output.append(data)
+            except QueueEmptyException:
+                pass
+
+            while True:
+                try:
+                    data: JSONObject = self.dataQueue.get_nowait()
+                    output.append(data)
+                except QueueEmptyException:
+                    break
+            self.databaseWriter.insertMany(output)
 
     def inCollectionEpisode(self) -> bool:
         return self._inCollectionEpisode
@@ -128,34 +156,28 @@ class DataCollectionManager:
             self.consumerThreads.append(ConsumerThread(
                 target=self._consumeDataFromDevices, args=(0, 1,)))
 
+        self._inCollectionEpisode = True
+
         for producer in self.producerThreads:
             producer.start()
         for consumer in self.consumerThreads:
             consumer.start()
         self.outputThread.start()
 
-        # TODO: begin event-based loop to handle entries to errorQueue
-        self._inCollectionEpisode = True
+        # begin the error-handling procedure on the main thread till we stop data collection
+        self._handleErrorsInQueue()
+        
 
     def stopDataCollection(self) -> None:
         if not self._inCollectionEpisode:
             raise AssertionError
         for device in self.devices:
             device.stopDataCollection()
+        
+        self._inCollectionEpisode = False
         for _, producer in self.producerThreads:
             producer.join()
         for consumer in self.consumerThreads:
             consumer.join()
         self.outputThread.join()
-        self._inCollectionEpisode = False
 
-    # This method is to handle ctrl-c in a graceful manner.
-    # NOTE: Python signal handlers are always executed in the main Python thread
-    # def handler(signum, frame):
-        # Handle cleanup which is gracefully terminating data collection
-        #print("SIGINT detected. Closing application.")
-        # self.terminateDataCollection()
-
-
-# Set the signal handler
-#signal.signal(signal.CTRL_C_EVENT, handler)
