@@ -33,10 +33,10 @@ class MongoDatabaseWriter(DatabaseWriter):
 
 
 # Testing
-mdb = MongoDatabaseWriter('mongodb://localhost:27017/iot_data')
-mdb.initializeTable()
-rows = []
-for i in range(100):
-    rows.append({'relative_time': i, 'freeform': 'hi'})
-mdb.insertMany(rows)
-del(mdb)
+# mdb = MongoDatabaseWriter('mongodb://localhost:27017/iot_data')
+# mdb.initializeTable()
+# rows = []
+# for i in range(100):
+#     rows.append({'relative_time': i, 'freeform': 'hi'})
+# mdb.insertMany(rows)
+# del(mdb)
