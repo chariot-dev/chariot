@@ -90,12 +90,16 @@ def getSupportedDevices():
 
 @app.route(nManagerBaseUrl + 'network/device/config', methods=['GET'])
 def getSupportedDeviceConfig():
-    requestContent = request.get_json()
-    deviceTemplateName = requestContent['DeviceName']
-
-    #get specified device template
+    deviceTemplateName = request.args['DeviceName']
     deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
+    
     return jsonify(deviceTemplate)
+
+    #requestContent = request.get_json()
+    #deviceTemplateName = requestContent['DeviceName']
+    #get specified device template
+    #deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
+    #return jsonify(deviceTemplate)
 
 
 @app.route(nManagerBaseUrl + 'network/device', methods=['GET'])
