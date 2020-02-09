@@ -2,7 +2,7 @@ from collections import OrderedDict
 from threading import Thread
 # unused right now, but will be useful for scaling past a couple of devices
 from multiprocessing.queues import Queue as ProcessQueue
-from typing import List, OrderedDict, Type, Union
+from typing import List, OrderedDict, Tuple, Type, Union
 from queue import Empty as QueueEmptyException, Queue as ThreadQueue
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.JSONTypes import JSONObject
@@ -79,16 +79,30 @@ class DataCollectionManager:
     def _handleErrorsInQueue(self) -> None:
         while self._inCollectionEpisode:
             try:
-                error: Type[Exception] = self.errorQueue.get(block=True, timeout=ERROR_CHECK_TIMEOUT)
+                # Errors received are a tuple of the Thread name/id and the stacktrace 
+                deviceID, error = self.errorQueue.get(block=True, timeout=ERROR_CHECK_TIMEOUT)
                 # handling error logic goes here - based on the type of the error we either continue
                 # or stop the whole episode
+
+                errorDevice: ProducerThread = self.producerThreads.get(deviceID)
+                exc_type, exc_obj, exc_trace = error
+
+                # Can make an error Dictionary to clean this up but, for now use this
+
+                if exc_obj is AssertionError:       # Should create new Error subclasses to specifiy what kind of Asserition error
+                    #handle error               #should probably output errors to a logger, the logger can the error for a GUI window to pop up
+                    pass
+                #else if exc_obj is "---":
+                    #handle error
+                else:                              #Unkown error, crash system for now
+                    self.stopDataCollection()
             except QueueEmptyException:
                 continue
 
     # use get then get_nowait logic here as well
     def _outputData(self) -> None:
         while self._inCollectionEpisode:
-             output: List[JSONObject] = []
+            output: List[JSONObject] = []
             try:
                 data: JSONObject = self.dataQueue.get(block=True, timeout=DEFAULT_TIMEOUT)
                 output.append(data)
@@ -110,7 +124,7 @@ class DataCollectionManager:
         if self._inCollectionEpisode:
             # can't set an active network during a data collection episode
             # to support concurrent network data collection, a new instance of DataCollectionManager has to be spawned
-            raise AssertionError
+            raise AssertionError('Tried to set network during a Collection Episode.')
         self.activeNetwork = network
         self.devices = network.getDevices()
 
@@ -119,15 +133,15 @@ class DataCollectionManager:
 
     def beginDataCollection(self) -> None:
         if self._inCollectionEpisode:
-            raise AssertionError
+            raise AssertionError('Tried to start a Data Collection Episode during an ongoing one.')
 
         if len(self.devices) == 0:
             # can't collect data from a network with no devices
-            raise AssertionError
+            raise AssertionError('Must have at least one device to collect from.')
         for device in self.devices:
             producer = ProducerThread(
                 name=f'Producer_{device.getId()}', target=device.beginDataCollection, args=(self.errorQueue,))
-            self.producerThreads[device.getId()] = producer
+            self.producerThreads[f'Producer_{device.getId()}'] = producer
 
         numConsumers = int(len(devices) / PRODUCERS_PER_CONSUMER)
         # in the special case of only one device this will end up being zero so we manually set it to 1
@@ -170,12 +184,12 @@ class DataCollectionManager:
 
     def stopDataCollection(self) -> None:
         if not self._inCollectionEpisode:
-            raise AssertionError
+            raise AssertionError('Tried to stop Data Collection, while not collecting data.')
         for device in self.devices:
             device.stopDataCollection()
         
         self._inCollectionEpisode = False
-        for _, producer in self.producerThreads:
+        for producer in self.producerThreads:
             producer.join()
         for consumer in self.consumerThreads:
             consumer.join()
