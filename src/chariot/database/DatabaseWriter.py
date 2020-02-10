@@ -56,7 +56,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def insertMany(self, dataPoints: List[dict]):
         """
-        Check for validity of each dataPoint, then insert into the table.
+        Check for validity of each dataPoint,then insert into the table.
         """
         for dataPoint in dataPoints:
             checkDataPoint(dataPoint)
