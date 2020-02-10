@@ -84,16 +84,21 @@ class DataCollectionManager:
                 # handling error logic goes here - based on the type of the error we either continue
                 # or stop the whole episode
 
+                # For making changes to the correct device in the ProducerThreads List
                 errorDevice: ProducerThread = self.producerThreads.get(deviceID)
-                exc_type, exc_obj, exc_trace = error
+                exc_type, exc_val, exc_trace = error
 
                 # Can make an error Dictionary to clean this up but, for now use this
 
-                if exc_obj is AssertionError:       # Should create new Error subclasses to specifiy what kind of Asserition error
+                if isinstance(exc_val, ChariotExceptions.DeviceNotConnected):       # Should create new Error subclasses to specifiy what kind of Asserition error
                     #handle error               #should probably output errors to a logger, the logger can the error for a GUI window to pop up
                     pass
-                #else if exc_obj is "---":
+                elif isinstance(exc_val, ChariotExceptions.InCollectionEpisodeError):
                     #handle error
+                    pass
+                elif isinstance(exc_val, ChariotExceptions.NotInCollectionEpisodeError):
+                    #handle error
+                    pass
                 else:                              #Unkown error, crash system for now
                     self.stopDataCollection()
             except QueueEmptyException:
