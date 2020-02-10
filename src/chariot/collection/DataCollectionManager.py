@@ -146,7 +146,7 @@ class DataCollectionManager:
         for device in self.devices:
             producer = ProducerThread(
                 name=f'Producer_{device.getId()}', target=device.beginDataCollection, args=(self.errorQueue,))
-            self.producerThreads[f'Producer_{device.getId()}'] = producer
+            self.producerThreads[device.getId()] = producer
 
         numConsumers = int(len(devices) / PRODUCERS_PER_CONSUMER)
         # in the special case of only one device this will end up being zero so we manually set it to 1
