@@ -8,7 +8,7 @@ from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.JSONTypes import JSONObject
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
-
+from chariot.utility import ChariotExceptions
 
 class ProducerThread(Thread):
     pass
@@ -124,7 +124,7 @@ class DataCollectionManager:
         if self._inCollectionEpisode:
             # can't set an active network during a data collection episode
             # to support concurrent network data collection, a new instance of DataCollectionManager has to be spawned
-            raise AssertionError('Tried to set network during a Collection Episode.')
+            raise ChariotExceptions.InCollectionEpisodeError()
         self.activeNetwork = network
         self.devices = network.getDevices()
 
@@ -133,7 +133,7 @@ class DataCollectionManager:
 
     def beginDataCollection(self) -> None:
         if self._inCollectionEpisode:
-            raise AssertionError('Tried to start a Data Collection Episode during an ongoing one.')
+            raise ChariotExceptions.InCollectionEpisodeError()
 
         if len(self.devices) == 0:
             # can't collect data from a network with no devices
@@ -184,7 +184,7 @@ class DataCollectionManager:
 
     def stopDataCollection(self) -> None:
         if not self._inCollectionEpisode:
-            raise AssertionError('Tried to stop Data Collection, while not collecting data.')
+            raise ChariotExceptions.NotInCollectionEpisodeError()
         for device in self.devices:
             device.stopDataCollection()
         

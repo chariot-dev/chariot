@@ -4,6 +4,7 @@ from typing import Type
 from queue import Queue
 from chariot.JSONTypes import JSONObject
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
+from chariot.utility import ChariotExceptions
 
 class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):

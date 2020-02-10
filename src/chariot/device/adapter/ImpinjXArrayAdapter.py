@@ -7,6 +7,7 @@ from typing import Dict, Union
 from chariot.JSONTypes import JSONDict, JSONObject
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
+from chariot.utility import ChariotExceptions
 
 
 class ItemsenseSession:
@@ -112,7 +113,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
         while self.inCollectionEpisode:
             if not self.connected:
                 # raise DeviceNotConnected(?)Error
-                stackTrace = self._generateStackTrace(AssertionError('Device was not connected'))
+                stackTrace = self._generateStackTrace(ChariotExceptions.DeviceNotConnected())
                 errorQueue.put(stackTrace, block=True)
                 self.stopDataCollection()
                 # or continue? makes no difference
@@ -147,7 +148,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
     def disconnect(self) -> None:
         if not self.connected:
             # raise DeviceNotConnected(?)Error
-            raise AssertionError
+            raise ChariotExceptions.DeviceNotConnected()
         self._stopItemsenseJob()
         self._revokeAuthToken()
         self.session = None

@@ -5,6 +5,7 @@ from typing import Union
 from chariot.JSONTypes import JSONObject
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
+from chariot.utility import ChariotExceptions
 
 class ImpinjR420Adapter(DeviceAdapter):
     def __init__(self, config: ImpinjR420Configuration):
@@ -17,7 +18,7 @@ class ImpinjR420Adapter(DeviceAdapter):
     def beginDataCollection(self, errorQueue: Queue) -> None:
         if not self.connected:
             # raise DeviceNotConnected(?)Error
-            stackTrace = self._generateStackTrace(AssertionError('Device was not connected'))
+            stackTrace = self._generateStackTrace(ChariotExceptions.DeviceNotConnected())
             errorQueue.put(stackTrace, block=True)
         self.inCollectionEpisode = True
         try:
@@ -59,7 +60,7 @@ class ImpinjR420Adapter(DeviceAdapter):
     def disconnect(self) -> None:
         if not self.connected:
             # raise DeviceNotConnected(?)Error
-            raise AssertionError
+            raise ChariotExceptions.DeviceNotConnected()
         self.llrpFactory = None
 
     
