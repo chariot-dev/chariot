@@ -30,13 +30,3 @@ class MongoDatabaseWriter(DatabaseWriter):
     def insertMany(self, dataPoints: List[dict]):
         DatabaseWriter.insertMany(self, dataPoints)
         self.iot_database.insert_many(dataPoints)
-
-
-# Testing
-# mdb = MongoDatabaseWriter('mongodb://localhost:27017/iot_data')
-# mdb.initializeTable()
-# rows = []
-# for i in range(100):
-#     rows.append({'relative_time': i, 'freeform': 'hi'})
-# mdb.insertMany(rows)
-# del(mdb)
