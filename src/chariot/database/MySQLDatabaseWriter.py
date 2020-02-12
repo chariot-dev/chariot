@@ -1,7 +1,7 @@
 from typing import List, Tuple
 import mysql.connector as connector
 
-from chariot.database.DatabaseWriter import DatabaseWriter
+from chariot.database.DatabaseWriter import DatabaseWriter, checkDataPoint
 
 
 class MySQLDatabaseWriter(DatabaseWriter):
@@ -11,13 +11,13 @@ class MySQLDatabaseWriter(DatabaseWriter):
     def __del__(self):
         self.disconnect()
 
-    def connect(self, _user: str, _password: str, _host: str, port: int):
+    def connect(self, _user: str, _password: str, _host: str, _port: int):
         self.conn: connector.connection.MySQLConnection = connector.connect(
-            user=_user, password=_password, host=_host)
+            user=_user, password=_password, host=_host, port=_port)
         self.cursor: connector.cursor.MySQLCursor = self.conn.cursor()
 
     def disconnect(self):
-        pass
+        self.conn.close()
 
     def initializeTable(self):
         # Create a new database, to be safe
@@ -28,7 +28,7 @@ class MySQLDatabaseWriter(DatabaseWriter):
         )
 
     def insertOne(self, dataPoint: dict):
-        DatabaseWriter.insertOne(self, dataPoint)
+        checkDataPoint(dataPoint)
         self.cursor.execute(
             "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
             (dataPoint["relative_time"], dataPoint["freeform"])
@@ -37,7 +37,9 @@ class MySQLDatabaseWriter(DatabaseWriter):
         self.conn.commit()
 
     def insertMany(self, dataPoints: List[dict]):
-        DatabaseWriter.insertMany(self, dataPoints)
+        for dataPoint in dataPoints:
+            checkDataPoint(dataPoint)
+
         values_to_insert: List[Tuple[int, str]] = [(dataPoint["relative_time"], dataPoint["freeform"])
                                                    for dataPoint in dataPoints]
         self.cursor.executemany(

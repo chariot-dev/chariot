@@ -1,8 +1,9 @@
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from typing import List
+from datetime import datetime
 
-from chariot.database.DatabaseWriter import DatabaseWriter
+from chariot.database.DatabaseWriter import DatabaseWriter, checkDataPoint
 
 
 class MongoDatabaseWriter(DatabaseWriter):
@@ -14,6 +15,11 @@ class MongoDatabaseWriter(DatabaseWriter):
         self.disconnect()
 
     def connect(self):
+        '''
+        Connection string should follow Mongo URI format:
+        https://docs.mongodb.com/manual/reference/connection-string/
+        Eg. for localhost: 'mongodb://localhost:27017/'
+        '''
         self.client: MongoClient = MongoClient(self.connectionString)
 
     def disconnect(self):
@@ -24,9 +30,19 @@ class MongoDatabaseWriter(DatabaseWriter):
         self.iot_database: Collection = self.client["iot_database"]["iot_data"]
 
     def insertOne(self, dataPoint: dict):
-        DatabaseWriter.insertOne(self, dataPoint)
+        checkDataPoint(dataPoint)
+
+        # Add database insertion time to dataPoint
+        dataPoint['db_insertion_time'] = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S")
         self.iot_database.insert_one(dataPoint)
 
     def insertMany(self, dataPoints: List[dict]):
-        DatabaseWriter.insertMany(self, dataPoints)
+        for dataPoint in dataPoints:
+            checkDataPoint(dataPoint)
+            # Add database insertion time to dataPoint
+            dataPoint['db_insertion_time'] = datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S")
+            dataPoint['db_insertion_time'] = datetime.now()
+
         self.iot_database.insert_many(dataPoints)
