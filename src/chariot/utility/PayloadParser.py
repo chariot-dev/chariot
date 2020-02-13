@@ -8,9 +8,12 @@ class PayloadParser:
     def checkForNetworkName(requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
         networkName: str = requestContent.get('NetworkName')
+        return networkName
 
-        if not networkName:
-            raise NoIdentifierError('Network name')
+    @staticmethod
+    def checkForNetworkDescription(requestContent) -> str:
+        # first ensure that a network name has been given to specify which network is to be modified
+        networkName: str = requestContent.get('Description')
         return networkName
 
     @staticmethod

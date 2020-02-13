@@ -6,22 +6,11 @@ from chariot.utility.exceptions import NameNotFoundError
 from chariot.network.Network import Network
 
 
-class NetworkManager:
-    __instance = None
-
-    @staticmethod
-    def getInstance(cls):
-        if NetworkManager.__instance is None:
-            NetworkManager()
-        return NetworkManager.__instance
+class _NetworkManager:
 
     def __init__(self):
         # TODO: load all networks for a user upon instantiation
-        if NetworkManager.__instance is None:
-            # hold all user defined networks. This will be a dictionary in which
-            # each key is the name of the network (Network names are unique).
-            self.userNetworks: Dict[str, Network] = {}
-            NetworkManager.__instance = self
+        self.userNetworks: Dict[str, Network] = {}
 
     # This method gives a new network name to an already defined network. Find the network by name
     def modifyNetworkNameByName(self, newName: str, toFind: str):
@@ -55,9 +44,9 @@ class NetworkManager:
             raise DuplicateNameError(networkName, 'Network')
 
     # This method deletes a Network object via name from the nested dictionary of Networks that this class manages
-    def deleteNetworkByName(self, netName: int):
+    def deleteNetworkByName(self, netName: str):
         networkToDel: Network = self.findNetworkByNetworkName(netName)
-        if networkToDel is not None:
+        if networkToDel in self.userNetworks:
             del self.userNetworks[networkToDel.getNetworkName()]
         else:
             raise NameNotFoundError('Network', netName, 'known networks')
@@ -72,10 +61,12 @@ class NetworkManager:
 
     # Convenience method that checks whether a network by the same name exists in the collection
     def isNetworkNameUnique(self, uniqueName: str) -> bool:
-        found: bool = False
-        if self.findNetworkByNetworkName(uniqueName) is not None:
-            found = True
-        return found
+        unique: bool
+        if uniqueName not in self.userNetworks:
+            unique = True
+        else:
+            unique = False
+        return unique
 
     # Returns a list of networks names found in the userNetworks
     def getAllNetworkNamesAndDesc(self) -> Dict[str, str]:
@@ -88,3 +79,9 @@ class NetworkManager:
     # def importNetworkConfiguration
     # def exportNetworkConfiguration
     # https://blog.miguelgrinberg.com/index/page/3
+
+
+# return a singleton instance
+NetworkManager = _NetworkManager()
+
+__all__ = ['NetworkManager']

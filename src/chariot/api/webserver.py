@@ -10,21 +10,22 @@ from chariot.device.configuration import DeviceConfiguration
 from chariot.device.configuration import ImpinjR420Configuration
 from chariot.device.configuration import ImpinjXArrayConfiguration
 from chariot.utility.PayloadParser import PayloadParser
-from chariot.network import Network
-from chariot.network import NetworkManager
+from chariot.network.Network import Network
+from chariot.network.NetworkManager import NetworkManager
 
 app = flask.Flask(__name__)
-CORS(app) # This will enable CORS for all routes
+CORS(app)  # This will enable CORS for all routes
 app.config["DEBUG"] = True
 
-nManagerBaseUrl: str = '/chariot/api/v1.0/'
+nManagerBaseUrl: str = '/chariot/api/v1.0'
+
 
 # --- This section of api endpoints deals with netowrks  --- #
 
 @app.route(nManagerBaseUrl + '/networks/names', methods=['GET'])
 # This method will return all network names known to the networkManager and their descriptions
 def retrieveAllNetworkNames():
-    allNetworks: Dict[str, str] = NetworkManager.getAllNetworkNames()
+    allNetworks: Dict[str, str] = NetworkManager.getAllNetworkNamesAndDesc()
     return jsonify(allNetworks)
 
 
@@ -34,19 +35,19 @@ def retrieveAllNetworkDetails():
     pass
 
 
-@app.route(nManagerBaseUrl + '/network/', methods=['POST'])
+@app.route(nManagerBaseUrl + '/network', methods=['POST'])
 def createNetwork():
     requestContent = request.get_json()
 
     # check that a network name is specified in the payload
     networkName = PayloadParser.checkForNetworkName(requestContent)
-
-    networkDesc: str = requestContent.get('Description', defaultValue='')  # note that description is optional
+    networkDesc: str = PayloadParser.checkForNetworkDescription(requestContent)  # note that description is optional
 
     NetworkManager.addNetwork(networkName, networkDesc)
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
-@app.route(nManagerBaseUrl + '/network/', methods=['POST'])
+@app.route(nManagerBaseUrl + '/network', methods=['POST'])
 def modifyNetwork():
     # through this endpoint, a network can have its name and/or description changed
     # it must be that the old name('Name') is specified and a new name('NewName') is given in the payload
@@ -57,14 +58,14 @@ def modifyNetwork():
     # check that a new name is found in the payload
     newName = PayloadParser.checkForNewNetworkName(requestContent)
 
-    networkDesc: str = requestContent.get('Description', defaultValue='')  # note that description is optional
+    networkDesc: str = PayloadParser.checkForNetworkDescription(requestContent)  # note that description is optional
 
     NetworkManager.modifyNetworkNameByName(newName, oldNetworkName)
     if networkDesc:
         NetworkManager.modifyNetworkDescriptionByName(networkDesc, newName)
 
 
-@app.route(nManagerBaseUrl + '/network/', methods=['DELETE'])
+@app.route(nManagerBaseUrl + '/network', methods=['DELETE'])
 def deleteNetwork():
     requestContent = request.get_json()
     networkName = PayloadParser.checkForNetworkName(requestContent)
@@ -88,18 +89,19 @@ def getNetworkDetails():
 def getSupportedDevices():
     return jsonify(DeviceAdapterFactory.getsupportedDevices())
 
+
 @app.route(nManagerBaseUrl + 'network/device/config', methods=['GET'])
 def getSupportedDeviceConfig():
     deviceTemplateName = request.args['DeviceName']
     deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
-    
+
     return jsonify(deviceTemplate)
 
-    #requestContent = request.get_json()
-    #deviceTemplateName = requestContent['DeviceName']
-    #get specified device template
-    #deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
-    #return jsonify(deviceTemplate)
+    # requestContent = request.get_json()
+    # deviceTemplateName = requestContent['DeviceName']
+    # get specified device template
+    # deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
+    # return jsonify(deviceTemplate)
 
 
 @app.route(nManagerBaseUrl + 'network/device', methods=['GET'])
@@ -153,6 +155,7 @@ def modifyDevice():
     networkName = PayloadParser.checkForNetworkName(requestContent)
     network: Network = NetworkManager.findNetworkByNetworkName(networkName)
 
+
 @app.route(nManagerBaseUrl + 'network/device', methods=['DELETE'])
 def deleteDevice():
     # ensure that a network is specified in the payload
@@ -162,7 +165,8 @@ def deleteDevice():
 
     deviceName = PayloadParser.checkForDeviceName(requestContent)
 
-    #now delete device from specified network
+    # now delete device from specified network
     network.deleteDeviceByName(deviceName)
+
 
 app.run()
