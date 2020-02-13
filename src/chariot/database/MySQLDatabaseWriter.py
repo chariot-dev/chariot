@@ -5,7 +5,17 @@ from chariot.database.DatabaseWriter import DatabaseWriter, checkDataPoint
 
 
 class MySQLDatabaseWriter(DatabaseWriter):
-    def __init__(self, _user: str, _password: str, _host: str, _port: int):
+    def __init__(self, connectionString: str):
+        '''
+        Connection string should follow format:
+        user:password@host:port
+        '''
+        # Parse connection string
+        _user = connectionString.split('@')[0].split(':')[0]
+        _password = connectionString.split('@')[0].split(':')[1]
+        _host = connectionString.split('@')[1].split(':')[0]
+        _port = connectionString.split('@')[1].split(':')[1]
+
         self.connect(_user, _password, _host, _port)
 
     def __del__(self):

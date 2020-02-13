@@ -1,0 +1,1706 @@
+diff --git a/.gitignore b/.gitignore
+index 4d813fd..9dbbc30 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -2,7 +2,7 @@
+ bin/
+ include/
+ lib/
+-lib64/
++lib64
+ pyvenv.cfg
+ share/
+ .mypy_cache/
+@@ -12,3 +12,6 @@ chariot.egg-info
+ # python
+ *.py[cod]
+ __pycache__/
++
++# database
++data/
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index 1b42f87..40b7db2 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -1,4 +1,4 @@
+-# Contributing to Chariot 
++# Contributing to Chariot
+ 
+ ## Introduction
+ 
+@@ -16,21 +16,28 @@ WIP
+ 
+ The entirety of the core is written in Python. Thus the following are required in order to have a working dev environment:
+ 
+-- NIX* environment (Linux, WSL, macOS terminal)
++- NIX\* environment (Linux, WSL, macOS terminal)
+ - Python (3.5 and above)
+ - Pip
+ 
+ Keep in mind that we enforce the use of python3 type hints as much as possible, to avoid obscurity.
+ 
+-Optionally, though strongly recommended, is to install Python's virtual environment (venv) module which will help with package management and dependency isolation. The rest of this tutorial assumes you have chosen to use a venv. 
++Optionally, though strongly recommended, is to install Python's virtual environment (venv) module which will help with package management and dependency isolation. The rest of this tutorial assumes you have chosen to use a venv.
+ 
+ Follow these steps to finish setting up:
+-1. Create a new virtual environment using the command `python3 -m venv .` in the `core` folder.
++1. Create a new virtual environment using the command `python3 -m venv .` in the `src` folder.
+ 2. Activate the newly created venv using any equivalent shell command to bash's `source ./bin/activate`.
+ 3. Install all dependencies using `pip install -r requirements.txt`.
+ 4. (WIP but intended workflow) run linters, typechecks and tests with the command `tox`. It will run using the configuration in the `tox.ini` file. If every test passes, you are ready to start contributing.
+ 
++### Running core modules
++
++The system core is structured as a Python package. You may run individual modules using the format
++
++`python3 -m chariot.network.Network`
++
++(note, no `.py` extension)
++
+ ### Pushing changes
+ 
+ Chariot follows a Pull Request model in that all changes to the master branch must be merged from a pull request. In the future, the project will have integrated CI which must pass for changes to be accepted. In the meantime, it is paramount to ensure all `tox` checks are passing before creating a pull request.
+-
+diff --git a/README.md b/README.md
+index ad62de1..d454530 100644
+--- a/README.md
++++ b/README.md
+@@ -30,7 +30,7 @@ This project is licensed under the GNU Lesser General Public License v3.0. See t
+ * [John Ho](https://github.com/jh3377)
+ * [Medard Azandegbe](https://github.com/maa433)
+ * [Kamalludin Colaire](https://github.com/kac486)
+-* [Christopher Mak](https://github.com/kac486)
++* [Christopher Mak](https://github.com/auronsento)
+ 
+ ## Acknowledgments
+ The team would like to thank:
+diff --git a/gui/src/components/dataAnalysis/DataAnalysisMain.js b/gui/src/components/dataAnalysis/DataAnalysisMain.js
+deleted file mode 100644
+index 456f169..0000000
+--- a/gui/src/components/dataAnalysis/DataAnalysisMain.js
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/*
+-  DataAnalysisMain.js
+-
+-  This component is the first screen the user will see when intending to perform data analysis.
+-*/
+-
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-class DataAnalysisMain extends Component {
+-
+-  render() {
+-    return (
+-      <div className="container">
+-        <h1>Data Analysis</h1>
+-          <p className="screenInfo">Configure your data analysis options.</p>
+-          
+-          <Link to="/welcome">
+-            <Button variant="primary" className="float-left footer-button">Back</Button>
+-          </Link>        
+-      </div>
+-    );
+-  }
+-
+-}
+-
+-export default DataAnalysisMain; 
+\ No newline at end of file
+diff --git a/gui/src/components/dataOutputConfigs/DataOutputConfigsMain.js b/gui/src/components/dataOutputConfigs/DataOutputConfigsMain.js
+deleted file mode 100644
+index 43fafc2..0000000
+--- a/gui/src/components/dataOutputConfigs/DataOutputConfigsMain.js
++++ /dev/null
+@@ -1,22 +0,0 @@
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-class DataOutputConfigsMain extends Component {
+-
+-  render() {
+-    return (
+-      <div className="container">
+-        <h1>Your Data Output Configurations</h1>
+-          <p className="screenInfo">Click a data output configuration to modify.</p>
+-          
+-          <Link to="/welcome">
+-            <Button variant="primary" className="float-left">Back</Button>
+-          </Link>
+-      </div>
+-    );
+-  }
+-
+-}
+-
+-export default DataOutputConfigsMain; 
+\ No newline at end of file
+diff --git a/gui/src/components/databaseConnection/DatabaseContainer.js b/gui/src/components/databaseConnection/DatabaseContainer.js
+deleted file mode 100644
+index fc16dd5..0000000
+--- a/gui/src/components/databaseConnection/DatabaseContainer.js
++++ /dev/null
+@@ -1,107 +0,0 @@
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-class DatabaseContainer extends Component {
+-    constructor(props) {
+-        super(props);
+-        this.state = {
+-            formControls: {
+-                ipAddress: {
+-                    value: ''
+-                },
+-                name: {
+-                    value: ''
+-                },
+-                password: {
+-                    value: ''
+-                }
+-            },
+-            successMessage : ''
+-        }
+-
+-        this.testConnection = this.testConnection.bind(this);
+-    }
+-
+-    /*
+-    Currently using the handleSubmit method to try to establish a TCP connection with a database
+-         if the connection is successful, then show success message. Otherwise, show failure message and do
+-         not proceed to next screen
+-    */
+-    testConnection(event) {
+-        //currently assuming that connection will always be established, display that connection is successful for 3 seconds
+-        setTimeout(() => this.setState({ message: 'Connection Successful!' }), 3000);
+-    }
+-
+-    setSuccessMessage(message) {
+-        this.setState({
+-            successMessage: message
+-        });
+-    }
+-
+-    changeHandler = event => {
+-
+-        const name = event.target.name;
+-        const value = event.target.value;
+-
+-        this.setState({
+-            formControls: {
+-                ...this.state.formControls,
+-                [name]: {
+-                    ...this.state.formControls[name],
+-                    value
+-                }
+-            }
+-        });
+-    }
+-
+-
+-    render() {
+-        return (
+-            <div className="container">
+-                <div>
+-                    <h1> Database Connection </h1>
+-                    <p className="screenInfo"> Please fill the following fields to connect to a database to store data to</p>
+-                </div>
+-                <div class="text-center">
+-                    <form>
+-                        <div className="form-group">
+-                            <label>Host name: </label>
+-                            <input type="text"
+-                                name="ipAddress"
+-                                value={this.state.formControls.ipAddress.value}
+-                                onChange={this.changeHandler}
+-                            />
+-                        </div>
+-
+-                        <div className="form-group">
+-                        <label>Username: </label>
+-                        <input type="text"
+-                            name="name"
+-                            value={this.state.formControls.name.value}
+-                            onChange={this.changeHandler}
+-                            />
+-                        </div>
+-
+-                        <div className="form-group">
+-                        <label>Password: </label>
+-                        <input type="password"
+-                            name="password"
+-                            value={this.state.formControls.password.value}
+-                            onChange={this.changeHandler}
+-                            />
+-                        </div>
+-                    </form>
+-                </div>
+-                <Link to="/chooseNetwork">
+-                    <Button variant="primary" className="float-left footer-button">Back</Button>
+-                </Link>
+-                <Button variant="primary" className="float-right footer-button">Connect</Button>
+-            </div>
+-        );
+-    }
+-
+-}
+-
+-
+-export default DatabaseContainer;
+\ No newline at end of file
+diff --git a/gui/src/components/deviceConfigs/DeviceConfigsMain.js b/gui/src/components/deviceConfigs/DeviceConfigsMain.js
+deleted file mode 100644
+index ce9acab..0000000
+--- a/gui/src/components/deviceConfigs/DeviceConfigsMain.js
++++ /dev/null
+@@ -1,22 +0,0 @@
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-class DeviceConfigsMain extends Component {
+-
+-  render() {
+-    return (
+-      <div className="container">
+-        <h1>Your Device Configurations</h1>
+-          <p className="screenInfo">Click on a device configurations to modify.</p>
+-           
+-          <Link to="/welcome">
+-            <Button variant="primary" className="float-left">Back</Button>
+-          </Link>        
+-      </div>
+-    );
+-  }
+-
+-}
+-
+-export default DeviceConfigsMain; 
+\ No newline at end of file
+diff --git a/gui/src/components/deviceManagement/AddDeviceHome.js b/gui/src/components/deviceManagement/AddDeviceHome.js
+deleted file mode 100644
+index 8d31d27..0000000
+--- a/gui/src/components/deviceManagement/AddDeviceHome.js
++++ /dev/null
+@@ -1,186 +0,0 @@
+-/*
+-  AddDeviceHome.js
+-
+-  This component is the first screen the user will see when creating a device.
+-  This component handles the GUI for creating a device, as well as the modals 
+-  that appear as the process is completed. In order to get the specific
+-  device fields, AddDeviceVars is a child component.
+-
+-  Currently, only a single device can be created before the user is sent back
+-  to the Welcome screen.
+-*/
+-
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Modal from 'react-bootstrap/Modal';
+-import Button from 'react-bootstrap/Button';
+-import AddDeviceVars from './AddDeviceVars';
+-
+-
+-class AddDeviceHome extends Component {
+-  constructor(props) {
+-    super(props);
+-    this.state = {
+-      newDeviceNickname: "", // Nickname attribute for device
+-      newDeviceDescription: "", // Description for device
+-      newDeviceType: "", // Type of device
+-      showDeviceSpecificSettings: false, // Whether or not the type of device has been chosen by the user already
+-      isSubmitted: false, // Whether or not the device information is ready to be sent to the server
+-      confirmIsOpen: false, // Is the confirm modal open?
+-      successIsOpen: false, // Is the success modal open?
+-      deviceSpecificState: {}, // User-defined device attributes
+-    }
+-
+-    this.handleChange = this.handleChange.bind(this);
+-    this.handleSubmit = this.handleSubmit.bind(this);
+-    this.handleDeviceTypeChange = this.handleDeviceTypeChange.bind(this);
+-  }
+-
+-  // ============ DEVICE-SPECIFIC FIELDS ARE CURRENTLY HARD-CODED ================
+-  handleNewDeviceCreation = (submittedDeviceSpecificState) => {
+-    this.setState ({ deviceSpecificState: submittedDeviceSpecificState })
+-
+-    console.log(this.state.newDeviceNickname);
+-    console.log(this.state.newDeviceDescription);
+-    console.log(this.state.newDeviceType);
+-    console.log(submittedDeviceSpecificState.newDeviceName);
+-    console.log(submittedDeviceSpecificState.newDeviceTime);
+-    console.log(submittedDeviceSpecificState.newDevicePower);
+-    console.log(this.state.deviceSpecificState); // Values are delayed in console. Will show up on second "Next" click
+-
+-    this.setState({
+-      isSubmitted: !this.state.isSubmitted,
+-      confirmIsOpen: !this.state.confirmIsOpen
+-    }); 
+-  }
+- 
+-  /*
+-    Updates prop values (device-related) as they are entered by the user.
+-  */  
+-  handleChange(event) {
+-    this.setState({[event.target.name]: event.target.value});
+-  }
+-
+-  /*
+-    As the device type the user selects changes, update that in the state.
+-  */
+-  handleDeviceTypeChange(event) {
+-    // Update chosen device type
+-    this.setState({[event.target.name]: event.target.value});
+-
+-    // Boolean to show the device type's-specific settings to true
+-    this.setState({
+-      showDeviceSpecificSettings: true
+-    });
+-  }
+-
+-  /*
+-    Function that launches the success modal after the user confirms the device
+-    information that they entered is correct. Also makes the POST request to the
+-    server to create the new device.
+-  */
+-  toggleSuccessModal = () => {
+-    this.setState({
+-      confirmIsOpen: false
+-    });
+-    this.setState({
+-      successIsOpen: !this.state.successIsOpen
+-    });
+-
+-
+-
+-  }
+-
+-  /* 
+-    Called when the user either submits the registration form by clicking "Next"
+-    in the AddDeviceVars component or "No" on the confirmation modal. Will change the 
+-    "isSubmitted" prop to true->false or false->true. Also will update the viewability
+-    status of the confirmation modal
+-  */
+-  handleSubmit(event) {
+-    this.setState({
+-      isSubmitted: !this.state.isSubmitted,
+-      confirmIsOpen: !this.state.confirmIsOpen
+-    });    
+-    event.preventDefault();
+-  }
+-
+-  /*
+-    Returns three separate objects with their unique keys. The first object
+-    is the Device Creation screen itself. This screen contains the fields that
+-    the user will have to fill in, in order to create a device. It also contains 
+-    AddDeviceVars component, which contains the "Next" button that will lead the 
+-    user to the other two objects, the confirmation and sucess modals.
+-  */
+-  render() {
+-    return [
+-      <div className="container" key="newDeviceScreen">
+-        <h1>Configure New Device Settings</h1>
+-        <p className="screenInfo">Please fill in the configuration fields for your new device.</p>
+-
+-        <form id="createDeviceForm" onSubmit={this.handleNewDeviceCreation}>
+-          <div className="form-group">
+-            <input required className="form-control" id="newDeviceNickname" name="newDeviceNickname" placeholder="New Device Nickname" onChange={this.handleChange}/>
+-          </div>
+-          <div className="form-group">
+-            <textarea required className="form-control" id="newDeviceDescription" rows="3" name="newDeviceDescription" placeholder="New Device Description" onChange={this.handleChange}></textarea>
+-          </div>
+-          <div className="form-group">
+-              <select required className="form-control" id="securityQuestion" name="newDeviceType" onChange={this.handleDeviceTypeChange}>
+-                <option selected disabled hidden value="">Select a Device Type</option>
+-                <option>R420</option>
+-                <option>X-Array</option>
+-              </select>
+-          </div>
+-
+-          <div>
+-            {this.state.showDeviceSpecificSettings ? <AddDeviceVars params={this.state} onFormSubmit={this.handleNewDeviceCreation}></AddDeviceVars> : null}
+-          </div>
+-
+-        </form>
+-
+-        <Link to="/networkManager">
+-          <Button variant="primary" className="float-left footer-button">Back</Button>
+-        </Link>
+-      </div>,
+-
+-      <Modal show={this.state.confirmIsOpen} key="newDeviceConfirmModal">
+-        <Modal.Body>
+-          Is this information for your new device correct?
+-          <br></br>
+-          <p>
+-            <b>Device Nickname:</b> {this.state.newDeviceNickname}
+-            <br></br>
+-            <b>Device Description:</b> {this.state.newDeviceDescription}
+-            <br></br>
+-            <b>Device Type:</b> {this.state.newDeviceType}
+-            <br></br>
+-            <b>Device Name/IP:</b> {this.state.deviceSpecificState.newDeviceName}
+-            <br></br>
+-            <b>Device Time:</b> {this.state.deviceSpecificState.newDeviceTime}
+-            <br></br>
+-            <b>Device Power:</b> {this.state.deviceSpecificState.newDevicePower}
+-            <br></br>
+-          </p>
+-        </Modal.Body>
+-        <Modal.Footer>
+-          <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
+-          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
+-        </Modal.Footer>
+-      </Modal>,
+-
+-      <Modal show={this.state.successIsOpen} key="registerSuccessModal">
+-        <Modal.Body>Your new device has been created and added to the network!</Modal.Body>
+-        <Modal.Footer>
+-          <Link to="/welcome">
+-            <Button variant="primary" className="float-right">Continue</Button>
+-          </Link>
+-        </Modal.Footer>
+-      </Modal>
+-      
+-
+-    ]
+-  }
+-}
+- 
+-export default AddDeviceHome; 
+\ No newline at end of file
+diff --git a/gui/src/components/deviceManagement/AddDeviceVars.js b/gui/src/components/deviceManagement/AddDeviceVars.js
+deleted file mode 100644
+index 7be97d6..0000000
+--- a/gui/src/components/deviceManagement/AddDeviceVars.js
++++ /dev/null
+@@ -1,73 +0,0 @@
+-/*
+-  AddDeviceVars.js
+-
+-  This component is shown inside the AddDeviceHome component containing the dynamically generated
+-  configuration fields of a device depending on the user's choice of device.
+-
+-*/
+-
+-import React, { Component } from 'react';
+-import Button from 'react-bootstrap/Button';
+-
+-class AddDeviceVars extends Component {
+-  constructor (props) {
+-    super(props);
+-    
+-    this.state = {
+-      newDeviceNickname: this.props.params.newDeviceNickname,
+-      newDeviceDescription: this.props.params.newDeviceDescription,
+-      newDeviceType: this.props.params.newDeviceType,
+-      newDeviceName: "",
+-      newDeviceTime: "",
+-      newDevicePower: "",
+-      isSubmitted: false
+-    }
+-
+-    this.handleChange = this.handleChange.bind(this);
+-    this.sendSpecificToForm = this.sendSpecificToForm.bind(this);
+-  }
+-
+-  handleChange(event) {
+-    this.setState({[event.target.name]: event.target.value});
+-    
+-  }
+-
+-  sendSpecificToForm(event) {
+-    this.props.onFormSubmit(this.state);
+-    event.preventDefault();
+-  }
+-
+-  render() {
+-    return (
+-      <div>
+-        <br></br>
+-        <p className="screenInfo">Now please fill in the configuration fields for the {this.props.params.newDeviceType} device.</p> 
+-
+-        
+-        <div className="form-group">
+-          <input className="form-control" id="newDeviceName" name="newDeviceName" placeholder="Name/IP Address" onChange={this.handleChange}/>
+-        </div>
+-        <div className="form-group">
+-          <input className="form-control" id="newDeviceTime" name="newDeviceTime" placeholder="Time" onChange={this.handleChange}/>
+-        </div>
+-        <div className="form-group">
+-          <input className="form-control" id="newDevicePower" name="newDevicePower" placeholder="Power" onChange={this.handleChange}/>
+-        </div>
+-        <br></br>
+-
+-
+-
+-
+-        <h1>FIELDS WILL BE DYNAMIC ACCORDING TO API CALL FOR THE DEVICE SELECTED</h1>
+-        <br></br>
+-        <br></br>
+-
+-
+-        
+-        <Button type="submit" variant="primary" className="float-right footer-button" onClick={this.sendSpecificToForm}>Next</Button>
+-      </div>
+-    );
+-  }
+-}
+-
+-export default AddDeviceVars;
+\ No newline at end of file
+diff --git a/gui/src/components/images/hiddenPassword.PNG b/gui/src/components/images/hiddenPassword.PNG
+deleted file mode 100644
+index ef768e4..0000000
+Binary files a/gui/src/components/images/hiddenPassword.PNG and /dev/null differ
+diff --git a/gui/src/components/images/showPassword.PNG b/gui/src/components/images/showPassword.PNG
+deleted file mode 100644
+index 22cfe1e..0000000
+Binary files a/gui/src/components/images/showPassword.PNG and /dev/null differ
+diff --git a/gui/src/components/images/success.png b/gui/src/components/images/success.png
+deleted file mode 100644
+index 55e66e2..0000000
+Binary files a/gui/src/components/images/success.png and /dev/null differ
+diff --git a/gui/src/components/loginPage/Login.js b/gui/src/components/loginPage/Login.js
+deleted file mode 100644
+index 03c93b1..0000000
+--- a/gui/src/components/loginPage/Login.js
++++ /dev/null
+@@ -1,94 +0,0 @@
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-import hiddenPasswordImg from "../images/hiddenPassword.PNG";
+-import showPasswordImg from "../images/showPassword.PNG";
+-
+-import '../../App.css';
+-
+-class Login extends Component {
+-  constructor(props) {
+-    super(props);
+-    this.state = {
+-      username: "",
+-      password: "",
+-      passwordVisible: false,
+-      passwordImg: hiddenPasswordImg,
+-      loginSuccess: false
+-    }
+-
+-    this.handleSubmit = this.handleSubmit.bind(this);
+-    this.handleChange = this.handleChange.bind(this);
+-    this.changePasswordVisibility = this.changePasswordVisibility.bind(this);
+-  }
+-
+-  handleChange(event) {
+-    this.setState({[event.target.name]: event.target.value});
+-  }
+-
+-  handleSubmit(event) {
+-    // Verify account credentials for correctness first
+-    this.setState({ loginSuccess: true });
+-    event.preventDefault();
+-    this.props.history.push(`/welcome`);
+-  }
+-
+-  changePasswordVisibility() {
+-    if (this.state.passwordImg === hiddenPasswordImg) {
+-      this.setState({passwordImg: showPasswordImg});
+-      this.setState({passwordVisible: true});
+-    } 
+-    else {
+-      this.setState({passwordImg: hiddenPasswordImg});
+-      this.setState({passwordVisible: false});
+-    }
+-  }
+-
+-  render() {
+-    return (
+-      <div className="general-component-bg">
+-        <div className="container">
+-          <div className="text-center">
+-            <h1 className="chariot-header">Chariot</h1>
+-            <p className="screenInfo">Collect and analyze data from multiple IoT devices</p>
+-          </div>
+-          <div className="card">
+-            <div className="card-body">
+-              <form onSubmit={this.handleSubmit}>
+-                <div className="form-group">
+-                  To get started, please log in.
+-                </div>
+-                <div className="form-group">
+-                  <input required className="form-control" id="usernameInput" name="username" placeholder="Username or Email" />
+-                </div>
+-                <div className="form-group input-group">
+-                  <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="passwordInput" name="password" placeholder="Password" />
+-                  <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
+-                </div>
+-                <div>
+-                  <input type="checkbox" id="rememberMe"/> Remember Me
+-                </div>
+-                <Button className="login-button" variant="primary" type="submit">
+-                  Login
+-                </Button>
+-              </form>
+-
+-              <div>
+-                Dont have an account? <Link to="/register" id="createAccountLink"> Create one here</Link>
+-              </div>
+-              <div>
+-                <Link to="/" id="forgotPasswordLink"> 
+-                  Forgot password?
+-                </Link>
+-              </div>  
+-            </div>
+-          </div>
+-        </div>
+-      </div>
+-    );
+-  }
+-  
+-}
+-
+-
+-export default Login; 
+\ No newline at end of file
+diff --git a/gui/src/components/networkConfigs/NetworkConfigsMain.js b/gui/src/components/networkConfigs/NetworkConfigsMain.js
+deleted file mode 100644
+index 5f55126..0000000
+--- a/gui/src/components/networkConfigs/NetworkConfigsMain.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/*
+-  NetworkConfigsMain.js
+-
+-  This component is the first screen the user will see when going to modify one of their 
+-  existing networks. The networks will be obtained via a GET request to the server.
+-
+-*/
+-
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-class NetworkConfigsMain extends Component {
+-
+-
+-  render() {
+-    return (
+-      <div className="container">
+-        <h1>Your Network Configurations</h1>
+-          <p className="screenInfo">Click on a network configuration to modify.</p>
+-          
+-          <Link to="/welcome">
+-            <Button variant="primary" className="float-left footer-button">Back</Button>
+-          </Link>
+-      </div>
+-    );
+-  }
+-
+-}
+-
+-export default NetworkConfigsMain; 
+\ No newline at end of file
+diff --git a/gui/src/components/networkManagement/AddNetwork.js b/gui/src/components/networkManagement/AddNetwork.js
+deleted file mode 100644
+index 6852d6d..0000000
+--- a/gui/src/components/networkManagement/AddNetwork.js
++++ /dev/null
+@@ -1,100 +0,0 @@
+-/*
+-
+-
+-*/
+-
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Modal from 'react-bootstrap/Modal';
+-import Button from 'react-bootstrap/Button';
+-
+-class AddNetwork extends Component {
+-  constructor(props) {
+-    super(props);
+-    this.state = {
+-      newNetworkName: "",
+-      newNetworkDescription: "",
+-      isSubmitted: false,
+-      confirmIsOpen: false,
+-      successIsOpen: false
+-    }
+-
+-    this.handleNetworkAdd = this.handleNetworkAdd.bind(this);
+-    this.handleChange = this.handleChange.bind(this);
+-  }
+-
+-  handleNetworkAdd(event) {
+-    this.setState({ isSubmitted: true });
+-    event.preventDefault();
+-  }
+-  
+-  handleChange(event) {
+-    this.setState({[event.target.name]: event.target.value});
+-  }
+-
+-  toggleConfirmationModal = () => {
+-    this.setState({
+-      confirmIsOpen: !this.state.confirmIsOpen
+-    });
+-  }
+-
+-  toggleSuccessModal = () => {
+-    this.setState({
+-      confirmIsOpen: false
+-    });
+-    this.setState({
+-      successIsOpen: !this.state.successIsOpen
+-    });
+-  }
+-
+-  render() {
+-    return [
+-      <div className="container" key="addNetworkForm">
+-        <h1>Add a New Network</h1>
+-          <p className="screenInfo">Please fill in the fields below to create a network. Then, click "Next".</p>
+-          
+-          <form id="createNetworkForm" onSubmit={this.handleNetworkAdd}>
+-            <div className="form-group">
+-              <input className="form-control" id="networkNameInput" name="newNetworkName" placeholder="New Network Name" onChange={this.handleChange}/>
+-            </div>
+-            <div className="form-group">
+-              <textarea className="form-control" id="networkDescriptionInput" rows="5" name="newNetworkDescription" placeholder="New Network Description" onChange={this.handleChange}></textarea>
+-            </div>
+-            <Link to="/networkManager">
+-              <Button variant="primary" className="float-left footer-button">Back</Button>
+-            </Link>
+-            <Button variant="primary" className="float-right footer-button" onClick={this.toggleConfirmationModal}>Next</Button>
+-        </form>
+-      </div>,
+-
+-      <Modal show={this.state.confirmIsOpen} key="addNetworkConfirmation">
+-        <Modal.Body>
+-          Is this information for your network correct?
+-          <br></br>
+-          <b>Name:</b> {this.state.newNetworkName}
+-          <br></br>
+-          <b>Description:</b> {this.state.newNetworkDescription}
+-        </Modal.Body>
+-        <Modal.Footer>
+-          <Button variant="primary" className="float-left" onClick={this.toggleConfirmationModal}>No</Button>
+-          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
+-        </Modal.Footer>
+-      </Modal>,
+-
+-      <Modal show={this.state.successIsOpen} key="addNetworkSuccessModal">
+-        <Modal.Body>Your network was succesfully added! Would you like to add a device to this network as well?</Modal.Body>
+-        <Modal.Footer>
+-          <Link to="/networkManager">
+-            <Button variant="primary" className="float-left">No</Button>
+-          </Link>
+-          <Link to="/addDeviceHome">
+-            <Button variant="primary" className="float-right">Yes</Button>
+-          </Link>
+-        </Modal.Footer>
+-      </Modal>
+-    ]
+-  }
+-
+-}
+-
+-export default AddNetwork; 
+\ No newline at end of file
+diff --git a/gui/src/components/networkManagement/ChooseNetwork.js b/gui/src/components/networkManagement/ChooseNetwork.js
+deleted file mode 100644
+index 5080033..0000000
+--- a/gui/src/components/networkManagement/ChooseNetwork.js
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/*
+-
+-
+-*/
+-
+-import React, { Component } from 'react';
+-import Dropdown from '../shared/Dropdown';
+-import Button from 'react-bootstrap/Button';
+-import { Link } from 'react-router-dom';
+-
+-class ChooseNetwork extends Component {
+-  render() {
+-    return (
+-      <div className="container">
+-        <h1>Choose a Network</h1>
+-        <p className="screenInfo">Select a network to begin data collection process.</p>
+-
+-        <Dropdown> </Dropdown>
+-
+-        <Link to="/welcome">
+-          <Button variant="primary" className="float-left footer-button">Back</Button>
+-        </Link>
+-        <Link to="/databaseContainer">
+-          <Button variant="primary" className="float-right footer-button">Next</Button>
+-        </Link>
+-      </div>
+-    );
+-  }
+-
+-}
+-
+-export default ChooseNetwork; 
+\ No newline at end of file
+diff --git a/gui/src/components/networkManagement/DeleteNetwork.js b/gui/src/components/networkManagement/DeleteNetwork.js
+deleted file mode 100644
+index 3182b5f..0000000
+--- a/gui/src/components/networkManagement/DeleteNetwork.js
++++ /dev/null
+@@ -1,21 +0,0 @@
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-class DeleteNetwork extends Component {
+-  render() {
+-    return (
+-      <div className="container">
+-        <h1>Delete an Existing Network</h1>
+-        <p className="screenInfo">Select a network to delete.</p>
+-        
+-        <Link to="/networkManager">
+-          <Button variant="primary" className="float-left footer-button">Back</Button>
+-        </Link>
+-      </div>
+-    );
+-  }
+-
+-}
+-
+-export default DeleteNetwork; 
+\ No newline at end of file
+diff --git a/gui/src/components/networkManagement/ManageExistingNetworks.js b/gui/src/components/networkManagement/ManageExistingNetworks.js
+deleted file mode 100644
+index 90ab2d6..0000000
+--- a/gui/src/components/networkManagement/ManageExistingNetworks.js
++++ /dev/null
+@@ -1,22 +0,0 @@
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-class ManageExistingNetworks extends Component {
+-  render() {
+-    return (
+-      <div className="container">
+-        <h1>Manage Existing Networks</h1>
+-        <p className="screenInfo">Select a network to modify its existing configuration settings.</p>
+-        
+-        <Link to="/networkManager">
+-          <Button variant="primary" className="float-left footer-button">Back</Button>
+-        </Link>
+-      </div>
+-    );
+-  }
+-
+-
+-}
+-
+-export default ManageExistingNetworks; 
+\ No newline at end of file
+diff --git a/gui/src/components/networkManagement/NetworkManager.js b/gui/src/components/networkManagement/NetworkManager.js
+deleted file mode 100644
+index 9040387..0000000
+--- a/gui/src/components/networkManagement/NetworkManager.js
++++ /dev/null
+@@ -1,32 +0,0 @@
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-class NetworkManager extends Component {
+-  render() {
+-    return (
+-      <div className="container">
+-        <h1>Network Manager</h1>
+-          <p className="screenInfo">Add, delete, or manage a network.</p>
+-          
+-          <div>
+-            <Link to="/addNetwork">Add a Network</Link>
+-            <br></br>
+-            <br></br>
+-            <Link to="/deleteNetwork">Delete a Network</Link>
+-            <br></br>
+-            <br></br>
+-            <Link to="/manageExistingNetworks">Manage Existing Networks</Link>
+-          </div>
+-
+-          <Link to="/welcome">
+-            <Button variant="primary" className="float-left footer-button">Back</Button>
+-          </Link>
+-      </div>
+-    );
+-  }
+-
+-
+-}
+- 
+-export default NetworkManager; 
+\ No newline at end of file
+diff --git a/gui/src/components/registerPage/Register.js b/gui/src/components/registerPage/Register.js
+deleted file mode 100644
+index 9964a9f..0000000
+--- a/gui/src/components/registerPage/Register.js
++++ /dev/null
+@@ -1,240 +0,0 @@
+-/*
+-  Register.js
+-
+-  This component handles the GUI for the registration screen, as well as 
+-  the modals that appear as the registration process is completed.
+-*/
+-
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Modal from 'react-bootstrap/Modal';
+-import Button from 'react-bootstrap/Button';
+-
+-import hiddenPasswordImg from "../images/hiddenPassword.PNG";
+-import showPasswordImg from "../images/showPassword.PNG";
+-
+-class Register extends Component {
+-  constructor(props) {
+-    super(props);
+-    this.state = {
+-      fullname: "", // Full-name account attribute
+-      username: "", // Username for  attribute
+-      password: "", // Password for account
+-      emailAddress: "", // Email-address for account
+-      securityQuestion: "", // Security question for account in the event the user forgets their password
+-      securityQuestionAnswer: "", // Answer to security question
+-      isSubmitted: false, // Whether or not the account information is ready to be sent to the server
+-      passwordVisible: false, // Whether or not the password is visible on the screen
+-      passwordImg: hiddenPasswordImg, // Current passwordImg that is shown (hidden/visible)
+-      confirmIsOpen: false, // Is the confirm modal open?
+-      successIsOpen: false // Is the success modal open?
+-    }
+-
+-    this.handleSubmit = this.handleSubmit.bind(this);
+-    this.handleChange = this.handleChange.bind(this);
+-    this.changePasswordVisibility = this.changePasswordVisibility.bind(this);
+-  }
+-
+-  /*
+-    Updates prop values (account-related) as they are entered by the user.
+-  */
+-  handleChange(event) {
+-    this.setState({[event.target.name]: event.target.value});
+-  }
+-
+-  /* 
+-    Called when the user either submits the registration form by clicking "Next"
+-    on the registration screen or "No" on the confirmation modal. Will change the 
+-    "isSubmitted" prop to true->false or false->true.
+-  */
+-  handleSubmit(event) {
+-    this.setState({
+-      isSubmitted: !this.state.isSubmitted,
+-      confirmIsOpen: !this.state.confirmIsOpen
+-    });    
+-    event.preventDefault(); // To prevent screen from rerendering
+-  }
+-
+-  /*
+-    Function that launches the success modal after the user confirms the account
+-    information that they entered is correct. 
+-    
+-    Also makes the POST request to the server to create the new account.
+-  */
+-  toggleSuccessModal = () => {
+-    this.setState({
+-      confirmIsOpen: false
+-    });
+-    this.setState({
+-      successIsOpen: !this.state.successIsOpen
+-    });
+-
+-
+-
+-  }
+-  
+-  componentDidMount() {
+-    fetch("https://api.example.com/items")
+-      .then(res => res.json())
+-      .then(
+-        (result) => {
+-          this.setState({
+-            isLoaded: true,
+-            items: result.items
+-          });
+-        },
+-        // Note: it's important to handle errors here
+-        // instead of a catch() block so that we don't swallow
+-        // exceptions from actual bugs in components.
+-        (error) => {
+-          this.setState({
+-            isLoaded: true,
+-            error
+-          });
+-        }
+-      )
+-  }
+-
+-  /*
+-    Called when the user clicks the button to view/unview the password they entered.
+-  */
+-  changePasswordVisibility() {
+-    console.log(this.state.passwordImg);
+-
+-    if (this.state.passwordImg === hiddenPasswordImg) {
+-      this.setState({passwordImg: showPasswordImg});
+-      this.setState({passwordVisible: true});
+-    } 
+-    else {
+-      this.setState({passwordImg: hiddenPasswordImg});
+-      this.setState({passwordVisible: false});
+-    }
+-
+-    console.log(this.state.passwordImg);
+-  }
+-  
+-  /*
+-    Returns three separate objects with their unique keys. The first object
+-    is the Registration screen itself. This screen contains the fields that
+-    the user will have to fill in, in order to create an account. It also 
+-    contains the "Next" button that will lead the user to the other two objects,
+-    the confirmation and sucess modals.
+-  */
+-  render() {
+-    return [
+-      // Main regsiter element for register component
+-      <div className="general-component-bg" key="registerForm">
+-        <div className="container">
+-
+-          {/* Register screen highlighted via card */}
+-          <div className="card">
+-            <div className="card-header">
+-              <h1>Create an Account</h1>
+-              <p>To create an account, fill in the required fields, then click "Next."</p>
+-            </div>
+-
+-            <div className="card-body">
+-
+-              {/* When user clicks on button to submit the form, call handleSubmit() to display confirmation modal */}
+-              <form onSubmit={this.handleSubmit}>
+-                {/* As fields are typed into, call handleChange() to update and keep track of the values */}
+-                <div className="form-group">
+-                  <input required type="text" className="form-control" id="fullname" name="fullname" placeholder="Full Name" onChange={this.handleChange}/>
+-                </div>
+-                
+-                <div className="form-group">
+-                  <input required type="text" className="form-control" id="username" name="username" placeholder="Username" onChange={this.handleChange}/>
+-                </div>
+-
+-                {/* Two fields for password and confirm password */}
+-                <div className="form-group input-group">
+-                    <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="password" name="password" placeholder="Password" />
+-                    <span className="input-group-addon">&nbsp;&nbsp;</span>
+-                    <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="confirmPassword" name="password" placeholder="Confirm Password" onChange={this.handleChange}/>
+-                    <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
+-                </div>
+-
+-                <div className="form-group">
+-                    <input required type="email" className="form-control" id="emailAddress" name="emailAddress" placeholder="Email Address" onChange={this.handleChange}/>
+-                    You'll need to verify that this email belongs to you.
+-                </div>
+-
+-                <div className="form-group">
+-                    <select required className="form-control" id="securityQuestion" name="securityQuestion" onChange={this.handleChange}>
+-                      <option selected disabled hidden value="">Select a Security Question</option>
+-                      <option>What was your first pet's name?</option>
+-                      <option>What is your dad's middle name?</option>
+-                      <option>What city were you born in?</option>
+-                      <option>What is your favorite sport's mascot?</option>
+-                    </select>
+-                </div>
+-
+-                <div className="form-group">
+-                    <input required type="text" className="form-control" id="securityQuestionAnswer" name="securityQuestionAnswer" placeholder="Security Question Answer" onChange={this.handleChange}/>
+-                </div>
+-
+-                <br></br>
+-                
+-                {/* Button to submit form for account creation */}
+-                <Button type="submit" variant="primary" className="float-right">Next</Button>
+-
+-                <div className="float-left">
+-                  Already have a Chariot account? <Link to="/"> Log In</Link>
+-                </div>
+-
+-              </form>
+-
+-            </div>
+-
+-          </div>
+-
+-        </div>
+-      </div>,
+-
+-      // Confirmation modal element for Register component
+-      <Modal show={this.state.confirmIsOpen} key="registerConfirmModal">
+-
+-        <Modal.Body>
+-          Is this information for your account correct?
+-          <br></br>
+-          <p>
+-            <b>Name:</b> {this.state.fullname}
+-            <br></br>
+-            <b>Username:</b> {this.state.username}
+-            <br></br>
+-            <b>Password:</b> {this.state.password}
+-            <br></br>
+-            <b>Email Address:</b> {this.state.emailAddress}
+-            <br></br>
+-            <b>Security Question:</b> {this.state.securityQuestion}
+-            <br></br>
+-            <b>Security Question Answer:</b> {this.state.securityQuestionAnswer}
+-          </p>
+-        </Modal.Body>
+-
+-        <Modal.Footer>
+-          <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
+-          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
+-        </Modal.Footer>
+-
+-      </Modal>,
+-
+-      // Sucess modal element for Register component
+-      <Modal show={this.state.successIsOpen} key="registerSuccessModal">
+-
+-        <Modal.Body>To complete the account creation process, please check your email to complete the account creation process.</Modal.Body>
+-
+-        <Modal.Footer>
+-          <Link to="/">
+-            <Button variant="primary" className="float-right">Continue</Button>
+-          </Link>
+-        </Modal.Footer>
+-      </Modal>
+-
+-    ]
+-  }
+-
+-}
+-
+-
+-export default Register;
+\ No newline at end of file
+diff --git a/gui/src/components/runConfirmation/RunConfirmationComponent.js b/gui/src/components/runConfirmation/RunConfirmationComponent.js
+deleted file mode 100644
+index 45aa715..0000000
+--- a/gui/src/components/runConfirmation/RunConfirmationComponent.js
++++ /dev/null
+@@ -1,30 +0,0 @@
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-class RunConfirmationComponent extends Component {
+-
+-  render() {
+-    return (
+-        <div className="container">
+-            <div>
+-                <h1> Data Collection Configuration Confirmation </h1>
+-                <p> You have selected the following configuration for the data collection episode: </p>
+-            </div>
+-            <div className="text-center">
+-                <p> Network Name: </p>
+-            </div>
+-            <div className="text-center">
+-                <p> Database Details </p>
+-            </div>
+-            <Link to="/databaseContainer">
+-                <Button variant="primary" className="float-left footer-button">Back</Button>
+-            </Link>
+-            <Button variant="primary" className="float-right footer-button">Begin Collection</Button>
+-        </div>
+-    );
+-  }
+-  
+-}
+-
+-export default RunConfirmationComponent;
+\ No newline at end of file
+diff --git a/gui/src/components/shared/Dropdown.js b/gui/src/components/shared/Dropdown.js
+deleted file mode 100644
+index 4350ea9..0000000
+--- a/gui/src/components/shared/Dropdown.js
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/*
+-
+-
+-*/
+-
+-import React, { Component } from 'react';
+-
+-class Dropdown extends Component {
+-  constructor() {
+-    super();
+-    
+-    this.state = {
+-        chosenNetwork: '',
+-        message : ''
+-    };
+-    
+-    this.showMenu = this.showMenu.bind(this);
+-    this.handleDropdownChange = this.handleDropdownChange.bind(this);
+-  }
+-
+-  choseNetwork(networkName) {
+-    this.chosenNetwork=networkName;
+-  }
+-  
+-  showMenu(event) {
+-    event.preventDefault();
+-    
+-    this.setState({ showMenu: true }, () => {
+-      document.addEventListener('click', this.closeMenu);
+-    });
+-  }
+-
+-    handleDropdownChange(e) {
+-        this.setState({ chosenNetwork: e.target.value });
+-  }
+-
+-  render() {
+-    var message = "You selected " + this.state.chosenNetwork;
+-    return (
+-      <div>
+-        <div>
+-        <p>{message}</p>
+-        <select className="menu" onChange={this.handleDropdownChange}>
+-            <option value="AirLab Network">AirLab</option>
+-            <option value="Dr.Mongan Network">Dr. Mongan</option>
+-        </select>
+-        </div>
+-      </div>
+-    );
+-  }
+-}
+-
+-export default Dropdown; 
+\ No newline at end of file
+diff --git a/gui/src/components/shared/SuccessModal.js b/gui/src/components/shared/SuccessModal.js
+deleted file mode 100644
+index 00d4dac..0000000
+--- a/gui/src/components/shared/SuccessModal.js
++++ /dev/null
+@@ -1,19 +0,0 @@
+-import React from 'react';
+-import successImg from "../images/success.png";
+-
+-class SuccessModal extends React.Component {
+-  render() {
+-    //Render nothing if the "show" prop is false
+-    if(!this.props.show) {
+-      return null;
+-    }
+-
+-    return (
+-      <div>
+-          <img id="successModal" src={successImg} alt="Success"></img>
+-      </div>
+-    );
+-  }
+-}
+-
+-export default SuccessModal;
+\ No newline at end of file
+diff --git a/gui/src/components/welcomePage/Welcome.css b/gui/src/components/welcomePage/Welcome.css
+deleted file mode 100644
+index 3a451c3..0000000
+--- a/gui/src/components/welcomePage/Welcome.css
++++ /dev/null
+@@ -1,11 +0,0 @@
+-.accountAvi {
+-    position: absolute;
+-    height: 159px;
+-    width: 115px;
+-    float: left;
+-    border: 1px solid #000000;
+-}
+-
+-.accountInfo {
+-    margin-left: 14%;
+-}
+\ No newline at end of file
+diff --git a/gui/src/components/welcomePage/Welcome.js b/gui/src/components/welcomePage/Welcome.js
+deleted file mode 100644
+index 1d1e140..0000000
+--- a/gui/src/components/welcomePage/Welcome.js
++++ /dev/null
+@@ -1,70 +0,0 @@
+-/*
+-  Welcome.js
+-
+-  This component handles the GUI for the welcome screen, which is the first screen the user will see after they
+-  successfully log in. There are multiple ways the user can interact with this screen, which will offer different
+-  features that Chariot offers.
+-
+-*/
+-
+-import React, { Component } from 'react';
+-import { Link } from 'react-router-dom';
+-import Button from 'react-bootstrap/Button';
+-
+-import './Welcome.css';
+-
+-class Welcome extends Component {
+-
+-  render() {
+-    return (
+-      <div className="container" id="welcomeContent">
+-
+-        {/* Top divs of this screen. Contains user's public account information and links to stored configuration files. Also contains a logout button */}
+-        {/* Update account img source to be an import */}
+-        <div>
+-          <img alt="Account Avatar" className="accountAvi" src="data:image/png;base64,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"></img>
+-        </div>
+-        <div className="accountInfo">
+-          <b>Name: </b> __________ <br></br>
+-          <div>
+-            <Link className="link" to="/networkConfigsMain" id="networkConfigsMainLink">View Network Configurations</Link>
+-            <br></br>
+-            <Link className="link" to="/deviceConfigsMain" id="deviceConfigsMainLink">View IoT Device Configurations</Link>
+-            <br></br>
+-            <Link className="link" to="/dataOutputConfigsMain" id="dataOutputConfigsMainLink">View Data Output Configurations</Link>
+-          </div>
+-          
+-          <div>
+-            <Link to="/">
+-              <Button className="logout-button" variant="primary">Log Out</Button>
+-            </Link>
+-          </div>
+-        </div>
+-
+-        {/* Network manager portion of welcome page. Contains the link to go to 'Network Manager' screen and description of what that entails */}
+-        <div>
+-          <Link className="link" to="/networkManager">Network Manager</Link>
+-          <br></br>
+-          View, create, delete, modify, or manage your existing networks.
+-        </div>
+-
+-        <br></br>
+-
+-        {/* Data analysis portion of welcome page. Contains the link to go to 'Data Analysis' screen and description of what that entails */}
+-        <div>
+-          <Link to="/dataAnalysisMain">Perform Data Analysis</Link>
+-          <br></br>
+-          Select a storage unit and perform data analysis.
+-        </div>
+-
+-        {/* Button to go to screen that will allow user to configure settings to begin a data collection episode */}
+-        <Link to="/chooseNetwork">
+-          <Button className="footer-button" variant="primary">Configure Data Collection</Button>
+-        </Link>
+-      </div>
+-    );
+-  }
+-
+-}
+-
+-export default Welcome; 
+diff --git a/src/chariot/api/database/DatabaseAPI.py b/src/chariot/api/database/DatabaseAPI.py
+deleted file mode 100644
+index dd42559..0000000
+--- a/src/chariot/api/database/DatabaseAPI.py
++++ /dev/null
+@@ -1,5 +0,0 @@
+-from flask import Flask, request, app, jsonify, request
+-
+-from chariot.database.Database import Database
+-
+-DatabaseBaseUrl: str = '/chariot/api/v1.0/Database'
+diff --git a/src/chariot/api/network/NetworkManagerAPI.py b/src/chariot/api/network/NetworkManagerAPI.py
+deleted file mode 100644
+index b029f0d..0000000
+--- a/src/chariot/api/network/NetworkManagerAPI.py
++++ /dev/null
+@@ -1,47 +0,0 @@
+-from typing import List
+-from flask import Flask, request, app, jsonify, request
+-from chariot.network import Network, NetworkManager
+-
+-nManagerBaseUrl: str = '/chariot/api/v1.0/networkManager'
+-networkManager = NetworkManager()
+-
+-
+-@app.route(nManagerBaseUrl + '/getAllNetworks', methods=['GET'])
+-# This method will return all networks known to the networkManager and their descriptions
+-def retrieveAllNetworkNames():
+-    # iterate over networkManager and create dict of networkName as key and description as value
+-    allNames: List[str] = networkManager.getAllNetworkNames()
+-    return jsonify(allNames)
+-
+-
+-@app.route(nManagerBaseUrl + '/changeNetworkName/<str:netToModify>', methods=['POST'])
+-def modifyNetworkName(netToModify):
+-    if netToModify is None or networkManager.findNetworkByNetworkName(netToModify) is None:
+-        # throw a 500 error
+-        pass
+-
+-    requestContent = request.get_json()
+-    networkName: str = requestContent['Name']
+-    networkDesc: str = requestContent['Description']
+-
+-    networkManager.modifyNetworkNameByName(networkName, netToModify)
+-
+-
+-@app.route(nManagerBaseUrl + '/changeNetworkDescription/<str:netToModify>', methods=['POST'])
+-def modifyNetworkDescription(netToModify):
+-    if netToModify is None or networkManager.findNetworkByNetworkName(netToModify) is None:
+-        # throw a 500 error
+-        pass
+-
+-    requestContent = request.get_json()
+-    networkDesc: str = requestContent['Description']
+-
+-    networkManager.modifyNetworkDescriptionByName(networkDesc, netToModify)
+-
+-@app.route(nManagerBaseUrl + '/delete/<str:netToDelete>', methods=['POST'])
+-def deleteNetwork(netToDelete):
+-    if netToDelete is None or networkManager.findNetworkByNetworkName(netToDelete) is None:
+-        # throw a 500 error
+-        pass
+-
+-    networkManager.deleteNetworkByName(netToDelete)
+\ No newline at end of file
+diff --git a/src/chariot/database/DatabaseWriter.py b/src/chariot/database/DatabaseWriter.py
+new file mode 100644
+index 0000000..f65ae19
+--- /dev/null
++++ b/src/chariot/database/DatabaseWriter.py
+@@ -0,0 +1,61 @@
++import abc
++from typing import List
++
++
++def checkDataPoint(dataPoint: dict):
++    """
++    Check for validity of a dataPoint. dataPoint should have keys
++    "relative_time" and "freeform". If dataPoint is missing either,
++    or if it has extra keys, this function raises a ValueError.
++    """
++    if 'relative_time' not in dataPoint.keys():
++        raise ValueError('Data point has no "relative_time" key')
++    elif 'freeform' not in dataPoint.keys():
++        raise ValueError('Data point has no "freeform" key')
++    else:
++        for key in dataPoint.keys():
++            if key not in ["relative_time", "freeform"]:
++                raise ValueError('Data point has extraneous keys')
++
++
++class DatabaseWriter(metaclass=abc.ABCMeta):
++    def __init__(self):
++        pass
++
++    def __del__(self):
++        pass
++
++    @abc.abstractmethod
++    def connect(self):
++        """
++        Establish a connection to the database.
++        """
++        pass
++
++    @abc.abstractmethod
++    def disconnect(self):
++        """
++        End connection to the database gracefully.
++        """
++        pass
++
++    @abc.abstractmethod
++    def initializeTable(self):
++        """
++        Create a table in the database.
++        """
++        pass
++
++    @abc.abstractmethod
++    def insertOne(self, dataPoint: dict):
++        """
++        Check for validity of dataPoint, then insert into the table.
++        """
++        pass
++
++    @abc.abstractmethod
++    def insertMany(self, dataPoints: List[dict]):
++        """
++        Check for validity of each dataPoint,then insert into the table.
++        """
++        pass
+diff --git a/src/chariot/database/MongoDatabaseWriter.py b/src/chariot/database/MongoDatabaseWriter.py
+new file mode 100644
+index 0000000..527be30
+--- /dev/null
++++ b/src/chariot/database/MongoDatabaseWriter.py
+@@ -0,0 +1,48 @@
++from pymongo import MongoClient
++from pymongo.collection import Collection
++from typing import List
++from time import time
++
++from chariot.database.DatabaseWriter import DatabaseWriter, checkDataPoint
++
++
++class MongoDatabaseWriter(DatabaseWriter):
++    def __init__(self, connectionString: str):
++        '''
++        Connection string should follow Mongo URI format:
++        https://docs.mongodb.com/manual/reference/connection-string/
++        Eg. for localhost: 'mongodb://localhost:27017/'
++        '''
++        self.connectionString: str = connectionString
++        self.connect()
++
++    def __del__(self):
++        self.disconnect()
++
++    def connect(self):
++        self.client: MongoClient = MongoClient(self.connectionString)
++
++    def disconnect(self):
++        self.client.close()
++
++    def initializeTable(self):
++        # Create a collection to insert to
++        self.iot_database: Collection = self.client["iot_database"]["iot_data"]
++
++    def insertOne(self, dataPoint: dict):
++        checkDataPoint(dataPoint)
++
++        # Add database insertion time to dataPoint
++        dataPoint['db_insertion_time'] = int(
++            round(time.time() * 1000))  # Millis since epoch
++        self.iot_database.insert_one(dataPoint)
++
++    def insertMany(self, dataPoints: List[dict]):
++        for dataPoint in dataPoints:
++            checkDataPoint(dataPoint)
++            # Add database insertion time to dataPoint
++            dataPoint['db_insertion_time'] = datetime.now().strftime(
++                "%Y-%m-%d %H:%M:%S")
++            dataPoint['db_insertion_time'] = datetime.now()
++
++        self.iot_database.insert_many(dataPoints)
+diff --git a/src/chariot/database/MySQLDatabaseWriter.py b/src/chariot/database/MySQLDatabaseWriter.py
+new file mode 100644
+index 0000000..3e926f6
+--- /dev/null
++++ b/src/chariot/database/MySQLDatabaseWriter.py
+@@ -0,0 +1,60 @@
++from typing import List, Tuple
++import mysql.connector as connector
++
++from chariot.database.DatabaseWriter import DatabaseWriter, checkDataPoint
++
++
++class MySQLDatabaseWriter(DatabaseWriter):
++    def __init__(self, connectionString: str):
++        '''
++        Connection string should follow format:
++        user:password@host:port
++        '''
++        # Parse connection string
++        _user = connectionString.split('@')[0].split(':')[0]
++        _password = connectionString.split('@')[0].split(':')[1]
++        _host = connectionString.split('@')[1].split(':')[0]
++        _port = connectionString.split('@')[1].split(':')[1]
++
++        self.connect(_user, _password, _host, _port)
++
++    def __del__(self):
++        self.disconnect()
++
++    def connect(self, _user: str, _password: str, _host: str, _port: int):
++        self.conn: connector.connection.MySQLConnection = connector.connect(
++            user=_user, password=_password, host=_host, port=_port)
++        self.cursor: connector.cursor.MySQLCursor = self.conn.cursor()
++
++    def disconnect(self):
++        self.conn.close()
++
++    def initializeTable(self):
++        # Create a new database, to be safe
++        self.cursor.execute("CREATE DATABASE IF NOT EXISTS iot_data;")
++        self.cursor.execute("USE iot_data;")
++        self.cursor.execute(
++            "CREATE TABLE IF NOT EXISTS data(id INTEGER PRIMARY KEY AUTO_INCREMENT, db_insertion_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, relative_time BIGINT, freeform VARBINARY(64535))"
++        )
++
++    def insertOne(self, dataPoint: dict):
++        checkDataPoint(dataPoint)
++        self.cursor.execute(
++            "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
++            (dataPoint["relative_time"], dataPoint["freeform"])
++        )
++
++        self.conn.commit()
++
++    def insertMany(self, dataPoints: List[dict]):
++        for dataPoint in dataPoints:
++            checkDataPoint(dataPoint)
++
++        values_to_insert: List[Tuple[int, str]] = [(dataPoint["relative_time"], dataPoint["freeform"])
++                                                   for dataPoint in dataPoints]
++        self.cursor.executemany(
++            "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
++            values_to_insert
++        )
++
++        self.conn.commit()
+diff --git a/src/chariot/api/__init__.py b/src/chariot/database/__init__.py
+similarity index 100%
+rename from src/chariot/api/__init__.py
+rename to src/chariot/database/__init__.py
+diff --git a/src/chariot/database/run_instructions.txt b/src/chariot/database/run_instructions.txt
+new file mode 100644
+index 0000000..eeb61af
+--- /dev/null
++++ b/src/chariot/database/run_instructions.txt
+@@ -0,0 +1,9 @@
++MONGODB
++To start the server using a specified directory, run `mongod --dbpath /path/to/directory`.
++
++To start a client (so that you can see changes the MongoDatabaseWriter makes), run `mongo mongodb://localhost:27017/`.
++
++MYSQL
++To start the server, run `sudo service mysql start`.
++
++To start a client (so that you can see changes), run `sudo mysql -u root -p`
+diff --git a/src/requirements.txt b/src/requirements.txt
+index 8912262..effd171 100644
+--- a/src/requirements.txt
++++ b/src/requirements.txt
+@@ -23,6 +23,7 @@ mccabe==0.6.1
+ more-itertools==8.0.2
+ mypy==0.761
+ mypy-extensions==0.4.3
++mysql-connector==2.2.9
+ packaging==20.0
+ pbr==5.4.4
+ pkg-resources==0.0.0
+@@ -32,8 +33,8 @@ pycodestyle==2.5.0
+ pyflakes==2.1.1
+ PyHamcrest==2.0.0
+ pylint==2.4.4
++pymongo==3.10.1
+ pyparsing==2.4.6
+-pytest==5.3.2
+ PyYAML==5.3
+ six==1.13.0
+ sllurp==0.5.1
