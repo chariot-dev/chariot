@@ -1,0 +1,381 @@
+diff --git a/.gitignore b/.gitignore
+index 4d813fd..dd2e546 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -2,7 +2,7 @@
+ bin/
+ include/
+ lib/
+-lib64/
++lib64
+ pyvenv.cfg
+ share/
+ .mypy_cache/
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index 1b42f87..40b7db2 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -1,4 +1,4 @@
+-# Contributing to Chariot 
++# Contributing to Chariot
+ 
+ ## Introduction
+ 
+@@ -16,21 +16,28 @@ WIP
+ 
+ The entirety of the core is written in Python. Thus the following are required in order to have a working dev environment:
+ 
+-- NIX* environment (Linux, WSL, macOS terminal)
++- NIX\* environment (Linux, WSL, macOS terminal)
+ - Python (3.5 and above)
+ - Pip
+ 
+ Keep in mind that we enforce the use of python3 type hints as much as possible, to avoid obscurity.
+ 
+-Optionally, though strongly recommended, is to install Python's virtual environment (venv) module which will help with package management and dependency isolation. The rest of this tutorial assumes you have chosen to use a venv. 
++Optionally, though strongly recommended, is to install Python's virtual environment (venv) module which will help with package management and dependency isolation. The rest of this tutorial assumes you have chosen to use a venv.
+ 
+ Follow these steps to finish setting up:
+-1. Create a new virtual environment using the command `python3 -m venv .` in the `core` folder.
++1. Create a new virtual environment using the command `python3 -m venv .` in the `src` folder.
+ 2. Activate the newly created venv using any equivalent shell command to bash's `source ./bin/activate`.
+ 3. Install all dependencies using `pip install -r requirements.txt`.
+ 4. (WIP but intended workflow) run linters, typechecks and tests with the command `tox`. It will run using the configuration in the `tox.ini` file. If every test passes, you are ready to start contributing.
+ 
++### Running core modules
++
++The system core is structured as a Python package. You may run individual modules using the format
++
++`python3 -m chariot.network.Network`
++
++(note, no `.py` extension)
++
+ ### Pushing changes
+ 
+ Chariot follows a Pull Request model in that all changes to the master branch must be merged from a pull request. In the future, the project will have integrated CI which must pass for changes to be accepted. In the meantime, it is paramount to ensure all `tox` checks are passing before creating a pull request.
+-
+diff --git a/README.md b/README.md
+index ad62de1..d454530 100644
+--- a/README.md
++++ b/README.md
+@@ -30,7 +30,7 @@ This project is licensed under the GNU Lesser General Public License v3.0. See t
+ * [John Ho](https://github.com/jh3377)
+ * [Medard Azandegbe](https://github.com/maa433)
+ * [Kamalludin Colaire](https://github.com/kac486)
+-* [Christopher Mak](https://github.com/kac486)
++* [Christopher Mak](https://github.com/auronsento)
+ 
+ ## Acknowledgments
+ The team would like to thank:
+diff --git a/src/chariot/api/database/DatabaseAPI.py b/src/chariot/api/database/DatabaseAPI.py
+deleted file mode 100644
+index dd42559..0000000
+--- a/src/chariot/api/database/DatabaseAPI.py
++++ /dev/null
+@@ -1,5 +0,0 @@
+-from flask import Flask, request, app, jsonify, request
+-
+-from chariot.database.Database import Database
+-
+-DatabaseBaseUrl: str = '/chariot/api/v1.0/Database'
+diff --git a/src/chariot/api/network/NetworkManagerAPI.py b/src/chariot/api/network/NetworkManagerAPI.py
+deleted file mode 100644
+index b029f0d..0000000
+--- a/src/chariot/api/network/NetworkManagerAPI.py
++++ /dev/null
+@@ -1,47 +0,0 @@
+-from typing import List
+-from flask import Flask, request, app, jsonify, request
+-from chariot.network import Network, NetworkManager
+-
+-nManagerBaseUrl: str = '/chariot/api/v1.0/networkManager'
+-networkManager = NetworkManager()
+-
+-
+-@app.route(nManagerBaseUrl + '/getAllNetworks', methods=['GET'])
+-# This method will return all networks known to the networkManager and their descriptions
+-def retrieveAllNetworkNames():
+-    # iterate over networkManager and create dict of networkName as key and description as value
+-    allNames: List[str] = networkManager.getAllNetworkNames()
+-    return jsonify(allNames)
+-
+-
+-@app.route(nManagerBaseUrl + '/changeNetworkName/<str:netToModify>', methods=['POST'])
+-def modifyNetworkName(netToModify):
+-    if netToModify is None or networkManager.findNetworkByNetworkName(netToModify) is None:
+-        # throw a 500 error
+-        pass
+-
+-    requestContent = request.get_json()
+-    networkName: str = requestContent['Name']
+-    networkDesc: str = requestContent['Description']
+-
+-    networkManager.modifyNetworkNameByName(networkName, netToModify)
+-
+-
+-@app.route(nManagerBaseUrl + '/changeNetworkDescription/<str:netToModify>', methods=['POST'])
+-def modifyNetworkDescription(netToModify):
+-    if netToModify is None or networkManager.findNetworkByNetworkName(netToModify) is None:
+-        # throw a 500 error
+-        pass
+-
+-    requestContent = request.get_json()
+-    networkDesc: str = requestContent['Description']
+-
+-    networkManager.modifyNetworkDescriptionByName(networkDesc, netToModify)
+-
+-@app.route(nManagerBaseUrl + '/delete/<str:netToDelete>', methods=['POST'])
+-def deleteNetwork(netToDelete):
+-    if netToDelete is None or networkManager.findNetworkByNetworkName(netToDelete) is None:
+-        # throw a 500 error
+-        pass
+-
+-    networkManager.deleteNetworkByName(netToDelete)
+\ No newline at end of file
+diff --git a/src/chariot/database/DatabaseWriter.py b/src/chariot/database/DatabaseWriter.py
+new file mode 100644
+index 0000000..f65ae19
+--- /dev/null
++++ b/src/chariot/database/DatabaseWriter.py
+@@ -0,0 +1,61 @@
++import abc
++from typing import List
++
++
++def checkDataPoint(dataPoint: dict):
++    """
++    Check for validity of a dataPoint. dataPoint should have keys
++    "relative_time" and "freeform". If dataPoint is missing either,
++    or if it has extra keys, this function raises a ValueError.
++    """
++    if 'relative_time' not in dataPoint.keys():
++        raise ValueError('Data point has no "relative_time" key')
++    elif 'freeform' not in dataPoint.keys():
++        raise ValueError('Data point has no "freeform" key')
++    else:
++        for key in dataPoint.keys():
++            if key not in ["relative_time", "freeform"]:
++                raise ValueError('Data point has extraneous keys')
++
++
++class DatabaseWriter(metaclass=abc.ABCMeta):
++    def __init__(self):
++        pass
++
++    def __del__(self):
++        pass
++
++    @abc.abstractmethod
++    def connect(self):
++        """
++        Establish a connection to the database.
++        """
++        pass
++
++    @abc.abstractmethod
++    def disconnect(self):
++        """
++        End connection to the database gracefully.
++        """
++        pass
++
++    @abc.abstractmethod
++    def initializeTable(self):
++        """
++        Create a table in the database.
++        """
++        pass
++
++    @abc.abstractmethod
++    def insertOne(self, dataPoint: dict):
++        """
++        Check for validity of dataPoint, then insert into the table.
++        """
++        pass
++
++    @abc.abstractmethod
++    def insertMany(self, dataPoints: List[dict]):
++        """
++        Check for validity of each dataPoint,then insert into the table.
++        """
++        pass
+diff --git a/src/chariot/database/DatabaseWriterFactory.py b/src/chariot/database/DatabaseWriterFactory.py
+new file mode 100644
+index 0000000..d9b96dd
+--- /dev/null
++++ b/src/chariot/database/DatabaseWriterFactory.py
+@@ -0,0 +1,13 @@
++from chariot.database.DatabaseWriter import DatabaseWriter
++from chariot.database.MongoDatabaseWriter import MongoDatabaseWriter
++from chariot.database.MySQLDatabaseWriter import MySQLDatabaseWriter
++
++
++class DatabaseWriterFactory:
++    def GetDatabaseWriter(DatabaseWriterType: str, connectionString: str) -> DatabaseWriter:
++        if DatabaseWriterType == 'MONGODB':
++            return MongoDatabaseWriter(connectionString)
++        elif DatabaseWriterType == 'MYSQL':
++            return MySQLDatabaseWriter(connectionString)
++        else:
++            return None
+diff --git a/src/chariot/database/MongoDatabaseWriter.py b/src/chariot/database/MongoDatabaseWriter.py
+new file mode 100644
+index 0000000..527be30
+--- /dev/null
++++ b/src/chariot/database/MongoDatabaseWriter.py
+@@ -0,0 +1,48 @@
++from pymongo import MongoClient
++from pymongo.collection import Collection
++from typing import List
++from time import time
++
++from chariot.database.DatabaseWriter import DatabaseWriter, checkDataPoint
++
++
++class MongoDatabaseWriter(DatabaseWriter):
++    def __init__(self, connectionString: str):
++        '''
++        Connection string should follow Mongo URI format:
++        https://docs.mongodb.com/manual/reference/connection-string/
++        Eg. for localhost: 'mongodb://localhost:27017/'
++        '''
++        self.connectionString: str = connectionString
++        self.connect()
++
++    def __del__(self):
++        self.disconnect()
++
++    def connect(self):
++        self.client: MongoClient = MongoClient(self.connectionString)
++
++    def disconnect(self):
++        self.client.close()
++
++    def initializeTable(self):
++        # Create a collection to insert to
++        self.iot_database: Collection = self.client["iot_database"]["iot_data"]
++
++    def insertOne(self, dataPoint: dict):
++        checkDataPoint(dataPoint)
++
++        # Add database insertion time to dataPoint
++        dataPoint['db_insertion_time'] = int(
++            round(time.time() * 1000))  # Millis since epoch
++        self.iot_database.insert_one(dataPoint)
++
++    def insertMany(self, dataPoints: List[dict]):
++        for dataPoint in dataPoints:
++            checkDataPoint(dataPoint)
++            # Add database insertion time to dataPoint
++            dataPoint['db_insertion_time'] = datetime.now().strftime(
++                "%Y-%m-%d %H:%M:%S")
++            dataPoint['db_insertion_time'] = datetime.now()
++
++        self.iot_database.insert_many(dataPoints)
+diff --git a/src/chariot/database/MySQLDatabaseWriter.py b/src/chariot/database/MySQLDatabaseWriter.py
+new file mode 100644
+index 0000000..3e926f6
+--- /dev/null
++++ b/src/chariot/database/MySQLDatabaseWriter.py
+@@ -0,0 +1,60 @@
++from typing import List, Tuple
++import mysql.connector as connector
++
++from chariot.database.DatabaseWriter import DatabaseWriter, checkDataPoint
++
++
++class MySQLDatabaseWriter(DatabaseWriter):
++    def __init__(self, connectionString: str):
++        '''
++        Connection string should follow format:
++        user:password@host:port
++        '''
++        # Parse connection string
++        _user = connectionString.split('@')[0].split(':')[0]
++        _password = connectionString.split('@')[0].split(':')[1]
++        _host = connectionString.split('@')[1].split(':')[0]
++        _port = connectionString.split('@')[1].split(':')[1]
++
++        self.connect(_user, _password, _host, _port)
++
++    def __del__(self):
++        self.disconnect()
++
++    def connect(self, _user: str, _password: str, _host: str, _port: int):
++        self.conn: connector.connection.MySQLConnection = connector.connect(
++            user=_user, password=_password, host=_host, port=_port)
++        self.cursor: connector.cursor.MySQLCursor = self.conn.cursor()
++
++    def disconnect(self):
++        self.conn.close()
++
++    def initializeTable(self):
++        # Create a new database, to be safe
++        self.cursor.execute("CREATE DATABASE IF NOT EXISTS iot_data;")
++        self.cursor.execute("USE iot_data;")
++        self.cursor.execute(
++            "CREATE TABLE IF NOT EXISTS data(id INTEGER PRIMARY KEY AUTO_INCREMENT, db_insertion_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, relative_time BIGINT, freeform VARBINARY(64535))"
++        )
++
++    def insertOne(self, dataPoint: dict):
++        checkDataPoint(dataPoint)
++        self.cursor.execute(
++            "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
++            (dataPoint["relative_time"], dataPoint["freeform"])
++        )
++
++        self.conn.commit()
++
++    def insertMany(self, dataPoints: List[dict]):
++        for dataPoint in dataPoints:
++            checkDataPoint(dataPoint)
++
++        values_to_insert: List[Tuple[int, str]] = [(dataPoint["relative_time"], dataPoint["freeform"])
++                                                   for dataPoint in dataPoints]
++        self.cursor.executemany(
++            "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
++            values_to_insert
++        )
++
++        self.conn.commit()
+diff --git a/src/chariot/api/__init__.py b/src/chariot/database/__init__.py
+similarity index 100%
+rename from src/chariot/api/__init__.py
+rename to src/chariot/database/__init__.py
+diff --git a/src/chariot/database/run_instructions.txt b/src/chariot/database/run_instructions.txt
+new file mode 100644
+index 0000000..eeb61af
+--- /dev/null
++++ b/src/chariot/database/run_instructions.txt
+@@ -0,0 +1,9 @@
++MONGODB
++To start the server using a specified directory, run `mongod --dbpath /path/to/directory`.
++
++To start a client (so that you can see changes the MongoDatabaseWriter makes), run `mongo mongodb://localhost:27017/`.
++
++MYSQL
++To start the server, run `sudo service mysql start`.
++
++To start a client (so that you can see changes), run `sudo mysql -u root -p`
+diff --git a/src/requirements.txt b/src/requirements.txt
+index 8912262..effd171 100644
+--- a/src/requirements.txt
++++ b/src/requirements.txt
+@@ -23,6 +23,7 @@ mccabe==0.6.1
+ more-itertools==8.0.2
+ mypy==0.761
+ mypy-extensions==0.4.3
++mysql-connector==2.2.9
+ packaging==20.0
+ pbr==5.4.4
+ pkg-resources==0.0.0
+@@ -32,8 +33,8 @@ pycodestyle==2.5.0
+ pyflakes==2.1.1
+ PyHamcrest==2.0.0
+ pylint==2.4.4
++pymongo==3.10.1
+ pyparsing==2.4.6
+-pytest==5.3.2
+ PyYAML==5.3
+ six==1.13.0
+ sllurp==0.5.1
