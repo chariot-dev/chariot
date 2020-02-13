@@ -1,15 +1,16 @@
+from typing import Dict
+
 from chariot.device.adapter import DeviceAdapter
 from chariot.utility.exceptions import DuplicateNameError
 from chariot.utility.exceptions import NameNotFoundError
 
 
 class Network:
-    networkBaseUrl: str = '/chariot/api/v1.0/network'
 
     def __init__(self, networkName: str, networkDesc: str):
         self.networkName = networkName
         self.networkDesc = networkDesc
-        self.devices: DeviceAdapter = []
+        self.devices: Dict[str, DeviceAdapter] = {}
 
     def modifyNetworkName(self, newName: str):
         self.networkName = newName
@@ -25,44 +26,35 @@ class Network:
 
     # figure out how much error-checking to do
     def addDevice(self, device: DeviceAdapter):
+        if not device:
+            pass
+            # need custom exception
+
         # Currently just restricting adding a device that already exists in collection
-        if self.getDeviceByDeviceName(device.getDeviceName()) is None:
-            self.devices.append(device)
+        if self.isDeviceNameUnique(device.getDeviceName()):
+            # name is unique, safely add to dict
+            self.devices[device.getDeviceName] = device
         else:
-            # have a device by the same name already in collection
             raise DuplicateNameError(device.getDeviceName, self.networkName)
 
     def getDeviceByDeviceName(self, nameToFind: str) -> DeviceAdapter:
-        i: int = 0
-        while i < len(self.devices):
-            if self.devices[i].getDeviceName == nameToFind:
-                return self.devices[i]
-
-    def getDeviceIndexByName(self, nameToFind: str) -> int:
-        i: int = 0
-        while i < len(self.devices):
-            if self.devices[i].getDeviceName == nameToFind:
-                return i
-            i = i + 1
-        return -1
-
-    def getDeviceByIndex(self, index: int) -> DeviceAdapter:
-        if index - 1 > len(self.devices) or index < 0:
-            print("Invalid index given for device lookup.")
-        return self.devices[index]
+        if nameToFind in self.devices:
+            return self.devices[nameToFind]
+        else:
+            raise NameNotFoundError('device', nameToFind, self.networkName)
 
     def deleteDeviceByName(self, deviceName: str):
-        deviceIndex: int = self.getDeviceIndexByName(deviceName)
-        if deviceIndex == -1:
+        if deviceName in self.devices:
+            del self.devices[deviceName]
+        else:
             raise NameNotFoundError('device', deviceName, self.networkName)
-        else:
-            del self.devices[deviceIndex]
 
-    def deleteDeviceByIndex(self, index: int):
-        if index - 1 > len(self.devices) or index < 0:
-            print(" Invalid index given for deletion of device")
-        else:
-            del self.devices[index]
+    def isDeviceNameUnique(self, name) -> bool:
+        isUnique: bool = True
+        if name in self.devices:
+            isUnique = False
+
+        return isUnique
 
     # importDeviceConfig
     # exportNetwork - again seems like a utility method
