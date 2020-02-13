@@ -3,7 +3,7 @@ from pymongo.collection import Collection
 from typing import List
 from time import time
 
-from chariot.database.DatabaseWriter import DatabaseWriter, checkDataPoint
+from chariot.database.DatabaseWriter import DatabaseWriter
 
 
 class MongoDatabaseWriter(DatabaseWriter):
@@ -30,7 +30,7 @@ class MongoDatabaseWriter(DatabaseWriter):
         self.iot_database: Collection = self.client["iot_database"]["iot_data"]
 
     def insertOne(self, dataPoint: dict):
-        checkDataPoint(dataPoint)
+        DatabaseWriter.checkDataPoint(dataPoint)
 
         # Add database insertion time to dataPoint
         dataPoint['db_insertion_time'] = int(
@@ -39,7 +39,7 @@ class MongoDatabaseWriter(DatabaseWriter):
 
     def insertMany(self, dataPoints: List[dict]):
         for dataPoint in dataPoints:
-            checkDataPoint(dataPoint)
+            DatabaseWriter.checkDataPoint(dataPoint)
             # Add database insertion time to dataPoint
             dataPoint['db_insertion_time'] = datetime.now().strftime(
                 "%Y-%m-%d %H:%M:%S")

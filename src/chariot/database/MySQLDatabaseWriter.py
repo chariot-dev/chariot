@@ -1,7 +1,7 @@
 from typing import List, Tuple
 import mysql.connector as connector
 
-from chariot.database.DatabaseWriter import DatabaseWriter, checkDataPoint
+from chariot.database.DatabaseWriter import DatabaseWriter
 
 
 class MySQLDatabaseWriter(DatabaseWriter):
@@ -38,7 +38,7 @@ class MySQLDatabaseWriter(DatabaseWriter):
         )
 
     def insertOne(self, dataPoint: dict):
-        checkDataPoint(dataPoint)
+        DatabaseWriter.checkDataPoint(dataPoint)
         self.cursor.execute(
             "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
             (dataPoint["relative_time"], dataPoint["freeform"])
@@ -48,7 +48,7 @@ class MySQLDatabaseWriter(DatabaseWriter):
 
     def insertMany(self, dataPoints: List[dict]):
         for dataPoint in dataPoints:
-            checkDataPoint(dataPoint)
+            DatabaseWriter.checkDataPoint(dataPoint)
 
         values_to_insert: List[Tuple[int, str]] = [(dataPoint["relative_time"], dataPoint["freeform"])
                                                    for dataPoint in dataPoints]
