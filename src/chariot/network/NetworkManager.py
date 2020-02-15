@@ -2,7 +2,7 @@ from typing import Dict, List
 from flask import Flask, request, app, jsonify, request
 from chariot.utility.exceptions import NoIdentifierError
 from chariot.utility.exceptions import DuplicateNameError
-from chariot.utility.exceptions import NameNotFoundError
+from chariot.utility.exceptions.NameNotFoundError import NameNotFoundError
 from chariot.network.Network import Network
 
 
@@ -15,8 +15,8 @@ class _NetworkManager:
     # This method gives a new network name to an already defined network. Find the network by name
     def modifyNetworkNameByName(self, newName: str, toFind: str):
         # check that newName is unique to avoid data overwrites
-        if self.isNetworkNameUnique(newName) is False:
-            raise DuplicateNameError(newName, 'Network')
+        if not self.isNetworkNameUnique(newName):
+            raise DuplicateNameError(newName)
 
         network: Network = self.findNetworkByNetworkName(toFind)
 
@@ -41,15 +41,14 @@ class _NetworkManager:
             network = Network(networkName, networkDesc)
             self.userNetworks[networkName] = network
         else:
-            raise DuplicateNameError(networkName, 'Network')
+            raise DuplicateNameError(networkName)
 
     # This method deletes a Network object via name from the nested dictionary of Networks that this class manages
     def deleteNetworkByName(self, netName: str):
-        networkToDel: Network = self.findNetworkByNetworkName(netName)
-        if networkToDel in self.userNetworks:
-            del self.userNetworks[networkToDel.getNetworkName()]
+        if netName in self.userNetworks:
+            del self.userNetworks[netName]
         else:
-            raise NameNotFoundError('Network', netName, 'known networks')
+            raise NameNotFoundError('Network', netName, 'known networks', 400)
 
     # Convenience method used to return a Network object via a given network name
     def findNetworkByNetworkName(self, netNameToFind: str) -> Network:

@@ -12,6 +12,8 @@ from chariot.device.configuration import ImpinjXArrayConfiguration
 from chariot.utility.PayloadParser import PayloadParser
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
+from chariot.utility.exceptions.NameNotFoundError import NameNotFoundError
+from chariot.utility.exceptions.DuplicateNameError import DuplicateNameError
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -40,71 +42,69 @@ def createNetwork():
     requestContent = request.get_json()
 
     # check that a network name is specified in the payload
-    networkName = PayloadParser.checkForNetworkName(requestContent)
-    networkDesc: str = PayloadParser.checkForNetworkDescription(requestContent)  # note that description is optional
+    networkName = PayloadParser.getNameInPayload(requestContent)
+    networkDesc: str = PayloadParser.getNetworkDescription(requestContent)  # note that description is optional
 
     NetworkManager.addNetwork(networkName, networkDesc)
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
-@app.route(nManagerBaseUrl + '/network', methods=['POST'])
+@app.route(nManagerBaseUrl + '/network', methods=['PUT'])
 def modifyNetwork():
     # through this endpoint, a network can have its name and/or description changed
     # it must be that the old name('Name') is specified and a new name('NewName') is given in the payload
     requestContent = request.get_json()
 
     # check that a network name is specified in the payload
-    oldNetworkName = PayloadParser.checkForNetworkName(requestContent)
+    oldNetworkName = PayloadParser.getNameInPayload(requestContent)
     # check that a new name is found in the payload
-    newName = PayloadParser.checkForNewNetworkName(requestContent)
+    newName = PayloadParser.getNewNetworkName(requestContent)
 
-    networkDesc: str = PayloadParser.checkForNetworkDescription(requestContent)  # note that description is optional
+    networkDesc: str = PayloadParser.getNetworkDescription(requestContent)  # note that description is optional
 
     NetworkManager.modifyNetworkNameByName(newName, oldNetworkName)
     if networkDesc:
         NetworkManager.modifyNetworkDescriptionByName(networkDesc, newName)
 
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
 
 @app.route(nManagerBaseUrl + '/network', methods=['DELETE'])
 def deleteNetwork():
-    requestContent = request.get_json()
-    networkName = PayloadParser.checkForNetworkName(requestContent)
-    NetworkManager.deleteNetworkByName(networkName)
+    networkToDelete = PayloadParser.getNameInURL(request)
+    NetworkManager.deleteNetworkByName(networkToDelete)
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
 @app.route(nManagerBaseUrl + '/network/', methods=['GET'])
 def getNetworkDetails():
     # this method returns a specific network details
-    requestContent = request.get_json()
-    networkName = PayloadParser.checkForNetworkName(requestContent)
+    networkName = PayloadParser.getNameInURL(request)
     network: Network = NetworkManager.findNetworkByNetworkName(networkName)
 
     # convert into JSON and return
-    return json.dumps(network)
+    return jsonify(network.toString())  # take a dictionary as input and returns a string as output
 
 
 # ---  This section of endpoints deals with devices  --- #
 
-@app.route(nManagerBaseUrl + 'network/devices/supportedDevices', methods=['GET'])
+@app.route(nManagerBaseUrl + '/network/devices/supportedDevices', methods=['GET'])
 def getSupportedDevices():
     return jsonify(DeviceAdapterFactory.getsupportedDevices())
 
 
-@app.route(nManagerBaseUrl + 'network/device/config', methods=['GET'])
+@app.route(nManagerBaseUrl + '/network/device/config', methods=['GET'])
 def getSupportedDeviceConfig():
-    deviceTemplateName = request.args['DeviceName']
+    deviceTemplateName = PayloadParser.getDeviceNameInURL(request)
+
+    # get specified device template
     deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
 
     return jsonify(deviceTemplate)
 
-    # requestContent = request.get_json()
-    # deviceTemplateName = requestContent['DeviceName']
-    # get specified device template
-    # deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
-    # return jsonify(deviceTemplate)
 
 
-@app.route(nManagerBaseUrl + 'network/device', methods=['GET'])
+@app.route(nManagerBaseUrl + '/network/device', methods=['GET'])
 def getDeviceDetails():
     # ensure that a network is specified in the payload
     requestContent = request.get_json()
@@ -117,7 +117,7 @@ def getDeviceDetails():
     return jsonify(device)
 
 
-@app.route(nManagerBaseUrl + 'network/device', methods=['POST'])
+@app.route(nManagerBaseUrl + '/network/device', methods=['POST'])
 def createDevice():
     # ensure that a network is specified in the payload
     requestContent = request.get_json()
@@ -148,7 +148,7 @@ def createDevice():
     network.addDevice(device)
 
 
-@app.route(nManagerBaseUrl + 'network/device', methods=['PUT'])
+@app.route(nManagerBaseUrl + '/network/device', methods=['PUT'])
 def modifyDevice():
     # ensure that a network is specified in the payload
     requestContent = request.get_json()
@@ -156,7 +156,7 @@ def modifyDevice():
     network: Network = NetworkManager.findNetworkByNetworkName(networkName)
 
 
-@app.route(nManagerBaseUrl + 'network/device', methods=['DELETE'])
+@app.route(nManagerBaseUrl + '/network/device', methods=['DELETE'])
 def deleteDevice():
     # ensure that a network is specified in the payload
     requestContent = request.get_json()
@@ -167,6 +167,21 @@ def deleteDevice():
 
     # now delete device from specified network
     network.deleteDeviceByName(deviceName)
+
+
+# ---  This section deals with errorHandlers  --- #
+@app.errorhandler(NameNotFoundError)
+def handle_invalid_usage(error):
+    res = jsonify(error.to_dict())
+    res.status_code = error.status_code
+    return res
+
+
+@app.errorhandler(DuplicateNameError)
+def handle_duplicate_name(error):
+    res = jsonify(error.to_dict())
+    res.status_code = error.status_code
+    return res
 
 
 app.run()

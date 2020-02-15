@@ -1,8 +1,8 @@
 from typing import Dict
 
-from chariot.device.adapter import DeviceAdapter
-from chariot.utility.exceptions import DuplicateNameError
-from chariot.utility.exceptions import NameNotFoundError
+from chariot.device.adapter.DeviceAdapter import DeviceAdapter
+from chariot.utility.exceptions.DuplicateNameError import DuplicateNameError
+from chariot.utility.exceptions.NameNotFoundError import NameNotFoundError
 
 
 class Network:
@@ -35,7 +35,7 @@ class Network:
             # name is unique, safely add to dict
             self.devices[device.getDeviceName] = device
         else:
-            raise DuplicateNameError(device.getDeviceName, self.networkName)
+            raise DuplicateNameError(device.getDeviceName)
 
     def getDeviceByDeviceName(self, nameToFind: str) -> DeviceAdapter:
         if nameToFind in self.devices:
@@ -55,6 +55,13 @@ class Network:
             isUnique = False
 
         return isUnique
+
+    def toString(self):
+        network: Dict[str, str] = {self.networkName: self.networkDesc}
+        for key in self.devices:
+            network[key] = self.getDeviceByDeviceName(key).config
+
+        return network
 
     # importDeviceConfig
     # exportNetwork - again seems like a utility method
