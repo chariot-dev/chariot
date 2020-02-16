@@ -6,7 +6,6 @@ from chariot.JSONTypes import JSONObject
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 from chariot.utility import ChariotExceptions
 
-
 class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):
         self._config: Type[DeviceConfiguration] = config

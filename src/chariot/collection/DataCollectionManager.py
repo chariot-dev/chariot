@@ -8,7 +8,7 @@ from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.JSONTypes import JSONObject
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
-from chariot.utility import *
+from chariot.utility.ChariotExceptions import *
 
 class ProducerThread(Thread):
     pass
@@ -199,4 +199,3 @@ class DataCollectionManager:
         for consumer in self.consumerThreads:
             consumer.join()
         self.outputThread.join()
-
