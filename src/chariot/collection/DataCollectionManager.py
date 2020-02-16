@@ -8,7 +8,7 @@ from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.JSONTypes import JSONObject
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
-from chariot.utility import ChariotExceptions
+from chariot.utility import *
 
 class ProducerThread(Thread):
     pass
@@ -90,13 +90,13 @@ class DataCollectionManager:
 
                 # Can make an error Dictionary to clean this up but, for now use this
 
-                if isinstance(exc_val, ChariotExceptions.DeviceNotConnected):       # Should create new Error subclasses to specifiy what kind of Asserition error
+                if isinstance(exc_val, DeviceNotConnectedError):       # Should create new Error subclasses to specifiy what kind of Asserition error
                     #handle error               #should probably output errors to a logger, the logger can the error for a GUI window to pop up
                     pass
-                elif isinstance(exc_val, ChariotExceptions.InCollectionEpisodeError):
+                elif isinstance(exc_val, InCollectionEpisodeError):
                     #handle error
                     pass
-                elif isinstance(exc_val, ChariotExceptions.NotInCollectionEpisodeError):
+                elif isinstance(exc_val, NotInCollectionEpisodeError):
                     #handle error
                     pass
                 else:                              #Unkown error, crash system for now
@@ -129,7 +129,7 @@ class DataCollectionManager:
         if self._inCollectionEpisode:
             # can't set an active network during a data collection episode
             # to support concurrent network data collection, a new instance of DataCollectionManager has to be spawned
-            raise ChariotExceptions.InCollectionEpisodeError()
+            raise InCollectionEpisodeError()
         self.activeNetwork = network
         self.devices = network.getDevices()
 
@@ -138,7 +138,7 @@ class DataCollectionManager:
 
     def beginDataCollection(self) -> None:
         if self._inCollectionEpisode:
-            raise ChariotExceptions.InCollectionEpisodeError()
+            raise InCollectionEpisodeError()
 
         if len(self.devices) == 0:
             # can't collect data from a network with no devices
@@ -189,7 +189,7 @@ class DataCollectionManager:
 
     def stopDataCollection(self) -> None:
         if not self._inCollectionEpisode:
-            raise ChariotExceptions.NotInCollectionEpisodeError()
+            raise NotInCollectionEpisodeError()
         for device in self.devices:
             device.stopDataCollection()
         
