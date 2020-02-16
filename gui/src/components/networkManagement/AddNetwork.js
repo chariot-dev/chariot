@@ -64,7 +64,7 @@ class AddNetwork extends Component {
     }
     var data = {
       "NetworkName": this.state.newNetworkName, 
-      "Description": this.state.newNetworkDescription
+      "Description": this.state.newNetworkName
     }
 
     xhr.send(JSON.stringify(data));
