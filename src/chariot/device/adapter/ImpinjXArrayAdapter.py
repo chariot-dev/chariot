@@ -98,7 +98,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
         tokenData: Dict[str, str] = {'token': self.sesion.token}
         response: requests.Response = requests.put(
             revokeUrl,
-            data=json.dumps(tokenData),
+            data=dumps(tokenData),
             headers=self.session.basicAuthHeaders
             )
         return
@@ -113,7 +113,8 @@ class ImpinjXArrayAdapter(DeviceAdapter):
         while self.inCollectionEpisode:
             if not self.connected:
                 # raise DeviceNotConnected(?)Error
-                stackTrace = self._generateStackTrace(ChariotExceptions.DeviceNotConnected())
+                # this should not be here - it should be handled by the overriden thread class used to run this method
+                stackTrace = self._generateStackTrace(AssertionError('Device was not connected'))
                 errorQueue.put(stackTrace, block=True)
                 self.stopDataCollection()
                 # or continue? makes no difference
@@ -132,7 +133,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
                     if 'nextPageMarker' in jsonData:
                         self.session.dataRequestBody['pageMarker'] = jsonData['nextPageMarker']
                     else:
-                    collectedAllPages = True
+                        collectedAllPages = True
                 except Exception as err:
                     stackTrace = self._generateStackTrace(err)
                     errorQueue.put(stackTrace, block=True)
