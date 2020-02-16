@@ -1,10 +1,15 @@
 import abc
-from typing import List
+from typing import List, Type
+
+from chariot.database.DatabaseConfiguration import DatabaseConfiguration
 
 
 class DatabaseWriter(metaclass=abc.ABCMeta):
-    def __init__(self):
-        pass
+    def __init__(self, databaseConfiguration: Type[DatabaseConfiguration]):
+        self.databaseConfiguration: Type[DatabaseConfiguration] = databaseConfiguration
+        self.configMap: JSONDict = self.databaseConfiguration.configMap
+        self.connect()
+        self.initializeTable()
 
     def __del__(self):
         pass
