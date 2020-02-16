@@ -1,5 +1,8 @@
 /*
+  AddNetwork.js
 
+  This component the represents the screen where the user will initially configure the name
+  and description of their network.
 
 */
 
@@ -7,6 +10,9 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+
+const postCreateNetworkBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
+const xhr = new XMLHttpRequest();
 
 class AddNetwork extends Component {
   constructor(props) {
@@ -45,6 +51,23 @@ class AddNetwork extends Component {
     this.setState({
       successIsOpen: !this.state.successIsOpen
     });
+  }
+
+  createNetwork = () => {
+    xhr.open('POST', postCreateNetworkBaseUrl);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = function() { // Call a function when the state changes.
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        console.log('post sent');
+      }
+    }
+    var data = {
+      "NetworkName": this.state.newNetworkName, 
+      "Description": this.state.newNetworkDescription
+    }
+
+    xhr.send(JSON.stringify(data));
   }
 
   render() {
@@ -88,7 +111,7 @@ class AddNetwork extends Component {
             <Button variant="primary" className="float-left">No</Button>
           </Link>
           <Link to="/addDeviceHome">
-            <Button variant="primary" className="float-right">Yes</Button>
+            <Button variant="primary" className="float-right" onClick={this.createNetwork}>Yes</Button>
           </Link>
         </Modal.Footer>
       </Modal>

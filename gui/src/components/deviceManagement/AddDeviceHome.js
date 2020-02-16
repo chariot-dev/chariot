@@ -16,7 +16,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import AddDeviceVars from './AddDeviceVars';
 
-const getUrl = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
+const getDeviceConfigBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
 const xhr = new XMLHttpRequest();
 
 class AddDeviceHome extends Component {
@@ -34,8 +34,50 @@ class AddDeviceHome extends Component {
     }
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDeviceTypeChange = this.handleDeviceTypeChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  /*
+    Updates textfield state values as they are entered by the user.
+  */  
+  handleChange(event) {
+    this.setState({[event.target.name]: event.target.value});
+  }
+
+
+  /*
+    As the device type the user selects changes, update that in the state.
+  */
+  handleDeviceTypeChange(event) {
+    console.log('');console.log('');console.log('')
+    console.log("------------------- changed -------------------");
+    var lastDeviceType = this.state.newDeviceType;
+    console.log(lastDeviceType + " ... " + event.target.value);
+    
+    if (lastDeviceType !== event.target.value) {
+      // Because react doesn't update state immediately
+      this.setState({[event.target.name]: event.target.value}, function () {
+
+        xhr.open('GET', getDeviceConfigBaseUrl + "?DeviceName=" + this.state.newDeviceType);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        // Once a response is received
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
+              var responseJson = JSON.parse(xhr.response);
+
+              // Store the device's config file to the state
+              this.setState({newDeviceTypeConfig: responseJson});
+              this.setState({showDeviceSpecificSettings: true}); // Will cause render to update device-specific section
+          }
+        }
+
+        xhr.send(); // Send the request to the url with set headers
+
+        this.setState({ showDeviceSpecificSettings: false}); // Reset to false after render to get ready for next render
+      });
+    }
   }
 
   handleNewDeviceCreation = (submittedDeviceSpecificState) => {
@@ -53,63 +95,19 @@ class AddDeviceHome extends Component {
 
 
   /*
-    Updates prop values (device-related) as they are entered by the user.
-  */  
-  handleChange(event) {
-    this.setState({[event.target.name]: event.target.value});
-  }
-
-  /*
-    As the device type the user selects changes, update that in the state.
-  */
-  handleDeviceTypeChange(event) {
-    // Update chosen device type
-    this.setState({[event.target.name]: event.target.value});
-
-    // Boolean to show the device type's-specific settings to true
-    this.setState({showDeviceSpecificSettings: true});
-
-    console.log("handleDeviceTypeChange");
-
-    // Make GET request to get device config (to get device-specific fields for user to fill in)
-    xhr.open('GET', getUrl + "?DeviceName=" + event.target.value);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(); // Send the request to the url with set headers
-    
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-          var responseJson = JSON.parse(xhr.response);
-
-          console.log(responseJson);
-
-          // Store the device's config file to the state
-          this.setState({newDeviceTypeConfig: responseJson});
-      }
-    }  
-    
-  }
-
-
-  
-  
-
-  /*
     Function that launches the success modal after the user confirms the device
     information that they entered is correct. Also makes the POST request to the
     server to create the new device.
   */
-  toggleSuccessModal = () => {
+ toggleSuccessModal = () => {
     this.setState({
       confirmIsOpen: false
     });
     this.setState({
       successIsOpen: !this.state.successIsOpen
     });
-
-
-
   }
+
 
   /* 
     Called when the user either submits the registration form by clicking "Next"
@@ -125,6 +123,7 @@ class AddDeviceHome extends Component {
     event.preventDefault();
   }
 
+
   /*
     Returns three separate objects with their unique keys. The first object
     is the Device Creation screen itself. This screen contains the fields that
@@ -133,138 +132,64 @@ class AddDeviceHome extends Component {
     user to the other two objects, the confirmation and sucess modals.
   */
   render() {
+    // If config for device type (e.g. Impinjxarray) was obtained, load the form with the device-specific section
+    return [
+      <div className="container" key="newDeviceScreen">
+        <h1>Configure New Device Settings</h1>
+        <p className="screenInfo">Please fill in the configuration fields for your new device.</p>
 
+        <form id="createDeviceForm">
+          <div className="form-group">
+            <input required className="form-control" id="newDeviceNickname" name="newDeviceNickname" placeholder="New Device Nickname" onChange={this.handleChange}/>
+          </div>
+          <div className="form-group">
+            <textarea required className="form-control" id="newDeviceDescription" rows="3" name="newDeviceDescription" placeholder="New Device Description" onChange={this.handleChange}></textarea>
+          </div>
+          <div className="form-group">
+              <select required className="form-control" id="securityQuestion" name="newDeviceType" onChange={this.handleDeviceTypeChange}>
+                <option selected disabled hidden value="">Select a Device Type</option>
+                <option>ImpinjSpeedwayR420</option>
+                <option>ImpinjxArray</option>
+              </select>
+          </div>
 
-    if (this.state.newDeviceTypeConfig) {
-      return [
-        <div className="container" key="newDeviceScreen">
-          <h1>Configure New Device Settings</h1>
-          <p className="screenInfo">Please fill in the configuration fields for your new device.</p>
+            {this.state.showDeviceSpecificSettings ? <AddDeviceVars params={this.state} onFormSubmit={this.handleNewDeviceCreation}></AddDeviceVars> : null}
+          
+        </form>
 
-          <form id="createDeviceForm" onSubmit={this.handleNewDeviceCreation}>
-            <div className="form-group">
-              <input required className="form-control" id="newDeviceNickname" name="newDeviceNickname" placeholder="New Device Nickname" onChange={this.handleChange}/>
-            </div>
-            <div className="form-group">
-              <textarea required className="form-control" id="newDeviceDescription" rows="3" name="newDeviceDescription" placeholder="New Device Description" onChange={this.handleChange}></textarea>
-            </div>
-            <div className="form-group">
-                <select required className="form-control" id="securityQuestion" name="newDeviceType" onChange={this.handleDeviceTypeChange}>
-                  <option selected disabled hidden value="">Select a Device Type</option>
-                  <option>ImpinjSpeedwayR420</option>
-                  <option>ImpinjxArray</option>
-                </select>
-            </div>
+        <Link to="/networkManager">
+          <Button variant="primary" className="float-left footer-button">Back</Button>
+        </Link>
+      </div>,
 
-            <div>
-              {this.state.showDeviceSpecificSettings ? <AddDeviceVars params={this.state} onFormSubmit={this.handleNewDeviceCreation}></AddDeviceVars> : null}
-            </div>
-
-          </form>
-
-          <Link to="/networkManager">
-            <Button variant="primary" className="float-left footer-button">Back</Button>
-          </Link>
-        </div>,
-
-        <Modal show={this.state.confirmIsOpen} key="newDeviceConfirmModal">
-          <Modal.Body>
-            Is this information for your new device correct?
+      <Modal show={this.state.confirmIsOpen} key="newDeviceConfirmModal">
+        <Modal.Body>
+          Is this information for your new device correct?
+          <br></br>
+          <p>
+            <b>Device Nickname:</b> {this.state.newDeviceNickname}
             <br></br>
-            <p>
-              <b>Device Nickname:</b> {this.state.newDeviceNickname}
-              <br></br>
-              <b>Device Description:</b> {this.state.newDeviceDescription}
-              <br></br>
-              <b>Device Type:</b> {this.state.newDeviceType}
-              <br></br>
-            </p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
-            <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
-          </Modal.Footer>
-        </Modal>,
-
-        <Modal show={this.state.successIsOpen} key="registerSuccessModal">
-          <Modal.Body>Your new device has been created and added to the network!</Modal.Body>
-          <Modal.Footer>
-            <Link to="/welcome">
-              <Button variant="primary" className="float-right">Continue</Button>
-            </Link>
-          </Modal.Footer>
-        </Modal>
-        
-
-      ]
-    }
-    else {
-      return [
-        <div className="container" key="newDeviceScreen">
-          <h1>Configure New Device Settings</h1>
-          <p className="screenInfo">Please fill in the configuration fields for your new device.</p>
-
-          <form id="createDeviceForm" onSubmit={this.handleNewDeviceCreation}>
-            <div className="form-group">
-              <input required className="form-control" id="newDeviceNickname" name="newDeviceNickname" placeholder="New Device Nickname" onChange={this.handleChange}/>
-            </div>
-            <div className="form-group">
-              <textarea required className="form-control" id="newDeviceDescription" rows="3" name="newDeviceDescription" placeholder="New Device Description" onChange={this.handleChange}></textarea>
-            </div>
-            <div className="form-group">
-                <select required className="form-control" id="securityQuestion" name="newDeviceType" onChange={this.handleDeviceTypeChange}>
-                  <option selected disabled hidden value="">Select a Device Type</option>
-                  <option>ImpinjSpeedwayR420</option>
-                  <option>ImpinjxArray</option>
-                </select>
-            </div>
-
-          </form>
-
-          <Link to="/networkManager">
-            <Button variant="primary" className="float-left footer-button">Back</Button>
-          </Link>
-        </div>,
-
-        <Modal show={this.state.confirmIsOpen} key="newDeviceConfirmModal">
-          <Modal.Body>
-            Is this information for your new device correct?
+            <b>Device Description:</b> {this.state.newDeviceDescription}
             <br></br>
-            <p>
-              <b>Device Nickname:</b> {this.state.newDeviceNickname}
-              <br></br>
-              <b>Device Description:</b> {this.state.newDeviceDescription}
-              <br></br>
-              <b>Device Type:</b> {this.state.newDeviceType}
-              <br></br>
-            </p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
-            <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
-          </Modal.Footer>
-        </Modal>,
+            <b>Device Type:</b> {this.state.newDeviceType}
+            <br></br>
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
+          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
+        </Modal.Footer>
+      </Modal>,
 
-        <Modal show={this.state.successIsOpen} key="registerSuccessModal">
-          <Modal.Body>Your new device has been created and added to the network!</Modal.Body>
-          <Modal.Footer>
-            <Link to="/welcome">
-              <Button variant="primary" className="float-right">Continue</Button>
-            </Link>
-          </Modal.Footer>
-        </Modal>
-        
-
-      ]
-
-
-
-
-    }
-
-
-
-    
+      <Modal show={this.state.successIsOpen} key="registerSuccessModal">
+        <Modal.Body>Your new device has been created and added to the network!</Modal.Body>
+        <Modal.Footer>
+          <Link to="/welcome">
+            <Button variant="primary" className="float-right">Continue</Button>
+          </Link>
+        </Modal.Footer>
+      </Modal>
+    ]
   }
 }
  
