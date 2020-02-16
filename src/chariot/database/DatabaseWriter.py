@@ -2,18 +2,19 @@ import abc
 from typing import List, Type
 
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
+from chariot.JSONTypes import JSONDict, JSONObject
 
 
 class DatabaseWriter(metaclass=abc.ABCMeta):
     def __init__(self, databaseConfiguration: Type[DatabaseConfiguration]):
         self.databaseConfiguration: Type[DatabaseConfiguration] = databaseConfiguration
-        self.configMap: JSONDict = self.databaseConfiguration.configMap
         self.connect()
         self.initializeTable()
 
     def __del__(self):
         pass
 
+    @staticmethod
     def checkDataPoint(dataPoint: dict):
         """
         Check for validity of a dataPoint. dataPoint should have keys

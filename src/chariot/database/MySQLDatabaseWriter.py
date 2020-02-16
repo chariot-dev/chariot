@@ -1,7 +1,7 @@
 from typing import List, Tuple, Type
 import mysql.connector as connector
 
-from chariot.JSONTypes import JSONDict
+from chariot.JSONTypes import JSONDict, JSONObject
 from chariot.database.DatabaseWriter import DatabaseWriter
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
 from chariot.database.MySQLDatabaseConfiguration import MySQLDatabaseConfiguration
@@ -16,11 +16,11 @@ class MySQLDatabaseWriter(DatabaseWriter):
 
     def connect(self):
         self.conn: connector.connection.MySQLConnection = connector.connect(
-            user=self.configMap['username'],
-            password=self.configMap['password'],
-            host=self.configMap['host'],
-            port=self.configMap['port'],
-            database=self.configMap['database']
+            user=self.databaseConfiguration.username,
+            password=self.databaseConfiguration.password,
+            host=self.databaseConfiguration.host,
+            port=self.databaseConfiguration.port,
+            database=self.databaseConfiguration.database
         )
 
         self.cursor: connector.cursor.MySQLCursor = self.conn.cursor()
@@ -29,7 +29,6 @@ class MySQLDatabaseWriter(DatabaseWriter):
         self.conn.close()
 
     def initializeTable(self):
-        # Create a new database, to be safe
         self.cursor.execute(
             "CREATE TABLE IF NOT EXISTS data(id INTEGER PRIMARY KEY AUTO_INCREMENT, db_insertion_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, relative_time BIGINT, freeform VARBINARY(64535))"
         )
@@ -55,14 +54,3 @@ class MySQLDatabaseWriter(DatabaseWriter):
         )
 
         self.conn.commit()
-
-
-config = MySQLDatabaseConfiguration(
-    {
-        'databaseType': 'MySQL',
-        'host': 'localhost',
-        'port': '3306',
-        'database': 'iot_data',
-        'username': 'root',
-        'password': '5431'})
-writer = MySQLDatabaseWriter(config)

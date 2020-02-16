@@ -1,24 +1,25 @@
+from typing import Dict, List, Type
+
 from chariot.JSONTypes import JSONDict, JSONObject
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
 
 
 class MySQLDatabaseConfiguration(DatabaseConfiguration):
+    requiredFields: Dict[str, Type[JSONObject]] = {
+        'username': str,
+        'password': str,
+        'database': str,
+    }
+
+    optionalFields: Dict[str, Type[JSONObject]] = {}
+
     def __init__(self, configMap: JSONDict):
-        self.validateConfig(configMap)
-        self.configMap = configMap
+        self.requiredFields.update(super().requiredFields)
+        self.optionalFields.update(super().optionalFields)
+        super().__init__(configMap)
 
-    def validateConfig(self, configMap: JSONDict):
+    def _validateInitialConfig(self, configMap: JSONDict) -> None:
+        super()._validateInitialConfig(configMap)
         if configMap['databaseType'] != 'MySQL':
-            raise AssertionError
-
-        requiredFields: Dict[str, Type[JSONObject]] = {
-            'username': str,
-            'password': str,
-            'database': str,
-        }
-
-        for field in requiredFields:
-            fieldType = requiredFields[field]
-            if field not in configMap or not isinstance(
-                    configMap[field], fieldType):
-                raise ValueError
+            raise AssertionError(
+                'Incorrect database type for use with MySQL writer')

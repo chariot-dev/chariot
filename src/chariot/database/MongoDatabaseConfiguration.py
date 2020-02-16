@@ -1,30 +1,32 @@
+from typing import Dict, List, Type
+
 from chariot.JSONTypes import JSONDict, JSONObject
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
 
 
 class MongoDatabaseConfiguration(DatabaseConfiguration):
+    requiredFields: Dict[str, Type[JSONObject]] = {}
+
+    optionalFields: Dict[str, Type[JSONObject]] = {
+        'username': str,
+        'password': str,
+        'database': str
+    }
+
     def __init__(self, configMap: JSONDict):
-        self.validateConfig(configMap)
-        self.configMap = configMap
+        self.requiredFields.update(super().requiredFields)
+        self.optionalFields.update(super().optionalFields)
+        super().__init__(configMap)
 
-    def validateConfig(self, configMap: JSONDict):
+    def _validateInitialConfig(self, configMap: JSONDict) -> None:
+        super()._validateInitialConfig(configMap)
         if configMap['databaseType'] != 'MongoDB':
-            raise AssertionError
-
-        optionalFields: Dict[str, Type[JSONObject]] = {
-            'username': str,
-            'password': str,
-            'database': str,
-        }
-
-        for field in optionalFields:
-            fieldType = optionalFields[field]
-            if field in configMap and not isinstance(
-                    configMap[field], fieldType):
-                raise ValueError
-
+            raise AssertionError(
+                'Incorrect database type for use with MongoDB writer')
         # no username without password, or vice versa
         if 'username' in configMap and 'password' not in configMap:
-            raise ValueError
+            raise ValueError(
+                "If username is supplied, password must also be supplied")
         if 'password' in configMap and 'username' not in configMap:
-            raise ValueError
+            raise ValueError(
+                "If username is supplied, password must also be supplied")
