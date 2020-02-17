@@ -4,7 +4,6 @@ from chariot.database.DatabaseWriter import DatabaseWriter
 from chariot.database.MongoDatabaseWriter import MongoDatabaseWriter
 from chariot.database.MySQLDatabaseWriter import MySQLDatabaseWriter
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
-from chariot.database.MySQLDatabaseConfiguration import MySQLDatabaseConfiguration
 
 
 class _DatabaseWriterFactory:

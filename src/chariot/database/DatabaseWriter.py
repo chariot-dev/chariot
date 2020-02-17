@@ -1,5 +1,5 @@
 import abc
-from typing import List, Type
+from typing import List, Type, Dict
 
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
 from chariot.JSONTypes import JSONDict, JSONObject
@@ -15,7 +15,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         pass
 
     @staticmethod
-    def checkDataPoint(dataPoint: dict):
+    def checkDataPoint(dataPoint: Dict[str, JSONDict]):
         """
         Check for validity of a dataPoint. dataPoint should have keys
         "relative_time" and "freeform". If dataPoint is missing either,
@@ -52,14 +52,14 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def insertOne(self, dataPoint: dict):
+    def insertOne(self, dataPoint: Dict[str, JSONDict]):
         """
         Check for validity of dataPoint, then insert into the table.
         """
         pass
 
     @abc.abstractmethod
-    def insertMany(self, dataPoints: List[dict]):
+    def insertMany(self, dataPoints: List[Dict[str, JSONDict]]):
         """
         Check for validity of each dataPoint,then insert into the table.
         """

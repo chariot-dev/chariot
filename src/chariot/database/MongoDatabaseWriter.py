@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
-from typing import List, Type
+from typing import List, Type, Dict
 from time import time
 
 from chariot.JSONTypes import JSONDict, JSONObject
@@ -29,7 +29,6 @@ class MongoDatabaseWriter(DatabaseWriter):
             setattr(self.databaseConfiguration, 'database', 'iot_database')
         self.connectionString += self.databaseConfiguration.database
 
-        print(self.connectionString)
         # Create connection
         self.client: MongoClient = MongoClient(self.connectionString)
 
@@ -42,7 +41,7 @@ class MongoDatabaseWriter(DatabaseWriter):
         self.database: Database = self.client[self.databaseConfiguration.database]
         self.table: Collection = self.database['iot_data']
 
-    def insertOne(self, dataPoint: dict):
+    def insertOne(self, dataPoint: Dict[str, JSONDict]):
         DatabaseWriter.checkDataPoint(dataPoint)
 
         # Add database insertion time to dataPoint
@@ -50,7 +49,7 @@ class MongoDatabaseWriter(DatabaseWriter):
             round(time() * 1000))  # Millis since epoch
         self.table.insert_one(dataPoint)
 
-    def insertMany(self, dataPoints: List[dict]):
+    def insertMany(self, dataPoints: List[Dict[str, JSONDict]]):
         for dataPoint in dataPoints:
             DatabaseWriter.checkDataPoint(dataPoint)
             # Add database insertion time to dataPoint
