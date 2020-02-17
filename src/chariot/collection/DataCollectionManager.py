@@ -30,6 +30,7 @@ class DataCollectionManager:
     # TODO: complete handleError method to continuously examine the error queue
     # TODO: when DatabaseWriter is implemented, remove quotes around type definition
     # TODO: add __del__ method to stop data collection when this object goes out of scope
+    # TODO: add DataOutputStream for outputThread to also send data to
     def __init__(self, network: Union[Network, None], dbWriter: 'DatabaseWriter'):
         self.activeNetwork: Union[Network, None] = network
         self.devices: List[DeviceAdapter] = network.getDevices() if network is not None else []
@@ -77,22 +78,35 @@ class DataCollectionManager:
                     self.dataQueue.put(output, block=True)
 
     def _handleErrorsInQueue(self) -> None:
+        disconnectedDevices: OrderedDict[str, int] = OrderedDict()          #Tracks how many attempts there were to reconnect
+
         while self._inCollectionEpisode:
             try:
                 # Errors received are a tuple of the Thread name/id and the stacktrace 
-                deviceID, error = self.errorQueue.get(block=True, timeout=ERROR_CHECK_TIMEOUT)
+                deviceID ,error = self.errorQueue.get(block=True, timeout=ERROR_CHECK_TIMEOUT)
                 # handling error logic goes here - based on the type of the error we either continue
                 # or stop the whole episode
 
                 # For making changes to the correct device in the ProducerThreads List
-                errorDevice: ProducerThread = self.producerThreads.get(deviceID)
+                errorDevice: DeviceAdapter = self.activeNetwork.getDeviceByDeviceName(deviceID)
                 exc_type, exc_val, exc_trace = error
 
-                # Can make an error Dictionary to clean this up but, for now use this
+                if isinstance(exc_val, ChariotExceptions.DeviceNotConnected):
 
-                if isinstance(exc_val, ChariotExceptions.DeviceNotConnected):       # Should create new Error subclasses to specifiy what kind of Asserition error
-                    #handle error               #should probably output errors to a logger, the logger can the error for a GUI window to pop up
-                    pass
+                    if deviceID in disconnectedDevices:
+                        if disconnectedDevices[deviceID] > 3:
+                            disconnectedDevices[deviceID] += 1
+                        elif disconnectedDevices[deviceID] == 3:
+                            #LOG: f'{deviceID} has failed to reconnect. Stopping collection from device.'
+                            errorDevice.stopDataCollection()
+                            disconnectedDevices[deviceID] += 1
+                        else: 
+                            #LOG: f'Attemtpting to reconnect to {deviceID}'
+                            errorDevice.connect()
+                            disconnectedDevices[deviceID] += 1
+                    else:
+                            disconnectedDevices[deviceID] = 1
+                            errorDevice.connect()
                 elif isinstance(exc_val, ChariotExceptions.InCollectionEpisodeError):
                     #handle error
                     pass
