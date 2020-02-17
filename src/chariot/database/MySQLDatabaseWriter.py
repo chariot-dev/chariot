@@ -33,7 +33,7 @@ class MySQLDatabaseWriter(DatabaseWriter):
             "CREATE TABLE IF NOT EXISTS data(id INTEGER PRIMARY KEY AUTO_INCREMENT, db_insertion_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, relative_time BIGINT, freeform VARBINARY(64535))"
         )
 
-    def insertOne(self, dataPoint: Dict[str, JSONDict]):
+    def insertOne(self, dataPoint: Dict[str, JSONObject]):
         DatabaseWriter.checkDataPoint(dataPoint)
         self.cursor.execute(
             "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
@@ -42,7 +42,7 @@ class MySQLDatabaseWriter(DatabaseWriter):
 
         self.conn.commit()
 
-    def insertMany(self, dataPoints: List[Dict[str, JSONDict]]):
+    def insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         for dataPoint in dataPoints:
             DatabaseWriter.checkDataPoint(dataPoint)
 

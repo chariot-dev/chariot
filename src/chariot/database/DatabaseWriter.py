@@ -15,7 +15,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         pass
 
     @staticmethod
-    def checkDataPoint(dataPoint: Dict[str, JSONDict]):
+    def checkDataPoint(dataPoint: Dict[str, JSONObject]):
         """
         Check for validity of a dataPoint. dataPoint should have keys
         "relative_time" and "freeform". If dataPoint is missing either,
@@ -52,14 +52,14 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def insertOne(self, dataPoint: Dict[str, JSONDict]):
+    def insertOne(self, dataPoint: Dict[str, JSONObject]):
         """
         Check for validity of dataPoint, then insert into the table.
         """
         pass
 
     @abc.abstractmethod
-    def insertMany(self, dataPoints: List[Dict[str, JSONDict]]):
+    def insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         """
         Check for validity of each dataPoint,then insert into the table.
         """

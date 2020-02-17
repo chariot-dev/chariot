@@ -41,7 +41,7 @@ class MongoDatabaseWriter(DatabaseWriter):
         self.database: Database = self.client[self.databaseConfiguration.database]
         self.table: Collection = self.database['iot_data']
 
-    def insertOne(self, dataPoint: Dict[str, JSONDict]):
+    def insertOne(self, dataPoint: Dict[str, JSONObject]):
         DatabaseWriter.checkDataPoint(dataPoint)
 
         # Add database insertion time to dataPoint
@@ -49,7 +49,7 @@ class MongoDatabaseWriter(DatabaseWriter):
             round(time() * 1000))  # Millis since epoch
         self.table.insert_one(dataPoint)
 
-    def insertMany(self, dataPoints: List[Dict[str, JSONDict]]):
+    def insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         for dataPoint in dataPoints:
             DatabaseWriter.checkDataPoint(dataPoint)
             # Add database insertion time to dataPoint
