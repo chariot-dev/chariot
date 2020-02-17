@@ -91,7 +91,7 @@ class DataCollectionManager:
                 errorDevice: DeviceAdapter = self.activeNetwork.getDeviceByDeviceName(deviceID)
                 exc_type, exc_val, exc_trace = error
 
-                if isinstance(exc_val, DeviceNotConnected):
+                if isinstance(exc_val, DeviceNotConnectedError):
 
                     if deviceID in disconnectedDevices:
                         if disconnectedDevices[deviceID] > 3:

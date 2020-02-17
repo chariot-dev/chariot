@@ -5,7 +5,7 @@ from typing import Union
 from chariot.JSONTypes import JSONObject
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
-from chariot.utility import ChariotExceptions
+from chariot.utility.ChariotExceptions import *
 
 class ImpinjR420Adapter(DeviceAdapter):
     def __init__(self, config: ImpinjR420Configuration):
@@ -18,7 +18,7 @@ class ImpinjR420Adapter(DeviceAdapter):
     def beginDataCollection(self, errorQueue: Queue) -> None:
         if not self.connected:
             # raise DeviceNotConnected(?)Error
-            stackTrace = self._generateStackTrace(ChariotExceptions.DeviceNotConnected())
+            stackTrace = self._generateStackTrace(DeviceNotConnectedError())
             errorQueue.put(stackTrace, block=True)
         self.inCollectionEpisode = True
         try:
@@ -60,7 +60,7 @@ class ImpinjR420Adapter(DeviceAdapter):
     def disconnect(self) -> None:
         if not self.connected:
             # raise DeviceNotConnected(?)Error
-            raise ChariotExceptions.DeviceNotConnectedError()
+            raise DeviceNotConnectedError()                   #Can't we just do nothing instead of raising an error
         self.llrpFactory = None
 
     
