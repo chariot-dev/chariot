@@ -24,8 +24,8 @@ class ImpinjR420Adapter(DeviceAdapter):
         try:
             self.llrpFactory.addTagReportCallback(self._reportData)
             reactor.run()
-        except Exception as err:
-            stackTrace = self._generateStackTrace(err)
+        except FailedToBeginCollectionError:
+            stackTrace = self._generateStackTrace(FailedToBeginCollectionError())
             errorQueue.put(stackTrace, block=True)
 
     def connect(self) -> None:

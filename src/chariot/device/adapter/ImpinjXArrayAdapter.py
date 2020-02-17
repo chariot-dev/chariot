@@ -134,8 +134,8 @@ class ImpinjXArrayAdapter(DeviceAdapter):
                         self.session.dataRequestBody['pageMarker'] = jsonData['nextPageMarker']
                     else:
                         collectedAllPages = True
-                except Exception as err:
-                    stackTrace = self._generateStackTrace(err)
+                except FailedToBeginCollectionError:
+                    stackTrace = self._generateStackTrace(FailedToBeginCollectionError())
                     errorQueue.put(stackTrace, block=True)
                 sleep(self._config.pollDelay)
         self.session.dataRequestBody.pop('nextPageMarker', None)
