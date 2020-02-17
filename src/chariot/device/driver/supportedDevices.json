@@ -125,6 +125,25 @@
                 "validationRegex": "TODO"
             },
             {
+                "title": "Port Number",
+                "alias": "port",
+                "description": "",
+                "type": "Number",
+                "inputType": "number",
+                "required": true,
+                "maxLength": 4,
+                "validationRegex": "TODO"
+            },
+            {
+                "title": "Tag Report Rate",
+                "alias": "report_every_n_tags",
+                "description": "The value of this field is how many tags will be collected before reporting",
+                "type": "Number",
+                "inputType": "number",
+                "required": false,
+                "validationRegex": "\\d+"
+            },
+            {
                 "title": "Antennas",
                 "alias": "antennas",
                 "description": "",
@@ -235,7 +254,7 @@
                     },
                     {
                         "title": "Enable Peak RSSI",
-                        "alias": "EnablePeakRSSI",
+                        "alias": "EnablePeakRSSI_General",
                         "description": "",
                         "type": "Boolean",
                         "inputType": "checkbox",
@@ -272,14 +291,6 @@
                         "type": "Boolean",
                         "inputType": "checkbox",
                         "required": false
-                    },
-                    {
-                        "title": "Enable Tag Seen Count",
-                        "alias": "EnableTagSeenCount",
-                        "description": "",
-                        "type": "Boolean",
-                        "inputType": "checkbox",
-                        "required": false
                     }
                 ]
             },
@@ -289,7 +300,7 @@
                 "settingsList": [
                     {
                         "title": "Enable Peak RSSI",
-                        "alias": "EnablePeakRSSI",
+                        "alias": "EnablePeakRSSI_Impinj",
                         "description": "",
                         "type": "Boolean",
                         "inputType": "checkbox",

@@ -44,14 +44,14 @@ class _NetworkManager:
             raise DuplicateNameError(networkName)
 
     # This method deletes a Network object via name from the nested dictionary of Networks that this class manages
-    def deleteNetworkByName(self, netName: str):
-        if netName in self.userNetworks:
-            del self.userNetworks[netName]
-        else:
-            raise NameNotFoundError('Network', netName, 'known networks', 400)
+    def deleteNetworkByName(self, netName: int):
+        networkToDel: Network = self.findNetworkByNetworkName(netName)
+        if networkToDel is not None:
+            del self.userNetworks[networkToDel.getNetworkName()]
 
     # Convenience method used to return a Network object via a given network name
     def findNetworkByNetworkName(self, netNameToFind: str) -> Network:
+        # since the collection is nested dictionaries, find the name with .get()
         try:
             network: Network = self.userNetworks[netNameToFind]
         except KeyError:
