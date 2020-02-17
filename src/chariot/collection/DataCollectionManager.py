@@ -91,7 +91,7 @@ class DataCollectionManager:
                 errorDevice: DeviceAdapter = self.activeNetwork.getDeviceByDeviceName(deviceID)
                 exc_type, exc_val, exc_trace = error
 
-                if isinstance(exc_val, ChariotExceptions.DeviceNotConnected):
+                if isinstance(exc_val, DeviceNotConnected):
 
                     if deviceID in disconnectedDevices:
                         if disconnectedDevices[deviceID] > 3:
@@ -107,7 +107,7 @@ class DataCollectionManager:
                     else:
                             disconnectedDevices[deviceID] = 1
                             errorDevice.connect()
-                elif isinstance(exc_val, ChariotExceptions.InCollectionEpisodeError):
+                elif isinstance(exc_val, InCollectionEpisodeError):
                     #handle error
                     pass
                 elif isinstance(exc_val, NotInCollectionEpisodeError):
