@@ -1,5 +1,5 @@
 from typing import List
-from chariot.device.DeviceAdapter import DeviceAdapter
+from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 
 
 class Network:

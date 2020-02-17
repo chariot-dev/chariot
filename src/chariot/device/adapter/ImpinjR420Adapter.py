@@ -60,7 +60,7 @@ class ImpinjR420Adapter(DeviceAdapter):
     def disconnect(self) -> None:
         if not self.connected:
             # raise DeviceNotConnected(?)Error
-            raise ChariotExceptions.DeviceNotConnected()
+            raise ChariotExceptions.DeviceNotConnectedError()
         self.llrpFactory = None
 
     
