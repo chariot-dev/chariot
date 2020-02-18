@@ -11,8 +11,8 @@ from chariot.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
 class _DeviceAdapterFactory:
     def __init__(self):
         self.deviceMap: Dict[str, Type[DeviceAdapter]] = {
-            'Impinj xArray': ImpinjXArrayAdapter,
-            'Impinj Speedway R420': ImpinjR420Adapter
+            'ImpinjxArray': ImpinjXArrayAdapter,
+            'ImpinjSpeedwayR420': ImpinjR420Adapter
         }
 
         currentPath = path.dirname(path.abspath(__file__))
@@ -20,11 +20,11 @@ class _DeviceAdapterFactory:
             self._supportedDevices: JSONDict = load(deviceList)
 
     def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:
-        if config.deviceType not in self._supportedDevices:
+        if config['deviceType'] not in self._supportedDevices:
             # raise UnsupportedDeviceError
             raise AssertionError
 
-        instance: Type[DeviceAdapter] = self.deviceMap[config.deviceType](config)
+        instance: Type[DeviceAdapter] = self.deviceMap[config['deviceType']](config)
         return instance
 
     def getsupportedDevices(self) -> JSONDict:

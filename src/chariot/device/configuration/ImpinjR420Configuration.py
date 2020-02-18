@@ -32,7 +32,7 @@ class ImpinjR420Configuration(DeviceConfiguration):
     def __init__(self, configMap: JSONDict):
         self.requiredFields.update(super().requiredFields)
         self.optionalFields.update(super().optionalFields)
-        super().__init__(self._flattenSettingsGroups(configMap))
+        #super().__init__(self._flattenSettingsGroups(configMap))
 
     def _flattenSettingsGroups(self, configMap: JSONDict) -> JSONDict:
         # since some R420 settings come in as a group, we need to flatten them to make verification easier
@@ -44,7 +44,7 @@ class ImpinjR420Configuration(DeviceConfiguration):
 
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
-        if configMap['deviceType'] != 'Impinj Speedway R420':
+        if configMap['deviceType'] != 'ImpinjSpeedwayR420':
             raise AssertionError
 
 

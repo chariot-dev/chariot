@@ -1,4 +1,5 @@
 from queue import Queue
+from typing import Dict
 from sllurp.llrp import LLRPClientFactory
 from twisted.internet import reactor
 from typing import Union
