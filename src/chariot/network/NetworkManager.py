@@ -78,6 +78,19 @@ class _NetworkManager:
 
         return allNetworks
 
+    def getAllNetworkNamesAndDevices(self):
+        allNetworks = []
+
+        for key in self.userNetworks:
+            networkSpecifics: Dict[str, str] = \
+                {'NetworkName': key,
+                 'Description': self.findNetworkByNetworkName(key).getNetworkDesc(),
+                 'Devices': self.findNetworkByNetworkName(key).getAllDeviceNamesOnNetwork()
+                 }
+            allNetworks.append(networkSpecifics)
+
+        return allNetworks
+
     # def importNetworkConfiguration
     # def exportNetworkConfiguration
     # https://blog.miguelgrinberg.com/index/page/3
