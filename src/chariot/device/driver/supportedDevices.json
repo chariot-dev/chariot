@@ -1,5 +1,5 @@
 {
-    "Impinj xArray": {
+    "ImpinjxArray": {
         "imgSrc": "some_imgur_link",
         "description": "The Impinj xArray gateway is a fixed infrastructure RAIN RFID reader system that provides always-on, wide-area monitoring, location, and direction of items.",
         "settings": [
@@ -110,7 +110,7 @@
             }
         ]
     },
-    "Impinj Speedway R420": {
+    "ImpinjSpeedwayR420": {
         "imgSrc": "some_imgur_link",
         "description": "",
         "settings": [

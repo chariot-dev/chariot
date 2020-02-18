@@ -6,9 +6,9 @@ from flask_cors import CORS
 
 from chariot.device.DeviceAdapterFactory import DeviceAdapterFactory
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.device.configuration import DeviceConfiguration
-from chariot.device.configuration import ImpinjR420Configuration
-from chariot.device.configuration import ImpinjXArrayConfiguration
+from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
+from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
+from chariot.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
 from chariot.utility.PayloadParser import PayloadParser
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
@@ -76,7 +76,7 @@ def deleteNetwork():
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
-@app.route(nManagerBaseUrl + '/network/', methods=['GET'])
+@app.route(nManagerBaseUrl + '/network', methods=['GET'])
 def getNetworkDetails():
     # this method returns a specific network details
     networkName = PayloadParser.getNameInURL(request)
@@ -103,49 +103,69 @@ def getSupportedDeviceConfig():
     return jsonify(deviceTemplate)
 
 
-
 @app.route(nManagerBaseUrl + '/network/device', methods=['GET'])
 def getDeviceDetails():
     # ensure that a network is specified in the payload
     requestContent = request.get_json()
-    networkName = PayloadParser.checkForNetworkName(requestContent)
+    networkName = PayloadParser.getNameInURL(request)
     network: Network = NetworkManager.findNetworkByNetworkName(networkName)
 
     # find device in network
-    device = network.getDeviceByDeviceName(requestContent['deviceName'])
+    deviceName: str = PayloadParser.getDeviceNameInURL(request)
+    device = network.getDeviceByDeviceName(deviceName)
 
-    return jsonify(device)
+    return jsonify(device.getDeviceConfiguration())
 
 
 @app.route(nManagerBaseUrl + '/network/device', methods=['POST'])
 def createDevice():
     # ensure that a network is specified in the payload
     requestContent = request.get_json()
-    networkName = PayloadParser.checkForNetworkName(requestContent)
+    networkName = PayloadParser.getNameInPayload(requestContent)
     network: Network = NetworkManager.findNetworkByNetworkName(networkName)
 
     deviceToCreate: str = ''
-    configurationInstance: DeviceConfiguration
+    configurationInstance: DeviceConfiguration = DeviceConfiguration.requiredFields
     supportedDevices = DeviceAdapterFactory.getsupportedDevices()
 
     # need to find which of the supported devices is found in the payload
-    if requestContent['deviceToCreate'] in supportedDevices:
-        deviceToCreate: str = requestContent['deviceToCreate']
+    if requestContent['deviceType'] in supportedDevices:
+        deviceToCreate: str = requestContent['deviceType']
+    else:
+        # need error saying device is not supported
+        pass
+
+    # ensure that generic required fields are in payload
+    for genericRequired in DeviceConfiguration.requiredFields.keys():
+        configurationInstance[genericRequired] = requestContent[genericRequired]
 
     # now that specific device has been identified, ensure that configuration variables are filled correctly
-    if deviceToCreate == "Impinj xArray":
-        configurationInstance = ImpinjXArrayConfiguration(requestContent[deviceToCreate])
-    elif deviceToCreate == "Impinj Speedway R420":
-        configurationInstance = ImpinjR420Configuration(requestContent[deviceToCreate])
+    if deviceToCreate == "ImpinjxArray":
+        for requiredField in ImpinjXArrayConfiguration.requiredFields:
+            configurationInstance[requiredField] = requestContent[requiredField]
+
+        ImpinjXArrayConfiguration(configurationInstance)
+    elif deviceToCreate == "ImpinjSpeedwayR420":
+        for requiredField in ImpinjR420Configuration.requiredFields:
+            configurationInstance[requiredField] = requestContent[requiredField]
+
+        for optionalField in ImpinjR420Configuration.optionalFields:
+            if optionalField in requestContent:
+                configurationInstance[optionalField] = requestContent[optionalField]
+
+        # validating that values are of correct type
+        ImpinjR420Configuration(configurationInstance)
     else:
         # device user wants to create is not supported raise error
         pass
 
     # now use the factory to create a deviceAdapter instance
-    device: DeviceAdapter = DeviceAdapterFactory(configurationInstance)
+    device: DeviceAdapter = DeviceAdapterFactory.getInstance(configurationInstance)
 
     # add device to specified network
     network.addDevice(device)
+
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
 @app.route(nManagerBaseUrl + '/network/device', methods=['PUT'])
@@ -159,14 +179,14 @@ def modifyDevice():
 @app.route(nManagerBaseUrl + '/network/device', methods=['DELETE'])
 def deleteDevice():
     # ensure that a network is specified in the payload
-    requestContent = request.get_json()
-    networkName = PayloadParser.checkForNetworkName(requestContent)
+    networkName = PayloadParser.getNameInURL(request)
     network: Network = NetworkManager.findNetworkByNetworkName(networkName)
 
-    deviceName = PayloadParser.checkForDeviceName(requestContent)
+    deviceName = PayloadParser.getDeviceNameInURL(request)
 
     # now delete device from specified network
     network.deleteDeviceByName(deviceName)
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
 # ---  This section deals with errorHandlers  --- #
