@@ -1,7 +1,8 @@
 from typing import Dict, List
 from flask import Flask, request, app, jsonify, request
-from chariot.utility.exceptions import NoIdentifierError
-from chariot.utility.exceptions import DuplicateNameError
+from chariot.utility.exceptions.NoIdentifierError import NoIdentifierError
+from chariot.utility.exceptions.DuplicateNameError import DuplicateNameError
+from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 from chariot.utility.exceptions.NameNotFoundError import NameNotFoundError
 from chariot.network.Network import Network
 
@@ -16,7 +17,9 @@ class _NetworkManager:
     def modifyNetworkNameByName(self, newName: str, toFind: str):
         # check that newName is unique to avoid data overwrites
         if not self.isNetworkNameUnique(newName):
-            raise DuplicateNameError(newName)
+            raise DuplicateNameError(
+                ErrorStrings.ERR_Not_Unique_Network_Name.value.format(newName)
+            )
 
         network: Network = self.findNetworkByNetworkName(toFind)
 
@@ -34,17 +37,17 @@ class _NetworkManager:
     # This method adds a Network object to the dictionary of Networks that this class manages
     def addNetwork(self, networkName: str, networkDesc: str):
         if networkName is None:
-            raise NoIdentifierError('Network')
+            raise NoIdentifierError(ErrorStrings.ERR_Specify_Network_Identifier)
 
         # When adding a key, if the same key is in the dict, the values are overriden. Avoid this.
         if self.isNetworkNameUnique(networkName):
             network = Network(networkName, networkDesc)
             self.userNetworks[networkName] = network
         else:
-            raise DuplicateNameError(networkName)
+            raise DuplicateNameError(ErrorStrings.ERR_Not_Unique_Network_Name.value.format(networkName))
 
     # This method deletes a Network object via name from the nested dictionary of Networks that this class manages
-    def deleteNetworkByName(self, netName: int):
+    def deleteNetworkByName(self, netName: str):
         networkToDel: Network = self.findNetworkByNetworkName(netName)
         if networkToDel is not None:
             del self.userNetworks[networkToDel.getNetworkName()]
@@ -55,7 +58,7 @@ class _NetworkManager:
         try:
             network: Network = self.userNetworks[netNameToFind]
         except KeyError:
-            raise NameNotFoundError('Network', netNameToFind, 'known networks')
+            raise NameNotFoundError(ErrorStrings.ERR_Network_Not_Found_In_Collection.value.format(netNameToFind))
         return network
 
     # Convenience method that checks whether a network by the same name exists in the collection

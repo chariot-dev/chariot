@@ -3,6 +3,8 @@ from typing import Dict
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.utility.exceptions.DuplicateNameError import DuplicateNameError
 from chariot.utility.exceptions.NameNotFoundError import NameNotFoundError
+from chariot.utility.exceptions.NoIdentifierError import NoIdentifierError
+from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 
 
 class Network:
@@ -26,28 +28,33 @@ class Network:
 
     # figure out how much error-checking to do
     def addDevice(self, device: DeviceAdapter):
-        if not device:
-            pass
-            # need custom exception
+        if device is None:
+            NoIdentifierError(ErrorStrings.ERR_Specify_Device_Identifier)
 
         # Currently just restricting adding a device that already exists in collection
-        if self.isDeviceNameUnique(device.getDeviceName()):
+        if self.isDeviceNameUnique(device.getId()):
             # name is unique, safely add to dict
-            self.devices[device.getDeviceName] = device
+            self.devices[device.getId()] = device
         else:
-            raise DuplicateNameError(device.getDeviceName)
+            raise DuplicateNameError(
+                ErrorStrings.ERR_Not_Unique_Device_Name.value.format(device.getId(), self.getNetworkName()))
 
     def getDeviceByDeviceName(self, nameToFind: str) -> DeviceAdapter:
+        if nameToFind is None:
+            NoIdentifierError(ErrorStrings.ERR_Specify_Device_Identifier)
+
         if nameToFind in self.devices:
             return self.devices[nameToFind]
         else:
-            raise NameNotFoundError('device', nameToFind, self.networkName)
+            raise NameNotFoundError(
+                ErrorStrings.ERR_Device_Not_Found_In_Collection.value.format(nameToFind, self.getNetworkName()))
 
     def deleteDeviceByName(self, deviceName: str):
         if deviceName in self.devices:
             del self.devices[deviceName]
         else:
-            raise NameNotFoundError('device', deviceName, self.networkName)
+            raise NameNotFoundError(
+                ErrorStrings.ERR_Device_Not_Found_In_Collection.value.format(deviceName, self.getNetworkName()))
 
     def isDeviceNameUnique(self, name) -> bool:
         isUnique: bool = True
@@ -57,9 +64,11 @@ class Network:
         return isUnique
 
     def toString(self):
-        network: Dict[str, str] = {self.networkName: self.networkDesc}
+        network: Dict[str, str] = {'NetworkName': self.networkName, 'Description': self.networkDesc}
+
+        # add each deviceId as key and the configuration as value
         for key in self.devices:
-            network[key] = self.getDeviceByDeviceName(key).config
+            network[key] = self.getDeviceByDeviceName(key).getDeviceConfiguration()
 
         return network
 
