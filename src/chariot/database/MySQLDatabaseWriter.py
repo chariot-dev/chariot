@@ -1,7 +1,7 @@
 from typing import List, Tuple, Type, Dict
 import mysql.connector as connector
 
-from chariot.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONDict, JSONObject
 from chariot.database.DatabaseWriter import DatabaseWriter
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
 from chariot.database.MySQLDatabaseConfiguration import MySQLDatabaseConfiguration

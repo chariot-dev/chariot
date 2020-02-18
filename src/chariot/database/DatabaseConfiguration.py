@@ -2,7 +2,7 @@ import abc
 from json import dumps
 from typing import Dict, Type
 
-from chariot.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONDict, JSONObject
 
 
 class DatabaseConfiguration(metaclass=abc.ABCMeta):

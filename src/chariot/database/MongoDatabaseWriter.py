@@ -4,7 +4,7 @@ from pymongo.collection import Collection
 from typing import List, Type, Dict
 from time import time
 
-from chariot.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONDict, JSONObject
 from chariot.database.DatabaseWriter import DatabaseWriter
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
 from chariot.database.MongoDatabaseConfiguration import MongoDatabaseConfiguration

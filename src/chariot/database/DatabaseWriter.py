@@ -2,7 +2,7 @@ import abc
 from typing import List, Type, Dict
 
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
-from chariot.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONDict, JSONObject
 
 
 class DatabaseWriter(metaclass=abc.ABCMeta):
