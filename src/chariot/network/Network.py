@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.utility.exceptions.DuplicateNameError import DuplicateNameError
@@ -62,6 +62,14 @@ class Network:
             isUnique = False
 
         return isUnique
+
+    def getAllDeviceNamesOnNetwork(self) -> List[str]:
+        devices: List[str] = []
+
+        for deviceName in self.devices:
+            devices.append(deviceName)
+
+        return devices
 
     def toString(self):
         network: Dict[str, str] = {'NetworkName': self.networkName, 'Description': self.networkDesc}

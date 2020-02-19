@@ -34,7 +34,8 @@ def retrieveAllNetworkNames():
 @app.route(nManagerBaseUrl + '/networks/all', methods=['GET'])
 # This method will return all known networks along with their devices
 def retrieveAllNetworkDetails():
-    pass
+    networksAndDevices = NetworkManager.getAllNetworkNamesAndDevices()
+    return jsonify(networksAndDevices)
 
 
 @app.route(nManagerBaseUrl + '/network', methods=['POST'])
@@ -96,9 +97,16 @@ def getSupportedDevices():
 @app.route(nManagerBaseUrl + '/network/device/config', methods=['GET'])
 def getSupportedDeviceConfig():
     deviceTemplateName = PayloadParser.getDeviceNameInURL(request)
+    config: Dict[str, str] = {}
+
+    #include generic required fields
+    genericTemplate = DeviceConfiguration.requiredFields
 
     # get specified device template
     deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
+
+    for requiredField in genericTemplate:
+        deviceTemplate[deviceTemplateName][requiredField] = ""
 
     return jsonify(deviceTemplate)
 
