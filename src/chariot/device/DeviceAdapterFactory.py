@@ -6,13 +6,15 @@ from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 from chariot.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
 from chariot.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
+from chariot.device.adapter.TestAdapter import TestAdapter
 
 
 class _DeviceAdapterFactory:
     def __init__(self):
         self.deviceMap: Dict[str, Type[DeviceAdapter]] = {
             'Impinj xArray': ImpinjXArrayAdapter,
-            'Impinj Speedway R420': ImpinjR420Adapter
+            'Impinj Speedway R420': ImpinjR420Adapter,
+            'Test Device': TestAdapter
         }
 
         currentPath = path.dirname(path.abspath(__file__))
