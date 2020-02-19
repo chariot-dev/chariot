@@ -21,5 +21,4 @@ class MySQLDatabaseConfiguration(DatabaseConfiguration):
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
         if configMap['databaseType'] != 'MySQL':
-            raise AssertionError(
-                'Incorrect database type for use with MySQL writer')
+            raise AssertionError('Incorrect database type for use with MySQL writer')

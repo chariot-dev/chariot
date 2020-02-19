@@ -1,34 +1,33 @@
 import abc
-from typing import List, Type, Dict
+from typing import Dict, List, Type
 
 from chariot.database.DatabaseConfiguration import DatabaseConfiguration
 from chariot.utility.JSONTypes import JSONDict, JSONObject
 
 
 class DatabaseWriter(metaclass=abc.ABCMeta):
+    requiredFields: Dict[str, Type[JSONObject]] = {
+        'relative_time': str,
+        'freeform': Type[JSONObject],
+    }
+
     def __init__(self, databaseConfiguration: Type[DatabaseConfiguration]):
         self.databaseConfiguration: Type[DatabaseConfiguration] = databaseConfiguration
         self.connect()
         self.initializeTable()
 
-    def __del__(self):
-        pass
-
-    @staticmethod
-    def checkDataPoint(dataPoint: Dict[str, JSONObject]):
+    def validateDataPoint(self, dataPoint: Dict[str, JSONObject]):
         """
         Check for validity of a dataPoint. dataPoint should have keys
         "relative_time" and "freeform". If dataPoint is missing either,
         or if it has extra keys, this function raises a ValueError.
         """
-        if 'relative_time' not in dataPoint.keys():
-            raise ValueError('Data point has no "relative_time" key')
-        elif 'freeform' not in dataPoint.keys():
-            raise ValueError('Data point has no "freeform" key')
-        else:
-            for key in dataPoint.keys():
-                if key not in ["relative_time", "freeform"]:
-                    raise ValueError('Data point has extraneous keys')
+        for key in self.requiredFields:
+            if key not in dataPoint:
+                raise AssertionError(f'the field "{key}" is missing from the data point')
+        for key in dataPoint:
+            if key not in self.requiredFields:
+                raise AssertionError(f'an invalid field "{key}" was included in the data point')
 
     @abc.abstractmethod
     def connect(self):

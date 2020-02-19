@@ -3,19 +3,17 @@ from chariot.utility.JSONTypes import JSONDict, JSONObject
 from json import dumps
 from typing import Dict, Type
 
-class DeviceConfiguration(Configuration):
+class DatabaseConfiguration(Configuration):
     requiredFields: Dict[str, Type[JSONObject]] = {
-        'deviceId': str,
-        'deviceType': str,
-        'pollDelay': str,
+        'databaseType': str
     }
 
     def _validateSubsetConfig(self, newConfig: JSONDict) -> None:
-        for field in newConfig:
-            if field == 'deviceType':
-                # cannot edit deviceType
-                raise AssertionError
         super()._validateSubsetConfig(newConfig)
+        for field in newConfig:
+            if field == 'databaseType':
+                # cannot edit databaseType
+                raise AssertionError
 
 
-__all__ = ['DeviceConfiguration']
+__all__ = ['DatabaseConfiguration']

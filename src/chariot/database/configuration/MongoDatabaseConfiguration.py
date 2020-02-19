@@ -21,12 +21,8 @@ class MongoDatabaseConfiguration(DatabaseConfiguration):
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
         if configMap['databaseType'] != 'MongoDB':
-            raise AssertionError(
-                'Incorrect database type for use with MongoDB writer')
-        # no username without password, or vice versa
+            raise AssertionError('Incorrect database type for use with MongoDB writer')
         if 'username' in configMap and 'password' not in configMap:
-            raise ValueError(
-                "If username is supplied, password must also be supplied")
+            raise ValueError('"username" was supplied but "password" was not')
         if 'password' in configMap and 'username' not in configMap:
-            raise ValueError(
-                "If username is supplied, password must also be supplied")
+            raise ValueError('"password" was supplied but "username" was not')

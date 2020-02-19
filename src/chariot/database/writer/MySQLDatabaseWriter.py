@@ -34,7 +34,7 @@ class MySQLDatabaseWriter(DatabaseWriter):
         )
 
     def insertOne(self, dataPoint: Dict[str, JSONObject]):
-        DatabaseWriter.checkDataPoint(dataPoint)
+        DatabaseWriter.validateDataPoint(dataPoint)
         self.cursor.execute(
             "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
             (dataPoint["relative_time"], dataPoint["freeform"])
@@ -44,7 +44,7 @@ class MySQLDatabaseWriter(DatabaseWriter):
 
     def insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         for dataPoint in dataPoints:
-            DatabaseWriter.checkDataPoint(dataPoint)
+            DatabaseWriter.validateDataPoint(dataPoint)
 
         values_to_insert: List[Tuple[int, str]] = [(dataPoint["relative_time"], dataPoint["freeform"])
                                                    for dataPoint in dataPoints]

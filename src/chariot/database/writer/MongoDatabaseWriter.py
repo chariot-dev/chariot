@@ -29,7 +29,6 @@ class MongoDatabaseWriter(DatabaseWriter):
             setattr(self.databaseConfiguration, 'database', 'iot_database')
         self.connectionString += self.databaseConfiguration.database
 
-        # Create connection
         self.client: MongoClient = MongoClient(self.connectionString)
 
     def disconnect(self):
@@ -42,18 +41,16 @@ class MongoDatabaseWriter(DatabaseWriter):
         self.table: Collection = self.database['iot_data']
 
     def insertOne(self, dataPoint: Dict[str, JSONObject]):
-        DatabaseWriter.checkDataPoint(dataPoint)
+        DatabaseWriter.validateDataPoint(dataPoint)
 
         # Add database insertion time to dataPoint
-        dataPoint['db_insertion_time'] = int(
-            round(time() * 1000))  # Millis since epoch
+        dataPoint['db_insertion_time'] = int(round(time() * 1000))  # Millis since epoch
         self.table.insert_one(dataPoint)
 
     def insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         for dataPoint in dataPoints:
-            DatabaseWriter.checkDataPoint(dataPoint)
+            DatabaseWriter.validateDataPoint(dataPoint)
             # Add database insertion time to dataPoint
-            dataPoint['db_insertion_time'] = int(
-                round(time() * 1000))  # Millis since epoch
+            dataPoint['db_insertion_time'] = int(round(time() * 1000))  # Millis since epoch
 
         self.table.insert_many(dataPoints)
