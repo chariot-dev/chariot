@@ -193,7 +193,7 @@ class AddDeviceHome extends Component {
           var curGeneralValsVal = this.state.deviceState.newDeviceTypeGeneralVals[curGeneralValsKey];
 
           confirmationElement.push(
-            <div><b>{curGeneralValsKey}</b>: {curGeneralValsVal}</div>
+            <div key={curGeneralValsKey}><b>{curGeneralValsKey}</b>: {curGeneralValsVal}</div>
           );
         }
       }

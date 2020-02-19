@@ -9,8 +9,7 @@ class ManageExistingNetworks extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      existingNetworkNames: null,
-      existingNetworkDescriptions: null
+      existingNetworks: []
     }
   } 
 
@@ -27,19 +26,15 @@ class ManageExistingNetworks extends Component {
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
         if (xhr.status === 200) {
-          var responseJson = JSON.parse(xhr.responseText); // Response is a dictionary 
-          
-          // Getting network names/descriptions and adding them to respective arrays
-          var tempNetworkNames = [];
-          var tempNetworkDescriptions = [];
-          for (var networkName in responseJson) {
-            tempNetworkNames.push(networkName);
-            tempNetworkDescriptions.push(responseJson[networkName]);
+          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+
+          var updatedNetworksJsonArray = this.state.existingNetworks; 
+
+          for (var i = 0; i < responseJsonArray.length; i++) {
+            updatedNetworksJsonArray.push(responseJsonArray[i]);
           }
-          
-          // Update state with gotten network names and descriptions
-          this.setState({existingNetworkNames: tempNetworkNames});
-          this.setState({existingNetworkDescriptions: tempNetworkDescriptions});
+
+          this.setState({ existingNetworks: updatedNetworksJsonArray });
         }
       }
     }
@@ -51,14 +46,29 @@ class ManageExistingNetworks extends Component {
   createNetworkLinks() {
     var networkLinks = [];
 
-    for (var i = 0; i < this.state.existingNetworkNames.length; i++) {
-      var curNetwork = this.state.existingNetworkNames[i];
-
+    for (var i = 0; i < this.state.existingNetworks.length; i++) {
+      var curNetworkName = this.state.existingNetworks[i]["NetworkName"];
+      var curNetworkDescription = this.state.existingNetworks[i]["Description"];
+    
+      // Create link for network
       networkLinks.push(
         <div key={i}>
-          <Link className="link" to={"/" + curNetwork + "/settings"}>{curNetwork}</Link><br></br>
+          <Link className="link" to={"/" + curNetworkName + "/settings"}>{curNetworkName}</Link>: {curNetworkDescription}<br></br>
         </div>
       );
+
+      // Now create links for network's corresponding devices
+      for (var k = 0; k < this.state.existingNetworks[i]["Devices"].length; k++) {
+        var curDeviceKey = curNetworkName + "Device" + k;
+        var curDeviceName = this.state.existingNetworks[i]["Devices"][k];
+        
+        networkLinks.push(
+          <div key={curDeviceKey}>
+            <Link className="networksDeviceLink" to={"/" + curDeviceName + "/settings"}>{curDeviceName}</Link><br></br>
+          </div>
+        );
+      }
+
     }
 
     return networkLinks;
@@ -72,7 +82,7 @@ class ManageExistingNetworks extends Component {
         <h1>Manage Existing Networks</h1>
         <p className="screenInfo">Select a network to modify its existing configuration settings.</p>
         
-        {this.state.existingNetworkNames ? this.createNetworkLinks() : null}
+        {this.state.existingNetworks ? this.createNetworkLinks() : null}
 
         <Link to="/networkManager">
           <Button variant="primary" className="float-left footer-button">Back</Button> 

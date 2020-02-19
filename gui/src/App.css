@@ -69,6 +69,10 @@
   border-top: 20px;
 }
 
+.networksDeviceLink {
+  padding-left: 25px;
+}
+
 .login-button {
   margin-top: 15px;
   margin-bottom: 40px; 
