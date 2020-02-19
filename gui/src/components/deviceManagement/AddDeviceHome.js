@@ -17,20 +17,24 @@ import Button from 'react-bootstrap/Button';
 import AddDeviceVars from './AddDeviceVars';
 
 const getDeviceConfigBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
+const postDeviceCreationBaseUrl = "http://localhost:5000/chariot/api/v1.0/network/device";
 const xhr = new XMLHttpRequest();
 
 class AddDeviceHome extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      newDeviceNickname: null, // Nickname attribute for device
-      newDeviceDescription: null, // Description for device
-      newDeviceType: null, // Type of device
+      newDeviceTypeGeneralVals: {
+        'Device Nickname': null,
+        'Device Description': null,
+        'Device Type': null,
+        newDeviceTypeConfig: null
+      },
       showDeviceSpecificSettings: false, // Whether or not the type of device has been chosen by the user already
       isSubmitted: false, // Whether or not the device information is ready to be sent to the server
       confirmIsOpen: false, // Is the confirm modal open?
       successIsOpen: false, // Is the success modal open?
-      newDeviceTypeConfig: null
+      deviceState: {} // All configuration setting values for the device (From AddDeviceHome and AddDeviceVars)
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -42,7 +46,10 @@ class AddDeviceHome extends Component {
     Updates textfield state values as they are entered by the user.
   */  
   handleChange(event) {
-    this.setState({[event.target.name]: event.target.value});
+    var updatedNewDeviceTypeGeneralVals = this.state.newDeviceTypeGeneralVals; // Store from current state
+    updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json
+    
+    this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }); // Update the state
   }
 
 
@@ -50,16 +57,18 @@ class AddDeviceHome extends Component {
     As the device type the user selects changes, update that in the state.
   */
   handleDeviceTypeChange(event) {
-    console.log('');console.log('');console.log('')
     console.log("------------------- changed -------------------");
-    var lastDeviceType = this.state.newDeviceType;
-    console.log(lastDeviceType + " ... " + event.target.value);
+    var lastDeviceType = this.state.newDeviceTypeGeneralVals['Device Type'];
+    //console.log(lastDeviceType + " ... " + event.target.value);
     
     if (lastDeviceType !== event.target.value) {
-      // Because react doesn't update state immediately
-      this.setState({[event.target.name]: event.target.value}, function () {
+      var updatedNewDeviceTypeGeneralVals = this.state.newDeviceTypeGeneralVals; // Store from current state
+      updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json
 
-        xhr.open('GET', getDeviceConfigBaseUrl + "?DeviceName=" + this.state.newDeviceType);
+      // Because react doesn't update state immediately
+      this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }, function () {
+
+        xhr.open('GET', getDeviceConfigBaseUrl + "?DeviceName=" + this.state.newDeviceTypeGeneralVals['Device Type']);
         xhr.setRequestHeader('Content-Type', 'application/json');
         
         // Once a response is received
@@ -67,8 +76,10 @@ class AddDeviceHome extends Component {
           if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
               var responseJson = JSON.parse(xhr.response);
 
+              updatedNewDeviceTypeGeneralVals['newDeviceTypeConfig'] = responseJson;
+
               // Store the device's config file to the state
-              this.setState({newDeviceTypeConfig: responseJson});
+              this.setState({newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals});
               this.setState({showDeviceSpecificSettings: true}); // Will cause render to update device-specific section
           }
         }
@@ -81,12 +92,11 @@ class AddDeviceHome extends Component {
   }
 
   handleNewDeviceCreation = (submittedDeviceSpecificState) => {
-    this.setState ({ deviceSpecificState: submittedDeviceSpecificState })
+    this.setState ({ deviceState: submittedDeviceSpecificState }, () => {
+      console.log(this.state.deviceState);
+    });
 
-    console.log(this.state.newDeviceNickname);
-    console.log(this.state.newDeviceDescription);
-    console.log(this.state.newDeviceType);
-
+    // Update state to launch confirmation modal
     this.setState({
       isSubmitted: !this.state.isSubmitted,
       confirmIsOpen: !this.state.confirmIsOpen
@@ -100,12 +110,59 @@ class AddDeviceHome extends Component {
     server to create the new device.
   */
  toggleSuccessModal = () => {
-    this.setState({
-      confirmIsOpen: false
-    });
-    this.setState({
-      successIsOpen: !this.state.successIsOpen
-    });
+    xhr.open('POST', postDeviceCreationBaseUrl, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = () => {// Call a function when the state changes.
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          this.setState({ confirmIsOpen: false });
+          this.setState({ successIsOpen: !this.state.successIsOpen });
+        }
+      }
+    }    
+    
+    // ============================== FIX LATER. SHOULDN'T HAVE TO HAVE CONDITIONAL ==============================
+    var data = {};
+
+    if (this.state.deviceState.newDeviceTypeGeneralVals['Device Type'] === 'ImpinjSpeedwayR420') {
+      data = {
+        "NetworkName": this.props.location.networkProps['Network Name'], // required
+        "deviceId": this.state.deviceState.newDeviceTypeGeneralVals['Device Nickname'], // required
+        "deviceType": this.state.deviceState.newDeviceTypeGeneralVals['Device Type'], // required
+        "ipAddress": this.state.deviceState.newDeviceTypeConfigVals["Device IP Address"], // required
+        "pollDelay":"", // required
+        "tag_population": parseInt(this.state.deviceState.newDeviceTypeConfigVals["Tag Population"]), // required
+        "report_every_n_tags": this.state.deviceState.newDeviceTypeConfigVals["Report Every N Tags"],
+        "tx_power":"",
+        "session": this.state.deviceState.newDeviceTypeConfigVals["Session"],
+        "start_inventory": this.state.deviceState.newDeviceTypeConfigVals["Start Inventory"],
+        "mode_identifier": this.state.deviceState.newDeviceTypeConfigVals["Mode Identifier"],
+        "EnableROSpecID":"",
+        "EnableSpecIndex":"",
+        "EnableInventoryParameterSpecID":""
+      }
+    }
+    else {
+      data = {
+        "NetworkName": this.props.location.networkProps['Network Name'], // required
+        "deviceId": this.state.deviceState.newDeviceTypeGeneralVals['Device Nickname'], // required
+        "deviceType": this.state.deviceState.newDeviceTypeGeneralVals['Device Type'], // required
+        "ipAddress": this.state.deviceState.newDeviceTypeConfigVals["Itemsense Server IP Address"], // required
+        "pollDelay":"", // required
+        "tag_population": "", // required
+        "report_every_n_tags": "",
+        "tx_power":"",
+        "session": "",
+        "start_inventory": "",
+        "mode_identifier": "",
+        "EnableROSpecID":"",
+        "EnableSpecIndex":"",
+        "EnableInventoryParameterSpecID":""
+      }      
+    }
+
+    xhr.send(JSON.stringify(data));
   }
 
 
@@ -121,6 +178,38 @@ class AddDeviceHome extends Component {
       confirmIsOpen: !this.state.confirmIsOpen
     });    
     event.preventDefault();
+  }
+
+  getConfirmationForDeviceFields = () => {
+    if (this.state.deviceState.newDeviceTypeGeneralVals && this.state.deviceState.newDeviceTypeConfigVals) {
+      var confirmationElement = [];
+
+      var networkName = this.props.location.networkProps['Network Name']; // Obtained from passing prop through link from AddNetwork.js
+
+      confirmationElement.push(<p>Before {this.state.newDeviceTypeGeneralVals['Device Nickname']} is added to {networkName}, please confirm that the information below is correct.</p>);
+
+      for (var curGeneralValsKey in this.state.deviceState.newDeviceTypeGeneralVals) {
+        if (curGeneralValsKey !== 'newDeviceTypeConfig') {
+          var curGeneralValsVal = this.state.deviceState.newDeviceTypeGeneralVals[curGeneralValsKey];
+
+          confirmationElement.push(
+            <div><b>{curGeneralValsKey}</b>: {curGeneralValsVal}</div>
+          );
+        }
+      }
+
+      for (var curConfigValsKey in this.state.deviceState.newDeviceTypeConfigVals) {
+        if (curConfigValsKey !== 'newDeviceTypeConfig') {
+          var curConfigValsVal = this.state.deviceState.newDeviceTypeConfigVals[curConfigValsKey];
+
+          confirmationElement.push(
+            <div key={curConfigValsKey}><b>{curConfigValsKey}</b>: {curConfigValsVal}</div>
+          );
+        }
+      }
+    }
+
+    return confirmationElement;
   }
 
 
@@ -140,13 +229,13 @@ class AddDeviceHome extends Component {
 
         <form id="createDeviceForm">
           <div className="form-group">
-            <input required className="form-control" id="newDeviceNickname" name="newDeviceNickname" placeholder="New Device Nickname" onChange={this.handleChange}/>
+            <input required className="form-control" id="Device Nickname" name="Device Nickname" placeholder="Device Nickname" onChange={this.handleChange}/>
           </div>
           <div className="form-group">
-            <textarea required className="form-control" id="newDeviceDescription" rows="3" name="newDeviceDescription" placeholder="New Device Description" onChange={this.handleChange}></textarea>
+            <textarea required className="form-control" id="Device Description" rows="3" name="Device Description" placeholder="Device Description" onChange={this.handleChange}></textarea>
           </div>
           <div className="form-group">
-              <select required className="form-control" id="securityQuestion" name="newDeviceType" onChange={this.handleDeviceTypeChange}>
+              <select required className="form-control" id="securityQuestion" name="Device Type" onChange={this.handleDeviceTypeChange}>
                 <option selected disabled hidden value="">Select a Device Type</option>
                 <option>ImpinjSpeedwayR420</option>
                 <option>ImpinjxArray</option>
@@ -164,20 +253,11 @@ class AddDeviceHome extends Component {
 
       <Modal show={this.state.confirmIsOpen} key="newDeviceConfirmModal">
         <Modal.Body>
-          Is this information for your new device correct?
-          <br></br>
-          <p>
-            <b>Device Nickname:</b> {this.state.newDeviceNickname}
-            <br></br>
-            <b>Device Description:</b> {this.state.newDeviceDescription}
-            <br></br>
-            <b>Device Type:</b> {this.state.newDeviceType}
-            <br></br>
-          </p>
+            {this.getConfirmationForDeviceFields()}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
-          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
+          <Button variant="primary" className="float-left" onClick={this.handleSubmit}>Incorrect</Button>
+          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Correct</Button>
         </Modal.Footer>
       </Modal>,
 

@@ -12,28 +12,37 @@ import Button from 'react-bootstrap/Button';
 class AddDeviceVars extends Component {
   constructor (props) {
     super(props);
+    
+    // Initializing newDeviceTypeConfigVals (the json to hold the config values of the device-specific parameters)
+    var deviceConfig = props.params.newDeviceTypeGeneralVals.newDeviceTypeConfig[props.params.newDeviceTypeGeneralVals['Device Type']];
+    var deviceSettings = deviceConfig["settings"];
+    var initializedNewDeviceTypeConfigVals = {};
+    for (var i = 0; i < deviceSettings.length; i++) {
+      var curFieldTitle = deviceSettings[i].title; 
+      initializedNewDeviceTypeConfigVals[curFieldTitle] = '';
+    }
 
+    // Setting the initial state
     this.state = {
-      newDeviceNickname: props.params.newDeviceNickname,
-      newDeviceDescription: props.params.newDeviceDescription,
-      newDeviceType: props.params.newDeviceType,
-      newDeviceTypeConfig: props.params.newDeviceTypeConfig, // Isn't being set for some reason. In cases below, references to props are used rather than state
+      newDeviceTypeGeneralVals: {
+        'Device Nickname': props.params.newDeviceTypeGeneralVals['Device Nickname'],
+        'Device Description': props.params.newDeviceTypeGeneralVals['Device Description'],
+        'Device Type': props.params.newDeviceTypeGeneralVals['Device Type'],
+        newDeviceTypeConfig: props.params.newDeviceTypeGeneralVals.newDeviceTypeConfig
+      },
+      newDeviceTypeConfigVals: initializedNewDeviceTypeConfigVals,
       isSubmitted: false
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.sendSpecificToForm = this.sendSpecificToForm.bind(this);
-    this.componentDidUpdate = this.componentDidUpdate.bind(this);
-  }
-
-  componentDidUpdate() {
-    if(this.state.newDeviceType !== this.props.params.newDeviceType ) {
-      this.setState({ newDeviceType: this.props.params.newDeviceType });
-    }
   }
 
   handleChange(event) {
-    this.setState({[event.target.name]: event.target.value});
+    // Remove spaces from variable name and replace with %20 to create state attribute variable
+    var updatedNewDeviceTypeConfigVals = this.state.newDeviceTypeConfigVals; // Store from current state
+    updatedNewDeviceTypeConfigVals[event.target.name] = event.target.value; // Update the json
+    this.setState({ newDeviceTypeConfigVals: updatedNewDeviceTypeConfigVals }); // Update the state
   }
 
   sendSpecificToForm(event) {
@@ -41,35 +50,28 @@ class AddDeviceVars extends Component {
     event.preventDefault();
   }
 
-  createDeviceFields() {
-    console.log('in createDeviceFields');
-    console.log(this.state);
-
-    var deviceConfig = this.state.newDeviceTypeConfig[this.state.newDeviceType];
-      
+  createDeviceFields = () => {
+    var deviceConfig = this.state.newDeviceTypeGeneralVals.newDeviceTypeConfig[this.state.newDeviceTypeGeneralVals['Device Type']];
     var deviceSpecificForm = [];
-    //var deviceDescription = deviceConfig["description"];
     var deviceSettings = deviceConfig["settings"];
 
     for (var i = 0; i < deviceSettings.length; i++) {
       var curFieldTitle = deviceSettings[i].title;
       var curFieldIsRequired = deviceSettings[i].required;
 
-        if (curFieldIsRequired) {
-          deviceSpecificForm.push(
-            <div className="form-group" key={i}><input className="form-control" id={curFieldTitle} name={curFieldTitle} placeholder={curFieldTitle} onChange={this.handleChange}/></div>
-          );
-        }
-        else {
-          deviceSpecificForm.push(
-            <div className="form-group" key={i}><input className="form-control" id={curFieldTitle} name={curFieldTitle} placeholder={curFieldTitle} onChange={this.handleChange}/></div>
-          );
-        }
+      if (curFieldIsRequired) {
+        deviceSpecificForm.push(
+          <div className="form-group" key={i}><input className="form-control" id={curFieldTitle} name={curFieldTitle} placeholder={curFieldTitle} onChange={this.handleChange}/></div>
+        );
+      }
+      else {
+        deviceSpecificForm.push(
+          <div className="form-group" key={i}><input className="form-control" id={curFieldTitle} name={curFieldTitle} placeholder={curFieldTitle} onChange={this.handleChange}/></div>
+        );
+      }
     }
 
-    console.log('leaving createDeviceFields');
     return (deviceSpecificForm);
-    
   }
 
 
@@ -77,7 +79,7 @@ class AddDeviceVars extends Component {
     return (
       <div>
         <br></br>
-        <p className="screenInfo">Now please fill in the configuration fields for the {this.state.newDeviceType} device.</p> 
+        <p className="screenInfo">Now please fill in the configuration fields for the {this.state.newDeviceTypeGeneralVals['Device Type']} device.</p> 
 
         {this.createDeviceFields()}
 

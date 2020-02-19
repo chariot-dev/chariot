@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 
-const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/names';
+const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
 const xhr = new XMLHttpRequest();
 
 class ManageExistingNetworks extends Component {
@@ -26,19 +26,21 @@ class ManageExistingNetworks extends Component {
     // Once a response is received
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        var responseJson = JSON.parse(xhr.responseText); // Response is a dictionary 
-        
-        // Getting network names/descriptions and adding them to respective arrays
-        var tempNetworkNames = [];
-        var tempNetworkDescriptions = [];
-        for (var networkName in responseJson) {
-          tempNetworkNames.push(networkName);
-          tempNetworkDescriptions.push(responseJson[networkName]);
+        if (xhr.status === 200) {
+          var responseJson = JSON.parse(xhr.responseText); // Response is a dictionary 
+          
+          // Getting network names/descriptions and adding them to respective arrays
+          var tempNetworkNames = [];
+          var tempNetworkDescriptions = [];
+          for (var networkName in responseJson) {
+            tempNetworkNames.push(networkName);
+            tempNetworkDescriptions.push(responseJson[networkName]);
+          }
+          
+          // Update state with gotten network names and descriptions
+          this.setState({existingNetworkNames: tempNetworkNames});
+          this.setState({existingNetworkDescriptions: tempNetworkDescriptions});
         }
-        
-        // Update state with gotten network names and descriptions
-        this.setState({existingNetworkNames: tempNetworkNames});
-        this.setState({existingNetworkDescriptions: tempNetworkDescriptions});
       }
     }
     

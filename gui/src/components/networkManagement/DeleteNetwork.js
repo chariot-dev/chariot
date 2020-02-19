@@ -32,19 +32,21 @@ class DeleteNetwork extends Component {
     // Once a response is received
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        var responseJson = JSON.parse(xhr.responseText); // Response is a dictionary 
-        
-        // Getting network names/descriptions and adding them to respective arrays
-        var tempNetworkNames = [];
-        var tempNetworkDescriptions = [];
-        for (var networkName in responseJson) {
-          tempNetworkNames.push(networkName);
-          tempNetworkDescriptions.push(responseJson[networkName]);
+        if (xhr.status === 200) {
+          var responseJson = JSON.parse(xhr.responseText); // Response is a dictionary 
+          
+          // Getting network names/descriptions and adding them to respective arrays
+          var tempNetworkNames = [];
+          var tempNetworkDescriptions = [];
+          for (var networkName in responseJson) {
+            tempNetworkNames.push(networkName);
+            tempNetworkDescriptions.push(responseJson[networkName]);
+          }
+          
+          // Update state with gotten network names and descriptions
+          this.setState({existingNetworkNames: tempNetworkNames});
+          this.setState({existingNetworkDescriptions: tempNetworkDescriptions});
         }
-        
-        // Update state with gotten network names and descriptions
-        this.setState({existingNetworkNames: tempNetworkNames});
-        this.setState({existingNetworkDescriptions: tempNetworkDescriptions});
       }
     }
     

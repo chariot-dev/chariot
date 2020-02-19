@@ -44,22 +44,22 @@ class AddNetwork extends Component {
     });
   }
 
-  toggleSuccessModal = () => {
+  createNetworkAndToggleSuccessModal = () => {
     this.setState({
       confirmIsOpen: false
     });
     this.setState({
       successIsOpen: !this.state.successIsOpen
     });
-  }
-
-  createNetwork = () => {
+  
     xhr.open('POST', postCreateNetworkBaseUrl);
     xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.onreadystatechange = function() { // Call a function when the state changes.
-      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-        console.log('post sent');
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          console.log('post sent');
+        }
       }
     }
     var data = {
@@ -100,7 +100,7 @@ class AddNetwork extends Component {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.toggleConfirmationModal}>No</Button>
-          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
+          <Button variant="primary" className="float-right" onClick={this.createNetworkAndToggleSuccessModal}>Yes</Button>
         </Modal.Footer>
       </Modal>,
 
@@ -110,8 +110,8 @@ class AddNetwork extends Component {
           <Link to="/networkManager">
             <Button variant="primary" className="float-left">No</Button>
           </Link>
-          <Link to="/addDeviceHome">
-            <Button variant="primary" className="float-right" onClick={this.createNetwork}>Yes</Button>
+          <Link to={{pathname:'/addDeviceHome', networkProps:{'Network Name': this.state.newNetworkName} }}>
+            <Button variant="primary" className="float-right">Yes</Button>
           </Link>
         </Modal.Footer>
       </Modal>
