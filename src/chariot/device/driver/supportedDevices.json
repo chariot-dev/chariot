@@ -340,11 +340,11 @@
                 "validationRegex": "TODO"
             },
             {
-                "title": "Filler String",
-                "alias": "filler",
-                "description": "Just a field to have an optional.",
-                "type": "String",
-                "inputType": "text",
+                "title": "Seed Value",
+                "alias": "seedVal",
+                "description": "Value to use with the seed, useful for getting consistent values",
+                "type": "Number",
+                "inputType": "number",
                 "required": false,
                 "validationRegex": "TODO"
             }
