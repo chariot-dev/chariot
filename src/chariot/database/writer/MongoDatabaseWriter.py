@@ -1,56 +1,40 @@
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
-from typing import List, Type, Dict
+from typing import Dict, List, Type, Union
 from time import time
 
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from chariot.database.DatabaseWriter import DatabaseWriter
-from chariot.database.DatabaseConfiguration import DatabaseConfiguration
-from chariot.database.MongoDatabaseConfiguration import MongoDatabaseConfiguration
+from chariot.database.writer.DatabaseWriter import DatabaseWriter
+from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
+from chariot.database.configuration.MongoDatabaseConfiguration import MongoDatabaseConfiguration
 
 
 class MongoDatabaseWriter(DatabaseWriter):
-    def __init__(self, databaseConfiguration: Type[MongoDatabaseConfiguration]):
-        super().__init__(databaseConfiguration)
+    def __init__(self, config: MongoDatabaseConfiguration):
+        super().__init__(config)
+        self.client: Union[MongoClient, None] = None
+        self.table: Union[Collection, None] = None
 
-    def __del__(self):
-        self.disconnect()
+    def _connect(self):
+        connectStr: str = 'mongodb://'
+        if hasattr(self.config, 'username'):
+            connectStr += f'{self.config["username"]}:{self.config["password"]}@'
+        connectStr += f'{self.config["host"]}:{self.config["port"]}/{self.config["databaseName"]}'
+        self.client = MongoClient(connectStr)
 
-    def connect(self):
-        # Generate connection string based on config
-        self.connectionString: str = 'mongodb://'
-        if hasattr(self.databaseConfiguration, 'username'):
-            self.connectionString += self.databaseConfiguration.username + \
-                ':' + self.databaseConfiguration.password + '@'
-        self.connectionString += self.databaseConfiguration.host + \
-            ':' + str(self.databaseConfiguration.port) + '/'
-        if not hasattr(self.databaseConfiguration, 'database'):
-            setattr(self.databaseConfiguration, 'database', 'iot_database')
-        self.connectionString += self.databaseConfiguration.database
-
-        self.client: MongoClient = MongoClient(self.connectionString)
-
-    def disconnect(self):
+    def _disconnect(self):
         self.client.close()
 
-    def initializeTable(self):
-        pass
-        # Create a collection to insert to
-        self.database: Database = self.client[self.databaseConfiguration.database]
-        self.table: Collection = self.database['iot_data']
+    def _initializeTable(self):
+        database: Database = self.client[self.config['databaseName']]
+        self.table = database[self.config['tableName']]
 
-    def insertOne(self, dataPoint: Dict[str, JSONObject]):
-        DatabaseWriter.validateDataPoint(dataPoint)
-
-        # Add database insertion time to dataPoint
+    def _insertOne(self, dataPoint: Dict[str, JSONObject]):
         dataPoint['db_insertion_time'] = int(round(time() * 1000))  # Millis since epoch
         self.table.insert_one(dataPoint)
 
-    def insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
+    def _insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         for dataPoint in dataPoints:
-            DatabaseWriter.validateDataPoint(dataPoint)
-            # Add database insertion time to dataPoint
             dataPoint['db_insertion_time'] = int(round(time() * 1000))  # Millis since epoch
-
         self.table.insert_many(dataPoints)

@@ -5,8 +5,20 @@ from typing import Dict, Type
 
 class DatabaseConfiguration(Configuration):
     requiredFields: Dict[str, Type[JSONObject]] = {
-        'databaseType': str
+        'databaseName': str,
+        'databaseType': str,
+        'host': str,
     }
+
+    optionalFields: Dict[str, Type[JSONObject]] = {
+        'port': int,
+        'tableName': str,
+    }
+
+    def __init__(self, configMap):
+        super().__init__(configMap)
+        if not hasattr(self, 'tableName'):
+            setattr(self, 'tableName', 'data')
 
     def _validateSubsetConfig(self, newConfig: JSONDict) -> None:
         super()._validateSubsetConfig(newConfig)

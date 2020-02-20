@@ -1,56 +1,49 @@
-from typing import List, Tuple, Type, Dict
-import mysql.connector as connector
-
+from mysql import connector
+from mysql.connection import MySQLConnection
+from mysql.connector.cursor import MySQLCursor
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from chariot.database.DatabaseWriter import DatabaseWriter
-from chariot.database.DatabaseConfiguration import DatabaseConfiguration
-from chariot.database.MySQLDatabaseConfiguration import MySQLDatabaseConfiguration
+from chariot.database.writer.DatabaseWriter import DatabaseWriter
+from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
+from chariot.database.configuration.MySQLDatabaseConfiguration import MySQLDatabaseConfiguration
+from typing import Dict, List, Tuple, Type, Union
 
 
 class MySQLDatabaseWriter(DatabaseWriter):
-    def __init__(self, databaseConfiguration: Type[MySQLDatabaseConfiguration]):
-        super().__init__(databaseConfiguration)
+    def __init__(self, config: MySQLDatabaseConfiguration):
+        super().__init__(config)
+        self.connection: Union[MySQLConnection, None] = None
+        self.cursor: Union[MySQLCursor, None] = None
 
-    def __del__(self):
-        self.disconnect()
-
-    def connect(self):
-        self.conn: connector.connection.MySQLConnection = connector.connect(
-            user=self.databaseConfiguration.username,
-            password=self.databaseConfiguration.password,
-            host=self.databaseConfiguration.host,
-            port=self.databaseConfiguration.port,
-            database=self.databaseConfiguration.database
+    def _connect(self):
+        self.connection = connector.connect(
+            user=self.config['username'],
+            password=self.config['password'],
+            host=self.config['host'],
+            port=self.config['port'],
+            database=self.config['databaseName']
         )
+        self.cursor = self  .connection.cursor()
+        self.connected = True
 
-        self.cursor: connector.cursor.MySQLCursor = self.conn.cursor()
+    def _disconnect(self):
+        self.connection.close()
 
-    def disconnect(self):
-        self.conn.close()
-
-    def initializeTable(self):
+    def _initializeTable(self):
         self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS data(id INTEGER PRIMARY KEY AUTO_INCREMENT, db_insertion_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, relative_time BIGINT, freeform VARBINARY(64535))"
+            f'CREATE TABLE IF NOT EXISTS {self.config["tableName"]}' + 
+            '(id INTEGER PRIMARY KEY AUTO_INCREMENT, db_insertion_time TIMESTAMP DEFAULT UNIX_TIMESTAMP(), relative_time BIGINT, freeform VARBINARY(64535))'
         )
 
-    def insertOne(self, dataPoint: Dict[str, JSONObject]):
-        DatabaseWriter.validateDataPoint(dataPoint)
+    def _insertOne(self, dataPoint: Dict[str, JSONObject]):
         self.cursor.execute(
-            "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
-            (dataPoint["relative_time"], dataPoint["freeform"])
+            f'INSERT INTO {self.tableName} (relative_time, freeform) VALUES (%s, %s)',
+            (dataPoint['relative_time'], dataPoint['freeform'])
         )
+        self.connection.commit()
 
-        self.conn.commit()
-
-    def insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
-        for dataPoint in dataPoints:
-            DatabaseWriter.validateDataPoint(dataPoint)
-
-        values_to_insert: List[Tuple[int, str]] = [(dataPoint["relative_time"], dataPoint["freeform"])
-                                                   for dataPoint in dataPoints]
+    def _insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         self.cursor.executemany(
-            "INSERT INTO data (relative_time, freeform) VALUES (%s, %s)",
-            values_to_insert
+            f'INSERT INTO {self.tableName} (relative_time, freeform) VALUES (%s, %s)',
+            [(dataPoint['relative_time'], dataPoint['freeform']) for dataPoint in dataPoints]
         )
-
-        self.conn.commit()
+        self.connection.commit()

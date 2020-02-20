@@ -1,14 +1,13 @@
 from typing import Dict, List, Type
 
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from chariot.database.DatabaseConfiguration import DatabaseConfiguration
+from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
 
 
 class MySQLDatabaseConfiguration(DatabaseConfiguration):
     requiredFields: Dict[str, Type[JSONObject]] = {
         'username': str,
         'password': str,
-        'database': str,
     }
 
     optionalFields: Dict[str, Type[JSONObject]] = {}
@@ -17,6 +16,9 @@ class MySQLDatabaseConfiguration(DatabaseConfiguration):
         self.requiredFields.update(super().requiredFields)
         self.optionalFields.update(super().optionalFields)
         super().__init__(configMap)
+        if not hasattr(self, 'port'):
+            # https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
+            setattr(self, 'port', 3306)
 
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
