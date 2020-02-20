@@ -15,20 +15,11 @@ class ImpinjR420Adapter(DeviceAdapter):
     def _reportData(self, data: Dict[str, JSONObject]):
         self.dataQueue.put(data, block=True)
 
-    def beginDataCollection(self, errorQueue: Queue) -> None:
-        if not self.connected:
-            # raise DeviceNotConnected(?)Error
-            stackTrace = self._generateStackTrace(DeviceNotConnectedError())
-            errorQueue.put(stackTrace, block=True)
-        self.inCollectionEpisode = True
-        try:
-            self.llrpFactory.addTagReportCallback(self._reportData)
-            reactor.run()
-        except FailedToBeginCollectionError:
-            stackTrace = self._generateStackTrace(FailedToBeginCollectionError())
-            errorQueue.put(stackTrace, block=True)
+    def _beginDataCollection(self, errorQueue: Queue) -> None:
+        self.llrpFactory.addTagReportCallback(self._reportData)
+        reactor.run()
 
-    def connect(self) -> None:
+    def _connect(self) -> None:
         #TODO: condition for the abscence of optional configs
         self.llrpFactory = LLRPClientFactory(
             report_every_n_tags=self._config.report_every_n_tags,
@@ -55,17 +46,11 @@ class ImpinjR420Adapter(DeviceAdapter):
                 'EnableRFDopplerFrequency': self._config.EnableRFDopplerFrequency
             })
         reactor.connectTCP(self._config.ipAddress, self._config.port, self.llrpFactory, timeout=5)
-        self.connected = True
 
-    def disconnect(self) -> None:
-        if not self.connected:
-            # raise DeviceNotConnected(?)Error
-            raise DeviceNotConnectedError()                   #Can't we just do nothing instead of raising an error
+    def _disconnect(self) -> None:
         self.llrpFactory = None
 
-    
-    def stopDataCollection(self) -> None:
-        super().stopDataCollection()
+    def _stopDataCollection(self) -> None:
         reactor.stop()
 
 

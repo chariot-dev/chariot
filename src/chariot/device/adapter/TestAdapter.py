@@ -8,13 +8,13 @@ from chariot.utility.ChariotExceptions import *
 
 class TestAdapter(DeviceAdapter):
     def __init__(self, config: TestConfiguration):
-        super().-__init__(config)
+        super().__init__(config)
 
-    def beginDataCollection(self, errorQueue: Queue) -> None:
+    def _beginDataCollection(self, errorQueue: Queue) -> None:
         pass
 
-    def connect(self) -> None:
+    def _connect(self) -> None:
         pass
 
-    def disconnect(self) ->None:
+    def _disconnect(self) ->None:
         pass

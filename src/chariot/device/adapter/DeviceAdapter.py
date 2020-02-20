@@ -14,18 +14,35 @@ class DeviceAdapter(metaclass=ABCMeta):
         self.inCollectionEpisode = False
 
     # this method should only be run as the target of a ProducerThread
-    @abstractmethod
     def beginDataCollection(self, errorQueue: Queue) -> None:
+        if self.inCollectionEpisode:
+            raise AssertionError
+        self.inCollectionEpisode = True
+        self._beginDataCollection(errorQueue)
+
+    @abstractmethod
+    def _beginDataCollection(self, errorQueue: Queue) -> None:
         pass
 
     # any procedures necessary to start capturing data from the device
+    def connect(self, reconnect=False) -> None:
+        if reconnect or not self.connected:
+            self._connect()
+            self.connected = True
+
     @abstractmethod
-    def connect(self) -> None:
+    def _connect(self) -> None:
         pass
 
     # gracefully close the connection to the device
-    @abstractmethod
     def disconnect(self) -> None:
+        if not self.connected:
+            raise AssertionError
+        self._disconnect()
+        self.connected = False
+
+    @abstractmethod
+    def _disconnect(self) -> None:
         pass
 
     def getDataQueue(self) -> Queue:
@@ -37,17 +54,14 @@ class DeviceAdapter(metaclass=ABCMeta):
     def getId(self) -> str:
         return self._config.deviceId
 
-    # https://stackoverflow.com/questions/2829329/catch-a-threads-exception-in-the-caller-thread-in-python
-    # "hack" to generate the entire stack trace since beginDataCollection is called in a different thread
-    # might add the thread's name explicitly so the DataCollectionManager knows which device produced the error
-    def _generateStackTrace(self,error: Exception):
-        try:
-            raise error
-        except Exception:
-            return (self.getId(), exc_info())
-
     def stopDataCollection(self) -> None:
+        if not self.inCollectionEpisode:
+            raise AssertionError
+        self._stopDataCollection()
         self.inCollectionEpisode = False
+
+    def _stopDataCollection(self) -> None:
+        pass
 
 
 __all__ = ['DeviceAdapter']

@@ -108,52 +108,36 @@ class ImpinjXArrayAdapter(DeviceAdapter):
         response: requests.Response = requests.post(stopUrl, headers=self.session.tokenAuthHeaders)
         return
 
-    def beginDataCollection(self, errorQueue: Queue) -> None:
-        self.inCollectionEpisode = True
+    def _beginDataCollection(self, errorQueue: Queue) -> None:
         while self.inCollectionEpisode:
             if not self.connected:
-                # raise DeviceNotConnected(?)Error
-                # this should not be here - it should be handled by the overriden thread class used to run this method
-                stackTrace = self._generateStackTrace(DeviceNotConnectedError())
-                errorQueue.put(stackTrace, block=True)
-                self.stopDataCollection()
-                # or continue? makes no difference
-                break
+                raise DeviceNotConnectedError()
 
             collectedAllPages: bool = False
             while not collectedAllPages:
-                try:
-                    response: requests.Response = requests.get(
-                        self.session.dataRequestUrl,
-                        data = dumps(self.session.dataRequestBody),
-                        headers = self.session.tokenAuthHeaders
-                        )
-                    jsonData: JSONDict = response.json()
-                    self.dataQueue.put(jsonData, block=True)
-                    if 'nextPageMarker' in jsonData:
-                        self.session.dataRequestBody['pageMarker'] = jsonData['nextPageMarker']
-                    else:
-                        collectedAllPages = True
-                except FailedToBeginCollectionError:
-                    stackTrace = self._generateStackTrace(FailedToBeginCollectionError())
-                    errorQueue.put(stackTrace, block=True)
+                response: requests.Response = requests.get(
+                    self.session.dataRequestUrl,
+                    data = dumps(self.session.dataRequestBody),
+                    headers = self.session.tokenAuthHeaders
+                    )
+                jsonData: JSONDict = response.json()
+                self.dataQueue.put(jsonData, block=True)
+                if 'nextPageMarker' in jsonData:
+                    self.session.dataRequestBody['pageMarker'] = jsonData['nextPageMarker']
+                else:
+                    collectedAllPages = True
                 sleep(self._config.pollDelay)
         self.session.dataRequestBody.pop('nextPageMarker', None)
 
     # any procedures necessary to start capturing data from the device
-    def connect(self) -> None:
+    def _connect(self) -> None:
         self._buildSession()
-        self.connected = True
 
     # gracefully close the connection to the device
-    def disconnect(self) -> None:
-        if not self.connected:
-            # raise DeviceNotConnected(?)Error
-            raise DeviceNotConnectedError()
+    def _disconnect(self) -> None:
         self._stopItemsenseJob()
         self._revokeAuthToken()
         self.session = None
-        self.connected = False
 
 
 __all__=['ImpinjXArrayAdapter']
