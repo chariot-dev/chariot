@@ -1,26 +1,21 @@
 from typing import Dict, Type
+from chariot.database.writer.DatabaseWriter import DatabaseWriter
+from chariot.database.writer.MongoDatabaseWriter import MongoDatabaseWriter
+from chariot.database.writer.MySQLDatabaseWriter import MySQLDatabaseWriter
+from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
+from chariot.utility.AbstractFactory import AbstractFactory
 
-from chariot.database.DatabaseWriter import DatabaseWriter
-from chariot.database.MongoDatabaseWriter import MongoDatabaseWriter
-from chariot.database.MySQLDatabaseWriter import MySQLDatabaseWriter
-from chariot.database.DatabaseConfiguration import DatabaseConfiguration
 
-
-class _DatabaseWriterFactory:
+class _DatabaseWriterFactory(AbstractFactory):
     def __init__(self):
-        self.databaseMap: Dict[str, Type[DatabaseWriter]] = {
+        self.instanceMap: Dict[str, Type[DatabaseWriter]] = {
             'MongoDB': MongoDatabaseWriter,
             'MySQL': MySQLDatabaseWriter
         }
-
-    def getInstance(self, databaseConfiguration: Type[DatabaseConfiguration]) -> Type[DatabaseWriter]:
-        databaseType: str = databaseConfiguration.databaseType
-        if databaseType not in self.databaseMap:
-            raise AssertionError('Database type not supported')
-
-        instance: Type[DatabaseWriter] = self.databaseMap[databaseType](databaseConfiguration)
-        return instance
+        self.instanceName: str = 'database'
 
 
 # Return singleton
 DatabaseWriterFactory = _DatabaseWriterFactory()
+
+__all__ = ['DatabaseWriterFactory']
