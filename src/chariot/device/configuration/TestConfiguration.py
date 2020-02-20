@@ -7,7 +7,7 @@ class TestConfiguration(DeviceConfiguration):
         'buffSize': int,
     }
     optionalFields: Dict[str, Type[JSONObject]] = {
-        'filler': str,
+        'seedVal': int,
     }
 
     def __init__(self, configMap: JSONDict):
@@ -17,7 +17,7 @@ class TestConfiguration(DeviceConfiguration):
 
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
-        if configMap['deviceType'] != 'Test Device'
+        if configMap['deviceType'] != 'Test Device':
             raise AssertionError
 
-__all__ = ['Test Device']
+__all__ = ['TestConfiguration']
