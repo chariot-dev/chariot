@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from sys import exc_info
 from typing import Type
 from queue import Queue
-from chariot.JSONTypes import JSONObject
+from chariot.utility.JSONTypes import JSONObject
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 from chariot.utility.ChariotExceptions import *
 

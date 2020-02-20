@@ -5,7 +5,7 @@ from multiprocessing.queues import Queue as ProcessQueue
 from typing import List, OrderedDict, Type, Union
 from queue import Empty as QueueEmptyException, Queue as ThreadQueue
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.JSONTypes import JSONObject
+from chariot.utility.JSONTypes import JSONObject
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
 from chariot.utility.ChariotExceptions import *

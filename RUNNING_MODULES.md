@@ -8,21 +8,21 @@ Suppose you want to run a submodule within the Chariot backend package - for exa
 
 * Navigate to `chariot/src`.
 * Run the command `python3 -m chariot.network.Network`. Note
-	* The `-m` option, to run the code as a module,
-	* Slashes are replaced with dots,
-	* No `.py` extension.
+  * The `-m` option, to run the code as a module,
+  * Slashes are replaced with dots,
+  * No `.py` extension.
 
 ## Importing a module
 
 Suppose that you want to import one Chariot submodule into another. For example, let's look at the imports in `chariot/src/chariot/device/adapter/ImpinjR420Adapter.py`:
 
-`from chariot.JSONTypes import JSONObject`
+`from chariot.utility.JSONTypes import JSONObject`
 `from chariot.device.adapter.DeviceAdapter import DeviceAdapter`
 `from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration`
 
 This submodule imports:
 
-* The `JSONObject` constant from the submodule `chariot/src/chariot/JSONTypes.py`,
+* The `JSONObject` constant from the submodule `chariot/src/chariot/utility/JSONTypes.py`,
 * The `DeviceAdapter` class from the submodule `chariot/src/chariot/device/adapter/DeviceAdapter.py`, and
 * The `ImpinjR420Configuration` class from the submodule `chariot/src/chariot/device/configuration/ImpinjR420Configuration.py`.
 

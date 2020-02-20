@@ -1,7 +1,7 @@
 from typing import Dict, Type
 from json import load
 from os import path
-from chariot.JSONTypes import JSONDict
+from chariot.utility.JSONTypes import JSONDict
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 from chariot.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter

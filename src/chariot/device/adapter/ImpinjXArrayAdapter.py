@@ -4,7 +4,7 @@ from base64 import b64encode
 from json import dumps
 from time import sleep
 from typing import Dict, Union
-from chariot.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONDict, JSONObject
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
 from chariot.utility.ChariotExceptions import *
