@@ -9,13 +9,24 @@ from chariot.utility.JSONTypes import JSONObject
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
 from chariot.utility.ChariotExceptions import *
+from sys import exc_info
 
-class ProducerThread(Thread):
-    pass
+class WorkerThread(Thread):
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
+        super().__init__(group=group, target=target, name=name, verbose=verbose)
+        self.args = args
+        self.kwargs = kwargs
+        self.target = target
 
-
-class ConsumerThread(Thread):
-    pass
+    def run(self):
+        try:
+            self.target(*self.args)
+        except Exception as err:
+            # add the error to the errorQueue for handling on the main thread
+            self.args[0].put((self.name, exc_info()))
+        finally:
+            # https://github.com/python/cpython/blob/9c87fbe54e1c797e3c690c6426bdf5e79c457cf1/Lib/threading.py#L872
+            del self.target, self.args, self.kwargs
 
 
 class DataCollectionManager:
@@ -34,10 +45,9 @@ class DataCollectionManager:
     def __init__(self, network: Union[Network, None], dbWriter: 'DatabaseWriter'):
         self.activeNetwork: Union[Network, None] = network
         self.devices: List[DeviceAdapter] = network.getDevices() if network is not None else []
-        self.consumerThreads: List[ConsumerThread] = []
-        self.producerThreads: OrderedDict[str, ProducerThread] = OrderedDict()
-        self.outputThread: ConsumerThread = ConsumerThread(
-            target=self._outputData)
+        self.consumerThreads: List[WorkerThread] = []
+        self.producerThreads: OrderedDict[str, WorkerThread] = OrderedDict()
+        self.outputThread: WorkerThread = WorkerThread(target=self._outputData)
         self.errorQueue: ThreadQueue = ThreadQueue()
         self.dataQueue: ThreadQueue = ThreadQueue()
         self.databaseWriter: 'DatabaseWriter' = dbWriter
@@ -85,9 +95,9 @@ class DataCollectionManager:
         while self._inCollectionEpisode:
             try:
                 # Errors received are a tuple of the Thread name/id and the stacktrace 
-                deviceID,error = self.errorQueue.get(block=True, timeout=self.ERROR_CHECK_TIMEOUT)
+                deviceID, error = self.errorQueue.get(block=True, timeout=self.ERROR_CHECK_TIMEOUT)
 
-                # For making changes to the correct device in the ProducerThreads List
+                # For making changes to the correct device in the producerThreads
                 errorDevice: DeviceAdapter = self.activeNetwork.getDeviceByDeviceName(deviceID)
                 exc_type, exc_val, exc_trace = error
 
@@ -130,7 +140,6 @@ class DataCollectionManager:
             except QueueEmptyException:
                 continue
 
-    # use get then get_nowait logic here as well
     def _outputData(self) -> None:
         while self._inCollectionEpisode:
             output: List[JSONObject] = []
@@ -170,7 +179,7 @@ class DataCollectionManager:
             # can't collect data from a network with no devices
             raise AssertionError('Must have at least one device to collect from.')
         for device in self.devices:
-            producer = ProducerThread(
+            producer = WorkerThread(
                 name=f'Producer_{device.getId()}', target=device.beginDataCollection, args=(self.errorQueue,))
             self.producerThreads[device.getId()] = producer
 
@@ -191,14 +200,14 @@ class DataCollectionManager:
                     if leftOver < int(numConsumers / 2):
                         numDevices += leftOver
                     else:
-                        self.consumerThreads.append(ConsumerThread(
+                        self.consumerThreads.append(WorkerThread(
                             target=self._consumeDataFromDevices, args=(startIdx + numDevices - 1, leftOver,)))
 
                 # TODO: add names of devices assigned as names of the threads for easier debugging
-                self.consumerThreads.append(ConsumerThread(
+                self.consumerThreads.append(WorkerThread(
                     target=self._consumeDataFromDevices, args=(startIdx, numDevices,)))
         else:
-            self.consumerThreads.append(ConsumerThread(
+            self.consumerThreads.append(WorkerThread(
                 target=self._consumeDataFromDevices, args=(0, 1,)))
 
         self._inCollectionEpisode = True

@@ -6,6 +6,7 @@ from chariot.device.configuration.TestConfiguration import TestConfiguration
 from chariot.utility.JSONTypes import JSONObject
 from chariot.utility.ChariotExceptions import *
 
+
 class TestAdapter(DeviceAdapter):
     def __init__(self, config: TestConfiguration):
         super().__init__(config)
