@@ -45,32 +45,41 @@ class ManageExistingNetworks extends Component {
   // Create the links to settings for the gotten networks
   createNetworkLinks() {
     var networkLinks = [];
+    
+
+    console.log(this.state.existingNetworks);
 
     for (var i = 0; i < this.state.existingNetworks.length; i++) {
+      var deviceLinks = []; // Reset list of devices for network-to-be-displayed
       var curNetworkName = this.state.existingNetworks[i]["NetworkName"];
       var curNetworkDescription = this.state.existingNetworks[i]["Description"];
-    
-      // Create link for network
-      networkLinks.push(
-        <div key={i}>
-          <Link className="link float-left" to={"/" + curNetworkName + "/settings"}>{curNetworkName}</Link>: {curNetworkDescription}<br></br>
-          <Button className="float-right" variant="light" size="sm">Add Device</Button>
-        </div>
-      );
-
+   
       // Now create links for network's corresponding devices
       for (var k = 0; k < this.state.existingNetworks[i]["Devices"].length; k++) {
         var curDeviceKey = curNetworkName + "Device" + k;
         var curDeviceName = this.state.existingNetworks[i]["Devices"][k];
         
-        networkLinks.push(
+        deviceLinks.push(
           <div key={curDeviceKey}>
             <Link className="networksDeviceLink" to={"/" + curDeviceName + "/settings"}>{curDeviceName}</Link><br></br>
           </div>
         );
+      }      
 
-        networkLinks.push(<br></br>);
-      }
+      // Create link for network
+      networkLinks.push(
+        <div className="existingNetworkBox" key={i}>
+          <div className="existingNetworkCell">
+            <Link to={{pathname:'/addDeviceHome', networkProps:{'Network Name': curNetworkName}}}>
+              <Button className="float-right" variant="light" size="sm">Add Device</Button>
+            </Link>
+            <Link className="link float-left" to={"/" + curNetworkName + "/settings"}>{curNetworkName}</Link>: {curNetworkDescription}<br></br>
+            {deviceLinks}
+          </div>
+        </div>
+      );
+
+
 
     }
 

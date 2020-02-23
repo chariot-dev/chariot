@@ -65,6 +65,15 @@
   z-index:1000;
 }
 
+.existingNetworkBox {
+  border-bottom: solid 1px lightslategray;
+}
+
+.existingNetworkCell {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
 .link {
   border-top: 20px;
 }

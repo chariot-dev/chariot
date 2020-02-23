@@ -80,7 +80,6 @@ class AddDeviceVars extends Component {
         {this.createDeviceFields()}
 
         <Button type="submit" variant="primary" className="float-right footer-button" onClick={this.sendSpecificToForm}>Next</Button>
-      
       </div>
     );
   }
