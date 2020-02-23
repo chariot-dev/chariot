@@ -1,5 +1,5 @@
 from queue import Queue
-from typing import Union
+from typing import List
 from random import random, seed
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.TestConfiguration import TestConfiguration
@@ -28,11 +28,9 @@ class TestAdapter(DeviceAdapter):
             seed(seedVal)
         bufSize = self._conifg.buffSize
         while self.inCollectionEpisode:
-            buf = list()
-            i = 0
-            while i < bufSize:
-                buf.append(random())
-                i += 1
+            buf: List[float] = [0 for _ in bufSize]
+            for i in range(bufSize):
+                buf[i] = random()
             self.dataQueue.put(buf)
 
 __all__ = ['TestAdapter']
