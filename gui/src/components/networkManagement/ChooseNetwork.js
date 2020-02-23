@@ -15,12 +15,12 @@ class ChooseNetwork extends Component {
         <h1>Choose a Network</h1>
         <p className="screenInfo">Select a network to begin data collection process.</p>
 
-        <Dropdown> </Dropdown>
+        <Dropdown></Dropdown>
 
         <Link to="/welcome">
           <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
-        <Link to="/databaseContainer">
+        <Link to="/databaseConnection">
           <Button variant="primary" className="float-right footer-button">Next</Button>
         </Link>
       </div>

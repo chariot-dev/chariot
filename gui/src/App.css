@@ -86,3 +86,17 @@
 .screenInfo {
   padding-bottom: 20px;
 }
+
+.successConfirmationImg {
+  float: left;
+  height: 50px;
+  width: 50px;
+  padding-right: 12px;
+}
+
+.errorConfirmationImg {
+  float: left;
+  height: 50px;
+  width: 50px;
+  padding-right: 12px;
+}

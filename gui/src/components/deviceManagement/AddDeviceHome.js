@@ -16,6 +16,10 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import AddDeviceVars from './AddDeviceVars';
 
+import ConfirmationModalBody from '../shared/ConfirmationModalBody';
+import SuccessModalBody from '../shared/SuccessModalBody';
+import ErrorModalBody from '../shared/ErrorModalBody';
+
 const getDeviceConfigBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
 const postDeviceCreationBaseUrl = "http://localhost:5000/chariot/api/v1.0/network/device";
 const xhr = new XMLHttpRequest();
@@ -34,6 +38,7 @@ class AddDeviceHome extends Component {
       isSubmitted: false, // Whether or not the device information is ready to be sent to the server
       confirmIsOpen: false, // Is the confirm modal open?
       successIsOpen: false, // Is the success modal open?
+      errorIsOpen: false, // Is the error modal open?
       deviceState: {} // All configuration setting values for the device (From AddDeviceHome and AddDeviceVars)
     }
 
@@ -165,6 +170,15 @@ class AddDeviceHome extends Component {
     xhr.send(JSON.stringify(data));
   }
 
+  toggleErrorModal = () => {
+    this.setState({
+      confirmIsOpen: false
+    });
+    this.setState({
+      errorIsOpen: !this.state.errorIsOpen
+    });
+  }
+
 
   /* 
     Called when the user either submits the registration form by clicking "Next"
@@ -180,6 +194,23 @@ class AddDeviceHome extends Component {
     event.preventDefault();
   }
 
+  parseConfirmationData = () => {
+    var confirmationDataJson = {};
+
+    confirmationDataJson['Device Nickname'] = this.state.newDeviceTypeGeneralVals['Device Nickname'];
+    confirmationDataJson['Device Description'] = this.state.newDeviceTypeGeneralVals['Device Description'];
+    confirmationDataJson['Device Type'] = this.state.newDeviceTypeGeneralVals['Device Type'];
+
+    for (var key in this.state.deviceState.newDeviceTypeConfigVals) {
+      var value = this.state.deviceState.newDeviceTypeConfigVals[key];
+      confirmationDataJson[key] = value;
+    }
+
+
+    return confirmationDataJson;
+  }
+
+  /*
   getConfirmationForDeviceFields = () => {
     if (this.state.deviceState.newDeviceTypeGeneralVals && this.state.deviceState.newDeviceTypeConfigVals) {
       var confirmationElement = [];
@@ -211,7 +242,7 @@ class AddDeviceHome extends Component {
 
     return confirmationElement;
   }
-
+  */
 
   /*
     Returns three separate objects with their unique keys. The first object
@@ -221,6 +252,7 @@ class AddDeviceHome extends Component {
     user to the other two objects, the confirmation and sucess modals.
   */
   render() {
+    console.log(this.props.location.networkProps['Network Name']);
     // If config for device type (e.g. Impinjxarray) was obtained, load the form with the device-specific section
     return [
       <div className="container" key="newDeviceScreen">
@@ -252,9 +284,13 @@ class AddDeviceHome extends Component {
       </div>,
 
       <Modal show={this.state.confirmIsOpen} key="newDeviceConfirmModal">
-        <Modal.Body>
-            {this.getConfirmationForDeviceFields()}
-        </Modal.Body>
+        
+        <ConfirmationModalBody
+          confirmationQuestion={('Before ').concat(this.state.newDeviceTypeGeneralVals['Device Nickname'], ' is added to ', this.props.location.networkProps['Network Name'], ' please confirm that the information below is correct.')} 
+          confirmationData = {this.parseConfirmationData()}
+          >
+        </ConfirmationModalBody>
+
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.handleSubmit}>Incorrect</Button>
           <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Correct</Button>
@@ -262,11 +298,22 @@ class AddDeviceHome extends Component {
       </Modal>,
 
       <Modal show={this.state.successIsOpen} key="registerSuccessModal">
-        <Modal.Body>Your new device has been created and added to the network!</Modal.Body>
+        <SuccessModalBody successMessage="Your new device has been created and added to the network!">
+        </SuccessModalBody>
         <Modal.Footer>
           <Link to="/welcome">
             <Button variant="primary" className="float-right">Continue</Button>
           </Link>
+        </Modal.Footer>
+      </Modal>,
+
+      <Modal show={this.state.errorIsOpen} key="addDeviceErrorModal">
+
+        <ErrorModalBody errorMessage="Your device was not added to the network. Please go back, verify that the information is correct, and then try again.">
+        </ErrorModalBody>
+
+        <Modal.Footer>
+          <Button variant="primary" className="float-left" onClick={this.toggleErrorModal}>OK</Button>
         </Modal.Footer>
       </Modal>
     ]
