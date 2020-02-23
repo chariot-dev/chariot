@@ -6,11 +6,14 @@
 import React, { Component } from 'react';
 
 class Dropdown extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     
     this.state = {
-        chosenNetwork: '',
+        id: this.props.id,
+        defaultOption: this.props.defaultOption,
+        availableOptions: this.props.availableOptions,
+        selectedOption: '', 
         message : ''
     };
     
@@ -18,33 +21,41 @@ class Dropdown extends Component {
     this.handleDropdownChange = this.handleDropdownChange.bind(this);
   }
 
-  choseNetwork(networkName) {
-    this.chosenNetwork=networkName;
-  }
   
   showMenu(event) {
-    event.preventDefault();
-    
     this.setState({ showMenu: true }, () => {
       document.addEventListener('click', this.closeMenu);
     });
+
+    event.preventDefault();
   }
 
-    handleDropdownChange(e) {
-        this.setState({ chosenNetwork: e.target.value });
+
+  handleDropdownChange(event) {
+    this.setState({ selectedOption: event.target.value });
   }
+
+
+  parseAvailableOptions= () => {
+    var dropdownOptionsElement = [];
+    var availableOptions = this.props.availableOptions;
+
+    dropdownOptionsElement.push(<option key="chooseNetworkDropdownTitle" selected default disabled>{this.state.defaultOption}</option>)
+
+    for (var i = 0; i < availableOptions.length; i++) {
+      dropdownOptionsElement.push(<option key={availableOptions[i]}>{availableOptions[i]}</option>);
+    }
+    
+    return dropdownOptionsElement;
+  }
+
 
   render() {
-    var message = "You selected " + this.state.chosenNetwork;
     return (
       <div>
-        <div>
-        <p>{message}</p>
-        <select className="menu" onChange={this.handleDropdownChange}>
-            <option value="AirLab Network">AirLab</option>
-            <option value="Dr.Mongan Network">Dr. Mongan</option>
+        <select id="" className="form-control" onChange={this.handleDropdownChange}>
+          {this.parseAvailableOptions()}
         </select>
-        </div>
       </div>
     );
   }

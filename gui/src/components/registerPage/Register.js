@@ -130,29 +130,29 @@ class Register extends Component {
 
                 {/* Two fields for password and confirm password */}
                 <div className="form-group input-group">
-                    <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="password" name="Password" placeholder="Password" />
-                    <span className="input-group-addon">&nbsp;&nbsp;</span>
-                    <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="confirmPassword" name="Password" placeholder="Confirm Password" onChange={this.handleChange}/>
-                    <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
+                  <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="password" name="Password" placeholder="Password" />
+                  <span className="input-group-addon">&nbsp;&nbsp;</span>
+                  <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="confirmPassword" name="Password" placeholder="Confirm Password" onChange={this.handleChange}/>
+                  <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
                 </div>
 
                 <div className="form-group">
-                    <input required type="email" className="form-control" id="emailAddress" name="Email Address" placeholder="Email Address" onChange={this.handleChange}/>
-                    You'll need to verify that this email belongs to you.
+                  <input required type="email" className="form-control" id="emailAddress" name="Email Address" placeholder="Email Address" onChange={this.handleChange}/>
+                  You'll need to verify that this email belongs to you.
                 </div>
 
                 <div className="form-group">
-                    <select required className="form-control" id="securityQuestion" name="Security Question" onChange={this.handleChange}>
-                      <option selected disabled hidden value="">Select a Security Question</option>
-                      <option>What was your first pet's name?</option>
-                      <option>What is your dad's middle name?</option>
-                      <option>What city were you born in?</option>
-                      <option>What is your favorite sport's mascot?</option>
-                    </select>
+                  <select required className="form-control" id="securityQuestion" name="Security Question" onChange={this.handleChange}>
+                    <option selected disabled hidden value="">Select a Security Question</option>
+                    <option>What was your first pet's name?</option>
+                    <option>What is your dad's middle name?</option>
+                    <option>What city were you born in?</option>
+                    <option>What is your favorite sport's mascot?</option>
+                  </select>
                 </div>
 
                 <div className="form-group">
-                    <input required type="text" className="form-control" id="securityQuestionAnswer" name="Security Question Answer" placeholder="Security Question Answer" onChange={this.handleChange}/>
+                  <input required type="text" className="form-control" id="securityQuestionAnswer" name="Security Question Answer" placeholder="Security Question Answer" onChange={this.handleChange}/>
                 </div>
 
                 <br></br>
