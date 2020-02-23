@@ -49,14 +49,18 @@ class ChooseNetwork extends Component {
         <h1>Choose a Network</h1>
         <p className="screenInfo">Select a network to begin data collection process.</p>
 
-        <Dropdown id="chooseNetwork" defaultOption="Select a Network" availableOptions={this.state.options}></Dropdown>
+        <form>
+          <Dropdown id="chooseNetwork" defaultOption="Select a Network" availableOptions={this.state.options}></Dropdown>
 
-        <Link to="/welcome">
-          <Button variant="primary" className="float-left footer-button">Back</Button>
-        </Link>
-        <Link to="/databaseConnection">
-          <Button variant="primary" className="float-right footer-button">Next</Button>
-        </Link>
+          <Link to="/welcome">
+            <Button variant="primary" className="float-left footer-button">Back</Button>
+          </Link>
+          <Link to="/databaseConnection">
+            <Button variant="primary" className="float-right footer-button">Next</Button>
+          </Link>
+        </form>
+        
+
       </div>
     );
   }

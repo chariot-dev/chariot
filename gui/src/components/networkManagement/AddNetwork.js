@@ -32,13 +32,8 @@ class AddNetwork extends Component {
       errorIsOpen: false
     }
 
-    this.handleNetworkAdd = this.handleNetworkAdd.bind(this);
+    this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
     this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleNetworkAdd(event) {
-    this.setState({ isSubmitted: true });
-    event.preventDefault();
   }
   
   handleChange(event) {
@@ -48,10 +43,11 @@ class AddNetwork extends Component {
     this.setState({ networkProperties: updatedNetworkProperties }); // Update the state
   }
 
-  toggleConfirmationModal = () => {
+  toggleConfirmationModal(event) {
     this.setState({
       confirmIsOpen: !this.state.confirmIsOpen
     });
+    event.preventDefault();
   }
 
   toggleErrorModal = () => {
@@ -97,17 +93,17 @@ class AddNetwork extends Component {
         <h1>Add a New Network</h1>
           <p className="screenInfo">Please fill in the fields below to create a network. Then, click "Next".</p>
           
-          <form id="createNetworkForm" onSubmit={this.handleNetworkAdd}>
+          <form id="createNetworkForm" onSubmit={this.toggleConfirmationModal}>
             <div className="form-group">
-              <input className="form-control" id="networkNameInput" name="Network Name" placeholder="Network Name" onChange={this.handleChange}/>
+              <input required className="form-control" id="networkNameInput" name="Network Name" placeholder="Network Name" onChange={this.handleChange}/>
             </div>
             <div className="form-group">
-              <textarea className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" placeholder="Network Description" onChange={this.handleChange}></textarea>
+              <textarea required className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" placeholder="Network Description" onChange={this.handleChange}></textarea>
             </div>
             <Link to="/networkManager">
               <Button variant="primary" className="float-left footer-button">Back</Button>
             </Link>
-            <Button variant="primary" className="float-right footer-button" onClick={this.toggleConfirmationModal}>Next</Button>
+            <Button variant="primary" className="float-right footer-button" type="submit">Next</Button>
         </form>
       </div>,
 

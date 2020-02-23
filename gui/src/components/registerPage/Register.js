@@ -13,6 +13,7 @@ import Button from 'react-bootstrap/Button';
 import hiddenPasswordImg from "../images/hiddenPassword.PNG";
 import showPasswordImg from "../images/showPassword.PNG";
 
+import Dropdown from '../shared/Dropdown';
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 
@@ -28,6 +29,13 @@ class Register extends Component {
         "Security Question": "", // Security question for account in the event the user forgets their password
         "Security Question Answer": "" // Answer to security question
       },
+      securityQuestionOptions : [
+        'What was your first pet\'s name?', 
+        'What is your dad\'s middle name?',
+        'What town or city were you born in?',
+        'In what town or city was your first full time job?',
+        'What is your favorite sport\'s mascot?'
+      ],
       isSubmitted: false, // Whether or not the account information is ready to be sent to the server
       passwordVisible: false, // Whether or not the password is visible on the screen
       passwordImg: hiddenPasswordImg, // Current passwordImg that is shown (hidden/visible)
@@ -142,13 +150,7 @@ class Register extends Component {
                 </div>
 
                 <div className="form-group">
-                  <select required className="form-control" id="securityQuestion" name="Security Question" onChange={this.handleChange}>
-                    <option selected disabled hidden value="">Select a Security Question</option>
-                    <option>What was your first pet's name?</option>
-                    <option>What is your dad's middle name?</option>
-                    <option>What city were you born in?</option>
-                    <option>What is your favorite sport's mascot?</option>
-                  </select>
+                  <Dropdown id="securityQuestion" defaultOption="Select a Security Question" availableOptions={this.state.securityQuestionOptions} onChange={this.handleChange}></Dropdown>
                 </div>
 
                 <div className="form-group">

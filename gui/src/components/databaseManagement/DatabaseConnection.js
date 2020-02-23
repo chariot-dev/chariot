@@ -12,9 +12,9 @@ class DatabaseConnection extends Component {
     super(props);
     this.state = {
       formControls: {
-          ipAddress: '',
-          name: '',
-          password: ''
+          "IP Address": '',
+          "Name": '',
+          "Password": ''
       },
       
       successMessage : '',
@@ -24,6 +24,7 @@ class DatabaseConnection extends Component {
 
     this.testConnection = this.testConnection.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleCancelConfirmation = this.handleCancelConfirmation.bind(this);
   }
 
   
@@ -43,11 +44,16 @@ class DatabaseConnection extends Component {
     });
   }
 
-  /*
-    Currently using the handleSubmit method to try to establish a TCP connection with a database
-    if the connection is successful, then show success message. Otherwise, show failure message and do
-    not proceed to next screen
-  */
+
+  handleCancelConfirmation(event) {
+    this.setState({
+      isSubmitted: !this.state.isSubmitted,
+      confirmIsOpen: !this.state.confirmIsOpen
+    });    
+    event.preventDefault(); // To prevent screen from rerendering
+  }
+
+
   testConnection(event) {
     //currently assuming that connection will always be established, display that connection is successful for 3 seconds
     setTimeout(() => this.setState({ message: 'Connection Successful!' }), 3000);
@@ -69,7 +75,7 @@ class DatabaseConnection extends Component {
         <h1>Database Connection</h1>
         <p className="screenInfo">Please fill in the following fields to connect to the database that will store the data.</p>
 
-        <form>
+        <form onSubmit={this.toggleConfirmationModal}>
           <div className="form-group">
             <input required type="text" className="form-control" id="ipAddress" name="ipAddress" placeholder="IP Address" onChange={this.handleChange}/>
           </div>
@@ -79,25 +85,26 @@ class DatabaseConnection extends Component {
           <div className="form-group">
             <input required type="password" className="form-control" id="password" name="password" placeholder="Password" onChange={this.handleChange}/>
           </div>         
+          <Link to="/chooseNetwork">
+            <Button variant="primary" className="float-left footer-button">Back</Button>
+        </Link>
+        <Button variant="primary" className="float-right footer-button" type="submit">Connect</Button>
 
         </form>
 
-        <Link to="/chooseNetwork">
-            <Button variant="primary" className="float-left footer-button">Back</Button>
-        </Link>
-        <Button variant="primary" className="float-right footer-button" onClick={this.toggleConfirmationModal}>Connect</Button>
+
       </div>,
 
       <Modal show={this.state.confirmIsOpen} key="databaseConnectionConfirmModal">
 
         <ConfirmationModalBody
           confirmationQuestion= 'If the information below about your database is correct, please click "Confirm".'
-          confirmationData = ''
+          confirmationData = {this.state.formControls}
           >
         </ConfirmationModalBody>
 
       <Modal.Footer>
-        <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
+        <Button variant="primary" className="float-left" onClick={this.handleCancelConfirmation}>No</Button>
         <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Confirm</Button>
       </Modal.Footer>
     </Modal>,

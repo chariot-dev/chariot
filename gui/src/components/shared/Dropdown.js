@@ -17,17 +17,7 @@ class Dropdown extends Component {
         message : ''
     };
     
-    this.showMenu = this.showMenu.bind(this);
     this.handleDropdownChange = this.handleDropdownChange.bind(this);
-  }
-
-  
-  showMenu(event) {
-    this.setState({ showMenu: true }, () => {
-      document.addEventListener('click', this.closeMenu);
-    });
-
-    event.preventDefault();
   }
 
 
@@ -40,10 +30,10 @@ class Dropdown extends Component {
     var dropdownOptionsElement = [];
     var availableOptions = this.props.availableOptions;
 
-    dropdownOptionsElement.push(<option key="chooseNetworkDropdownTitle" selected default disabled>{this.state.defaultOption}</option>)
+    dropdownOptionsElement.push(<option key="chooseNetworkDropdownTitle" selected default disabled value="">{this.state.defaultOption}</option>)
 
     for (var i = 0; i < availableOptions.length; i++) {
-      dropdownOptionsElement.push(<option key={availableOptions[i]}>{availableOptions[i]}</option>);
+      dropdownOptionsElement.push(<option key={availableOptions[i]} value={availableOptions[i]}>{availableOptions[i]}</option>);
     }
     
     return dropdownOptionsElement;
@@ -53,7 +43,7 @@ class Dropdown extends Component {
   render() {
     return (
       <div>
-        <select id="" className="form-control" onChange={this.handleDropdownChange}>
+        <select id="" className="form-control" onChange={this.handleDropdownChange} required>
           {this.parseAvailableOptions()}
         </select>
       </div>

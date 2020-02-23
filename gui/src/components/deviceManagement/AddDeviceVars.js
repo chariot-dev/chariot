@@ -55,20 +55,16 @@ class AddDeviceVars extends Component {
     var deviceSpecificForm = [];
     var deviceSettings = deviceConfig["settings"];
 
+    console.log(deviceSettings);
+
     for (var i = 0; i < deviceSettings.length; i++) {
       var curFieldTitle = deviceSettings[i].title;
       var curFieldIsRequired = deviceSettings[i].required;
+      console.log(curFieldIsRequired + '   ' + curFieldTitle);
 
-      if (curFieldIsRequired) {
-        deviceSpecificForm.push(
-          <div className="form-group" key={i}><input className="form-control" id={curFieldTitle} name={curFieldTitle} placeholder={curFieldTitle} onChange={this.handleChange}/></div>
-        );
-      }
-      else {
-        deviceSpecificForm.push(
-          <div className="form-group" key={i}><input className="form-control" id={curFieldTitle} name={curFieldTitle} placeholder={curFieldTitle} onChange={this.handleChange}/></div>
-        );
-      }
+      deviceSpecificForm.push(
+        <div className="form-group" key={i}><input required={curFieldIsRequired} className="form-control" id={curFieldTitle} name={curFieldTitle} placeholder={curFieldTitle} onChange={this.handleChange}/></div>
+      );
     }
 
     return (deviceSpecificForm);
@@ -84,6 +80,7 @@ class AddDeviceVars extends Component {
         {this.createDeviceFields()}
 
         <Button type="submit" variant="primary" className="float-right footer-button" onClick={this.sendSpecificToForm}>Next</Button>
+      
       </div>
     );
   }

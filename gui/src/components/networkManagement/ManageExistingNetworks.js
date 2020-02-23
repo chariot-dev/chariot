@@ -53,7 +53,8 @@ class ManageExistingNetworks extends Component {
       // Create link for network
       networkLinks.push(
         <div key={i}>
-          <Link className="link" to={"/" + curNetworkName + "/settings"}>{curNetworkName}</Link>: {curNetworkDescription}<br></br>
+          <Link className="link float-left" to={"/" + curNetworkName + "/settings"}>{curNetworkName}</Link>: {curNetworkDescription}<br></br>
+          <Button className="float-right" variant="light" size="sm">Add Device</Button>
         </div>
       );
 
@@ -67,6 +68,8 @@ class ManageExistingNetworks extends Component {
             <Link className="networksDeviceLink" to={"/" + curDeviceName + "/settings"}>{curDeviceName}</Link><br></br>
           </div>
         );
+
+        networkLinks.push(<br></br>);
       }
 
     }

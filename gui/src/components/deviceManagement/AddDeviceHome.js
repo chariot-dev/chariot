@@ -252,7 +252,6 @@ class AddDeviceHome extends Component {
     user to the other two objects, the confirmation and sucess modals.
   */
   render() {
-    console.log(this.props.location.networkProps['Network Name']);
     // If config for device type (e.g. Impinjxarray) was obtained, load the form with the device-specific section
     return [
       <div className="container" key="newDeviceScreen">
@@ -275,7 +274,6 @@ class AddDeviceHome extends Component {
           </div>
 
             {this.state.showDeviceSpecificSettings ? <AddDeviceVars params={this.state} onFormSubmit={this.handleNewDeviceCreation}></AddDeviceVars> : null}
-          
         </form>
 
         <Link to="/networkManager">
