@@ -26,7 +26,7 @@ class _DeviceAdapterFactory:
             # raise UnsupportedDeviceError
             raise AssertionError
 
-        instance: Type[DeviceAdapter] = self.deviceMap[config.deviceType](config)
+        instance: DeviceAdapter = self.deviceMap[config.deviceType](config)
         return instance
 
     def getsupportedDevices(self) -> JSONDict:
