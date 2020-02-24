@@ -2,7 +2,7 @@ from collections import OrderedDict
 from threading import Thread
 # unused right now, but will be useful for scaling past a couple of devices
 from multiprocessing.queues import Queue as ProcessQueue
-from typing import List, OrderedDict, Type, Union
+from typing import List, Dict, Optional, Type, Union
 from queue import Empty as QueueEmptyException, Queue as ThreadQueue
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.utility.JSONTypes import JSONObject
@@ -37,16 +37,17 @@ class DataCollectionManager:
     DEFAULT_TIMEOUT = 5
     ERROR_CHECK_TIMEOUT = 0.5
     PRODUCERS_PER_CONSUMER = 2
+    THREAD_JOIN_TIMEOUT = 2.0
 
     # TODO: complete handleError method to continuously examine the error queue
     # TODO: when DatabaseWriter is implemented, remove quotes around type definition
     # TODO: add __del__ method to stop data collection when this object goes out of scope
     # TODO: add DataOutputStream for outputThread to also send data to
-    def __init__(self, network: Union[Network, None], dbWriter: 'DatabaseWriter'):
-        self.activeNetwork: Union[Network, None] = network
+    def __init__(self, network: Optional[Network], dbWriter: 'DatabaseWriter'):
+        self.activeNetwork: Optional[Network] = network
         self.devices: List[DeviceAdapter] = network.getDevices() if network is not None else []
         self.consumerThreads: List[WorkerThread] = []
-        self.producerThreads: OrderedDict[str, WorkerThread] = OrderedDict()
+        self.producerThreads: Dict[str, WorkerThread] = {}
         self.outputThread: WorkerThread = WorkerThread(target=self._outputData)
         self.errorQueue: ThreadQueue = ThreadQueue()
         self.dataQueue: ThreadQueue = ThreadQueue()
@@ -129,10 +130,10 @@ class DataCollectionManager:
                         else:
                             #LOG: f'Attempting to begin {deviceID}'s collection'
                             disconnectedDevices[deviceID] += 1
-                            errorDevice.beginDataCollection()
+                            errorDevice.beginDataCollection(self.errorQueue)
                     else:
                         disconnectedDevices[deviceID] = 0
-                        errorDevice.beginDataCollection()
+                        errorDevice.beginDataCollection(self.errorQueue)
                 else:   #Unkown error, stop device before it floods queues with useless data, or causes damages to the physical device
                     #LOG: f'{deviceID} has encountered a fatal error.
                     errorDevice.stopDataCollection()
@@ -151,7 +152,7 @@ class DataCollectionManager:
 
             while True:
                 try:
-                    data: JSONObject = self.dataQueue.get_nowait()
+                    data = self.dataQueue.get_nowait()
                     output.append(data)
                 except QueueEmptyException:
                     break
@@ -160,7 +161,7 @@ class DataCollectionManager:
     def inCollectionEpisode(self) -> bool:
         return self._inCollectionEpisode
 
-    def setActiveNetwork(self, network: Union[Network, None]):
+    def setActiveNetwork(self, network: Optional[Network]):
         if self._inCollectionEpisode:
             # can't set an active network during a data collection episode
             # to support concurrent network data collection, a new instance of DataCollectionManager has to be spawned
@@ -168,7 +169,7 @@ class DataCollectionManager:
         self.activeNetwork = network
         self.devices = network.getDevices()
 
-    def getActiveNetwork(self) -> Network:
+    def getActiveNetwork(self) -> Optional[Network]:
         return self.activeNetwork
 
     def beginDataCollection(self) -> None:
@@ -212,7 +213,7 @@ class DataCollectionManager:
 
         self._inCollectionEpisode = True
 
-        for producer in self.producerThreads:
+        for producer in self.producerThreads.values():
             producer.start()
         for consumer in self.consumerThreads:
             consumer.start()
@@ -229,8 +230,8 @@ class DataCollectionManager:
             device.stopDataCollection()
         
         self._inCollectionEpisode = False
-        for producer in self.producerThreads:
-            producer.join()
+        for producer in self.producerThreads.values():
+            producer.join(self.THREAD_JOIN_TIMEOUT)
         for consumer in self.consumerThreads:
-            consumer.join()
-        self.outputThread.join()
+            consumer.join(self.THREAD_JOIN_TIMEOUT)
+        self.outputThread.join(self.THREAD_JOIN_TIMEOUT)

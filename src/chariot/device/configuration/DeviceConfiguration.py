@@ -63,7 +63,7 @@ class DeviceConfiguration(ABC):
             setattr(self, key, value)
 
     def toJSON(self) -> str:
-        return self.__str__()
+        return str(self)
 
     def toDict(self) -> JSONDict:
         return dict(self)

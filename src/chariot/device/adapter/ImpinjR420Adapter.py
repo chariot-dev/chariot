@@ -1,7 +1,7 @@
 from queue import Queue
 from sllurp.llrp import LLRPClientFactory
 from twisted.internet import reactor
-from typing import Union
+from typing import Dict, Optional
 from chariot.utility.JSONTypes import JSONObject
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
@@ -10,7 +10,7 @@ from chariot.utility.ChariotExceptions import *
 class ImpinjR420Adapter(DeviceAdapter):
     def __init__(self, config: ImpinjR420Configuration):
         super().__init__(config)
-        self.llrpFactory: Union[LLRPClientFactory, None] = None
+        self.llrpFactory: Optional[LLRPClientFactory] = None
 
     def _reportData(self, data: Dict[str, JSONObject]):
         self.dataQueue.put(data, block=True)
