@@ -12,15 +12,20 @@ class TestAdapter(DeviceAdapter):
         super().__init__(config)
 
     def _beginDataCollection(self, errorQueue: Queue) -> None:
-        self.randomizer()
+        self._inCollectionEpisode = True
+        self._randomizer()
 
+    # For testing purpose do things to mess up these functions and cause errors
     def _connect(self) -> None:
         pass
 
     def _disconnect(self) -> None:
         pass
 
-    def randomizer(self) -> None:
+    def _stopDataCollection(self) -> None:
+        pass
+
+    def _randomizer(self) -> None:
         seedVal = self._config.seedVal
         if seedVal == 0:
             seed()
@@ -33,6 +38,6 @@ class TestAdapter(DeviceAdapter):
             while i < bufSize:
                 buf.append(random())
                 i += 1
-            self.dataQueue.put(buf)
+            self.dataQueue.put(buf, block=True)
 
 __all__ = ['TestAdapter']
