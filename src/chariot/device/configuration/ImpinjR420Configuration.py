@@ -9,7 +9,7 @@ class ImpinjR420Configuration(DeviceConfiguration):
         'tag_population': int,
     }
     optionalFields: Dict[str, Type[JSONObject]] = {
-        'antennas': List[int],
+        'antennas': Type[List[int]],
         'report_every_n_tags': int,
         'tx_power': int,
         'session': int,

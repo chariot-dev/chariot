@@ -13,7 +13,7 @@ class NotInCollectionEpisodeError(AssertionError):
     def __init__(self):
         super().__init__('Network is not in a Collection Episode.')
 
-class FailedToBeginCollectionError(Exception)
+class FailedToBeginCollectionError(Exception):
     def __init__(self):
         super().__init__('Data Collection could not be started')
 

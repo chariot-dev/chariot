@@ -3,7 +3,7 @@ from queue import Queue
 from base64 import b64encode
 from json import dumps
 from time import sleep
-from typing import Dict, Union
+from typing import Dict, Optional
 from chariot.utility.JSONTypes import JSONDict, JSONObject
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
@@ -27,7 +27,7 @@ class ItemsenseSession:
 class ImpinjXArrayAdapter(DeviceAdapter):
     def __init__(self, config: ImpinjXArrayConfiguration):
         super().__init__(config)
-        self.session: Union['ItemsenseSession', None] = None
+        self.session: Optional['ItemsenseSession'] = None
 
     def _buildJobInfo(self) -> Dict[str, JSONObject]:
         jobInfo: Dict[str, str] = {}

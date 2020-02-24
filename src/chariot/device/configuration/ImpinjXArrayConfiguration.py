@@ -13,7 +13,7 @@ class ImpinjXArrayConfiguration(DeviceConfiguration):
         'jobName': str,
         'facility': str,
         'startDelay': str,
-        'readerGroups': List[str],
+        'readerGroups': Type[List[str]],
         'reportToDatabaseEnabled': bool,
         'reportToHistoryEnabled': bool,
         'reportToMessageQueueEnabled': bool,
