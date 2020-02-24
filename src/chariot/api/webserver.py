@@ -53,7 +53,7 @@ def createNetwork():
 @app.route(nManagerBaseUrl + '/network', methods=['PUT'])
 def modifyNetwork():
     # through this endpoint, a network can have its name and/or description changed
-    # it must be that the old name('Name') is specified and a new name('NewName') is given in the payload
+    # it must be that the old name('NetworkName') is specified and a new name('NewName') is given in the payload
     requestContent = request.get_json()
 
     # check that a network name is specified in the payload
