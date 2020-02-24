@@ -110,7 +110,9 @@ class DeleteNetwork extends Component {
     return [
       <div className="container" key="deleteNetworkScreen">
         <h1>Delete an Existing Network</h1>
-        <p className="screenInfo">Select a network to delete.</p>
+        <p className="screenInfo">
+          Select a network to delete. Deleting a network will also delete its corresponding devices.
+        </p>
 
         {this.state.existingNetworkNames ? this.createNetworkLinks() : null}
         

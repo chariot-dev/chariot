@@ -14,6 +14,9 @@ import DeviceConfigsMain from "./components/deviceConfigs/DeviceConfigsMain";
 import DataOutputConfigsMain from "./components/dataOutputConfigs/DataOutputConfigsMain";
 import AddDeviceHome from "./components/deviceManagement/AddDeviceHome";
 import DataCollectionEpisodeStatus from "./components/dataCollection/DataCollectionEpisodeStatus";
+import ManageNetwork from "./components/networkManagement/ManageNetwork";
+import ManageDevice from "./components/deviceManagement/ManageDevice";
+import ManageNetworkConfiguration from "./components/networkManagement/ManageNetworkConfiguration";
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
@@ -37,6 +40,9 @@ function App() {
           <Route path="/dataOutputConfigsMain" component={DataOutputConfigsMain} />
           <Route path="/addDeviceHome" component={AddDeviceHome} />
           <Route path="/DataCollectionEpisodeStatus" component={DataCollectionEpisodeStatus} />
+          <Route path="/manageExistingNetwork/:networkName" exact component={ManageNetwork} />
+          <Route path="/manageExistingNetwork/:networkName/networkConfiguration" exact component={ManageNetworkConfiguration} />
+          <Route path="/manageExistingDevice/:networkName/:deviceName" exact component={ManageDevice} />
         </Switch>
       </div>
     </Router>

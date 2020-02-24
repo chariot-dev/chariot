@@ -46,9 +46,6 @@ class ManageExistingNetworks extends Component {
   createNetworkLinks() {
     var networkLinks = [];
     
-
-    console.log(this.state.existingNetworks);
-
     for (var i = 0; i < this.state.existingNetworks.length; i++) {
       var deviceLinks = []; // Reset list of devices for network-to-be-displayed
       var curNetworkName = this.state.existingNetworks[i]["NetworkName"];
@@ -60,27 +57,33 @@ class ManageExistingNetworks extends Component {
         var curDeviceName = this.state.existingNetworks[i]["Devices"][k];
         
         deviceLinks.push(
-          <div key={curDeviceKey}>
-            <Link className="networksDeviceLink" to={"/" + curDeviceName + "/settings"}>{curDeviceName}</Link><br></br>
+          <div key={curDeviceKey} className="networksDeviceLink">
+            <b>Device {k + 1}: </b>
+              <Link to={{pathname:"/manageExistingDevice/" + curNetworkName + "/" + curDeviceName, deviceProps:{'Network Name': curNetworkName, 'Device Name': curDeviceName} }}>
+                {curDeviceName}
+              </Link><br></br>
           </div>
         );
       }      
 
-      // Create link for network
       networkLinks.push(
         <div className="existingNetworkBox" key={i}>
           <div className="existingNetworkCell">
-            <Link to={{pathname:'/addDeviceHome', networkProps:{'Network Name': curNetworkName}}}>
+            <Link to={{pathname:'/addDeviceHome', networkProps:{'Network Name': curNetworkName}}}> 
               <Button className="float-right" variant="light" size="sm">Add Device</Button>
             </Link>
-            <Link className="link float-left" to={"/" + curNetworkName + "/settings"}>{curNetworkName}</Link>: {curNetworkDescription}<br></br>
+            
+            <div>
+              <b>Network Name: </b> 
+                <Link to={{pathname:"/manageExistingNetwork/" + curNetworkName, networkProps:{'Network Name': curNetworkName} }}>
+                  {curNetworkName}
+                </Link><br></br>
+              <b>Description: </b> {curNetworkDescription}<br></br>
+            </div>
             {deviceLinks}
           </div>
         </div>
       );
-
-
-
     }
 
     return networkLinks;
@@ -92,7 +95,9 @@ class ManageExistingNetworks extends Component {
     return (
       <div className="container">
         <h1>Manage Existing Networks</h1>
-        <p className="screenInfo">Select a network to modify its existing configuration settings.</p>
+        <p className="screenInfo">
+          Select a network to modify its existing configuration settings. Select a device under a network to modify the device's existing configuration settings.
+        </p>
         
         {this.state.existingNetworks ? this.createNetworkLinks() : null}
 
