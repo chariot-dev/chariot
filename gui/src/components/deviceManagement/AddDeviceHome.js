@@ -64,14 +64,14 @@ class AddDeviceHome extends Component {
   handleDeviceTypeChange(event) {
     console.log("------------------- changed -------------------");
     var lastDeviceType = this.state.newDeviceTypeGeneralVals['Device Type'];
-    //console.log(lastDeviceType + " ... " + event.target.value);
     
     if (lastDeviceType !== event.target.value) {
       var updatedNewDeviceTypeGeneralVals = this.state.newDeviceTypeGeneralVals; // Store from current state
-      updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json
+      updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json with the new device type
 
-      // Because react doesn't update state immediately
+      // State is update asynchronousyly, so run function after state is updated
       this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }, function () {
+        console.log(this.state.newDeviceTypeGeneralVals);
 
         xhr.open('GET', getDeviceConfigBaseUrl + "?DeviceName=" + this.state.newDeviceTypeGeneralVals['Device Type']);
         xhr.setRequestHeader('Content-Type', 'application/json');
@@ -81,7 +81,13 @@ class AddDeviceHome extends Component {
           if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
               var responseJson = JSON.parse(xhr.response);
 
+              console.log(responseJson);
+
+              console.log(updatedNewDeviceTypeGeneralVals);
+
               updatedNewDeviceTypeGeneralVals['newDeviceTypeConfig'] = responseJson;
+
+              console.log(updatedNewDeviceTypeGeneralVals);
 
               // Store the device's config file to the state
               this.setState({newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals});
@@ -97,10 +103,22 @@ class AddDeviceHome extends Component {
   }
 
   handleNewDeviceCreation = (submittedDeviceSpecificState) => {
+    console.log(submittedDeviceSpecificState);
     this.setState ({ deviceState: submittedDeviceSpecificState }, () => {
       console.log(this.state.deviceState);
     });
 
+    
+
+    /*
+    var temp = [];
+    for (var key in submittedDeviceSpecificState) {
+      temp.push(submittedDeviceSpecificState[key]);
+    }
+    this.setState ({ deviceState: temp }, () => {
+      console.log(this.state.deviceState);
+    });
+    */
     // Update state to launch confirmation modal
     this.setState({
       isSubmitted: !this.state.isSubmitted,
@@ -130,41 +148,19 @@ class AddDeviceHome extends Component {
     // ============================== FIX LATER. SHOULDN'T HAVE TO HAVE CONDITIONAL ==============================
     var data = {};
 
-    if (this.state.deviceState.newDeviceTypeGeneralVals['Device Type'] === 'ImpinjSpeedwayR420') {
-      data = {
-        "NetworkName": this.props.location.networkProps['Network Name'], // required
-        "deviceId": this.state.deviceState.newDeviceTypeGeneralVals['Device Nickname'], // required
-        "deviceType": this.state.deviceState.newDeviceTypeGeneralVals['Device Type'], // required
-        "ipAddress": this.state.deviceState.newDeviceTypeConfigVals["Device IP Address"], // required
-        "pollDelay":"", // required
-        "tag_population": parseInt(this.state.deviceState.newDeviceTypeConfigVals["Tag Population"]), // required
-        "report_every_n_tags": this.state.deviceState.newDeviceTypeConfigVals["Report Every N Tags"],
-        "tx_power":"",
-        "session": this.state.deviceState.newDeviceTypeConfigVals["Session"],
-        "start_inventory": this.state.deviceState.newDeviceTypeConfigVals["Start Inventory"],
-        "mode_identifier": this.state.deviceState.newDeviceTypeConfigVals["Mode Identifier"],
-        "EnableROSpecID":"",
-        "EnableSpecIndex":"",
-        "EnableInventoryParameterSpecID":""
-      }
-    }
-    else {
-      data = {
-        "NetworkName": this.props.location.networkProps['Network Name'], // required
-        "deviceId": this.state.deviceState.newDeviceTypeGeneralVals['Device Nickname'], // required
-        "deviceType": this.state.deviceState.newDeviceTypeGeneralVals['Device Type'], // required
-        "ipAddress": this.state.deviceState.newDeviceTypeConfigVals["Itemsense Server IP Address"], // required
-        "pollDelay":"", // required
-        "tag_population": "", // required
-        "report_every_n_tags": "",
-        "tx_power":"",
-        "session": "",
-        "start_inventory": "",
-        "mode_identifier": "",
-        "EnableROSpecID":"",
-        "EnableSpecIndex":"",
-        "EnableInventoryParameterSpecID":""
-      }      
+    console.log(this.props.location.networkProps);
+    console.log(this.state.deviceState.newDeviceTypeConfigVals);
+
+    data["NetworkName"] = this.props.location.networkProps['Network Name'];
+    data["deviceId"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Nickname'];
+    data["deviceType"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Type'];
+    data["pollDelay"] = "xxxxxxxx";
+
+    for (var key in this.state.deviceState.newDeviceTypeConfigVals) {
+      console.log(key);
+      console.log(this.state.deviceState.newDeviceTypeConfigVals[key]);
+
+      data[this.state.deviceState.newDeviceTypeConfigVals[key].alias] = this.state.deviceState.newDeviceTypeConfigVals[key].value;
     }
 
     xhr.send(JSON.stringify(data));
@@ -194,6 +190,7 @@ class AddDeviceHome extends Component {
     event.preventDefault();
   }
 
+
   parseConfirmationData = () => {
     var confirmationDataJson = {};
 
@@ -202,10 +199,8 @@ class AddDeviceHome extends Component {
     confirmationDataJson['Device Type'] = this.state.newDeviceTypeGeneralVals['Device Type'];
 
     for (var key in this.state.deviceState.newDeviceTypeConfigVals) {
-      var value = this.state.deviceState.newDeviceTypeConfigVals[key];
-      confirmationDataJson[key] = value;
+      confirmationDataJson[key] = this.state.deviceState.newDeviceTypeConfigVals[key].value;
     }
-
 
     return confirmationDataJson;
   }
@@ -219,8 +214,6 @@ class AddDeviceHome extends Component {
     user to the other two objects, the confirmation and sucess modals.
   */
   render() {
-    console.log(this.props.location.networkProps['Network Name']);
-
     // If config for device type (e.g. Impinjxarray) was obtained, load the form with the device-specific section
     return [
       <div className="container" key="newDeviceScreen">
