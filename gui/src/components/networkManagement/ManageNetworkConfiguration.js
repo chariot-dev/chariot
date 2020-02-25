@@ -106,6 +106,11 @@ class ManageNetworkConfiguration extends React.Component {
     xhr.send(JSON.stringify(data));
   }
 
+  toggleErrorModal = () => {
+    this.setState({confirmIsOpen: !this.state.confirmIsOpen});
+    this.setState({errorIsOpen: !this.state.errorIsOpen});
+  }
+
 
   render() {
     return [

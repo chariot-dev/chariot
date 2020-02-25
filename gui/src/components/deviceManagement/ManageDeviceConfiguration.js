@@ -1,8 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+
+import ConfirmationModalBody from '../shared/ConfirmationModalBody';
+import SuccessModalBody from '../shared/SuccessModalBody';
 
 var getDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
+const deleteDeviceBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
 const xhr = new XMLHttpRequest();
 
 class ManageDeviceConfiguration extends React.Component {
@@ -13,8 +18,10 @@ class ManageDeviceConfiguration extends React.Component {
       originalDeviceName : this.props.location.networkProps["Device Name"], // this.props.location.deviceProps obtained from prop passed through from Link in ManageExistingNetworks jsx element
       originalNetworkName : this.props.location.networkProps["Network Name"],
       originalDeviceProperties: {}, // Filled by componentDidMount()
-      newDeviceProperties: {}
-
+      newDeviceProperties: {},
+      confirmIsOpen: false,
+      successIsOpen: false,
+      deleteIsOpen: false
     }
   }
 
@@ -71,12 +78,40 @@ class ManageDeviceConfiguration extends React.Component {
     return configurationFields;
   }
 
+  toggleDeletionModal = () => {
+    console.log('hi')
+    this.setState({deleteIsOpen: !this.state.deleteIsOpen});
+  }
+
+  toggleSuccessModal = () => {
+    xhr.open('DELETE', deleteDeviceBaseUrl + "?NetworkName=" + this.state.originalNetworkName + "&DeviceName=" + this.state.originalDeviceName);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
+        if (xhr.status === 200) {
+          this.setState({
+            confirmIsOpen: false
+          });
+          this.setState({
+            successIsOpen: !this.state.successIsOpen
+          });    
+        }
+        else {
+          console.log("ERROR");
+        }  
+      }
+    }
+
+    xhr.send();
+  }
+
 
   render() {
     console.log(this.state.originalDeviceName + "   " + this.state.originalNetworkName);
 
-    return (
-      <div className="container">
+    return [
+      <div className="container" key="manageDeviceConfigurationScreen">
         <h1>{this.state.originalDeviceName} - Device Configuration</h1>
         <p className="screenInfo">Modifying configuration settings of {this.state.originalDeviceName} for {this.state.originalNetworkName}.</p>
 
@@ -87,8 +122,32 @@ class ManageDeviceConfiguration extends React.Component {
         <Link to="/manageExistingNetworks">
           <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
-      </div>
-    );
+
+        <Button variant="danger" className="footer-button button-mid-bottom" onClick={this.toggleDeletionModal}>Delete Device</Button>
+
+        <Button variant="success" className="float-right footer-button">Save</Button>
+      </div>,
+
+      <Modal show={this.state.deleteIsOpen} key="deviceDeletionConfirmModal">
+        <Modal.Body>
+          To confirm the deletion of the device, {this.state.originalDeviceName}, click 'Yes'.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
+          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
+        </Modal.Footer>
+      </Modal>,
+
+      <Modal show={this.state.successIsOpen} key="deviceDeletionSuccessModal">
+        <SuccessModalBody successMessage= {this.state.originalDeviceName + " has been successfully removed from " + this.state.originalNetworkName}>
+        </SuccessModalBody>
+        <Modal.Footer>
+          <Link to="/welcome">
+            <Button variant="primary" className="float-right">Continue</Button>
+          </Link>
+        </Modal.Footer>
+      </Modal>
+    ]
   }
 }
 

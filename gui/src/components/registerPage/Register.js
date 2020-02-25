@@ -13,7 +13,6 @@ import Button from 'react-bootstrap/Button';
 import hiddenPasswordImg from "../images/hiddenPassword.PNG";
 import showPasswordImg from "../images/showPassword.PNG";
 
-import Dropdown from '../shared/Dropdown';
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 
@@ -91,8 +90,6 @@ class Register extends Component {
     Called when the user clicks the button to view/unview the password they entered.
   */
   changePasswordVisibility() {
-    console.log(this.state.passwordImg);
-
     if (this.state.passwordImg === hiddenPasswordImg) {
       this.setState({passwordImg: showPasswordImg});
       this.setState({passwordVisible: true});
@@ -150,7 +147,15 @@ class Register extends Component {
                 </div>
 
                 <div className="form-group">
-                  <Dropdown id="securityQuestion" availableOptions={this.state.securityQuestionOptions} onChange={this.handleChange}></Dropdown>
+                  <select required className="form-control" id="securityQuestion" name="Security Question" onChange={this.handleChange}>
+                    <option selected disabled hidden value="">Select a Security Question</option>
+                    <option>What was the house number you lived in as a child?</option>
+                    <option>What high school did you attend?</option>
+                    <option>What is your mother's maiden name?</option>
+                    <option>What is your favorite food?</option>
+                    <option>What is your favorite sports mascot?</option>
+                    <option>What is town/city were you born in?</option>
+                  </select>
                 </div>
 
                 <div className="form-group">

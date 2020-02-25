@@ -141,10 +141,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
 
       }
 
-
     }
-
-
 
 
     return networkLinks;

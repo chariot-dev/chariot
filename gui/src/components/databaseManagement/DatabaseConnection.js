@@ -91,6 +91,9 @@ class DatabaseConnection extends Component {
           <Link to="/chooseNetwork">
             <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
+
+        <Button variant="success" className="footer-button button-mid-bottom">Test Connection</Button>
+
         <Button variant="primary" className="float-right footer-button" type="submit">Connect</Button>
 
         </form>

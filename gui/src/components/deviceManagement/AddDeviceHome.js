@@ -108,17 +108,6 @@ class AddDeviceHome extends Component {
       console.log(this.state.deviceState);
     });
 
-    
-
-    /*
-    var temp = [];
-    for (var key in submittedDeviceSpecificState) {
-      temp.push(submittedDeviceSpecificState[key]);
-    }
-    this.setState ({ deviceState: temp }, () => {
-      console.log(this.state.deviceState);
-    });
-    */
     // Update state to launch confirmation modal
     this.setState({
       isSubmitted: !this.state.isSubmitted,
@@ -145,12 +134,13 @@ class AddDeviceHome extends Component {
       }
     }    
     
-    // ============================== FIX LATER. SHOULDN'T HAVE TO HAVE CONDITIONAL ==============================
     var data = {};
 
     console.log(this.props.location.networkProps);
     console.log(this.state.deviceState.newDeviceTypeConfigVals);
 
+
+    // ============================================ FIX POLL DELAY ==============================================
     data["NetworkName"] = this.props.location.networkProps['Network Name'];
     data["deviceId"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Nickname'];
     data["deviceType"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Type'];
@@ -228,7 +218,7 @@ class AddDeviceHome extends Component {
             <textarea required className="form-control" id="Device Description" rows="3" name="Device Description" placeholder="Device Description" onChange={this.handleChange}></textarea>
           </div>
           <div className="form-group">
-              <select required className="form-control" id="securityQuestion" name="Device Type" onChange={this.handleDeviceTypeChange}>
+              <select required className="form-control" id="Device Type Select" name="Device Type" onChange={this.handleDeviceTypeChange}>
                 <option selected disabled hidden value="">Select a Device Type</option>
                 <option>ImpinjSpeedwayR420</option>
                 <option>ImpinjxArray</option>

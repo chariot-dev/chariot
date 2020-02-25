@@ -14,7 +14,6 @@ import DeviceConfigsMain from "./components/deviceConfigs/DeviceConfigsMain";
 import DataOutputConfigsMain from "./components/dataOutputConfigs/DataOutputConfigsMain";
 import AddDeviceHome from "./components/deviceManagement/AddDeviceHome";
 import DataCollectionEpisodeStatus from "./components/dataCollection/DataCollectionEpisodeStatus";
-import ManageNetwork from "./components/networkManagement/ManageNetwork";
 import ManageNetworkConfiguration from "./components/networkManagement/ManageNetworkConfiguration";
 import ManageDevices from "./components/deviceManagement/ManageDevices";
 import ManageDeviceConfiguration from "./components/deviceManagement/ManageDeviceConfiguration";
@@ -41,8 +40,7 @@ function App() {
           <Route path="/dataOutputConfigsMain" component={DataOutputConfigsMain} />
           <Route path="/addDeviceHome" component={AddDeviceHome} />
           <Route path="/DataCollectionEpisodeStatus" component={DataCollectionEpisodeStatus} />
-          <Route path="/manageExistingNetwork/:networkName" exact component={ManageNetwork} />
-          <Route path="/manageExistingNetwork/:networkName/networkConfiguration" exact component={ManageNetworkConfiguration} />
+          <Route path="/manageExistingNetwork/:networkName" exact component={ManageNetworkConfiguration} />
           <Route path="/manageExistingDevices/devices/:networkName" exact component={ManageDevices} />
           <Route path="/manageExistingDevices/devices/:networkName/:deviceName" exact component={ManageDeviceConfiguration} />
         </Switch>

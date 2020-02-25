@@ -7,7 +7,6 @@
 */
 
 import React, { Component } from 'react';
-import Dropdown from '../shared/Dropdown';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
@@ -58,9 +57,8 @@ class ChooseNetwork extends Component {
           Select a network to begin data collection process.
         </p>
 
-        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={true} type="choose"></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="choose"></NetworkDeviceCellScreenTemplate> : null}
 
-        
         <Link to="/welcome">
           <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>

@@ -77,12 +77,17 @@ class DeleteNetwork extends Component {
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        this.setState({
-          confirmIsOpen: false
-        });
-        this.setState({
-          successIsOpen: !this.state.successIsOpen
-        });      
+        if (xhr.status === 200) {
+          this.setState({
+            confirmIsOpen: false
+          });
+          this.setState({
+            successIsOpen: !this.state.successIsOpen
+          });      
+        }
+        else {
+          console.log("ERROR");
+        }
       }
     }
 
