@@ -25,7 +25,8 @@ class ManageNetworkConfiguration extends React.Component {
       },
       confirmIsOpen: false,
       successIsOpen: false,
-      errorIsOpen: false
+      errorIsOpen: false,
+      errorMessage: ""
     }    
 
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
@@ -42,9 +43,7 @@ class ManageNetworkConfiguration extends React.Component {
 
 
   toggleConfirmationModal(event) {
-    this.setState({
-      confirmIsOpen: !this.state.confirmIsOpen
-    });
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
     event.preventDefault();
   }
 
@@ -84,17 +83,21 @@ class ManageNetworkConfiguration extends React.Component {
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
         if (xhr.status === 200) {
-          this.setState({
-            confirmIsOpen: false
-          });
-          this.setState({
-            successIsOpen: !this.state.successIsOpen
-          });
+          this.setState({ confirmIsOpen: false });
+          this.setState({ successIsOpen: !this.state.successIsOpen });
         }
-        else {
-          this.setState({ errorIsOpen: !this.state.errorIsOpen });
+        else if (xhr.status === 400){
+          this.setState({ errorIsOpen: !this.state.errorIsOpen }, function () {
+            var returnedErrorMessage = JSON.parse(xhr.response).message;
+            this.setState({ errorMessage: returnedErrorMessage }, function () {
+              console.log(this.state.errorMessage);
+            });
+          });
+          
         }
       }
+
+
     }
 
     var data = {
@@ -158,9 +161,9 @@ class ManageNetworkConfiguration extends React.Component {
       </Modal.Footer>
     </Modal>,
 
-    <Modal show={this.state.errorIsOpen} key="modifyNetworkNetworkSpecificSettingsErrorModal">
+    <Modal show={this.state.errorIsOpen && this.state.errorMessage} key="modifyNetworkNetworkSpecificSettingsErrorModal">
 
-      <ErrorModalBody errorMessage="The network could not be modified. Please go back, verify that the information is correct, and then try again.">
+      <ErrorModalBody errorMessage={this.state.errorMessage}>
       </ErrorModalBody>
 
       <Modal.Footer>
