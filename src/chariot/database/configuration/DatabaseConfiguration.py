@@ -3,10 +3,11 @@ from chariot.utility.JSONTypes import JSONDict, JSONObject
 from json import dumps
 from typing import Dict, Type
 
+
 class DatabaseConfiguration(Configuration):
     requiredFields: Dict[str, Type[JSONObject]] = {
         'databaseName': str,
-        'databaseType': str,
+        'type': str,
         'host': str,
     }
 

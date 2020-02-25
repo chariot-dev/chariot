@@ -2,7 +2,7 @@ import abc
 from typing import Dict, List, Type
 
 from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
-from chariot.utility.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONObject
 
 
 class DatabaseWriter(metaclass=abc.ABCMeta):
@@ -13,14 +13,13 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
 
     def __init__(self, config: Type[DatabaseConfiguration]):
         self.config: Type[DatabaseConfiguration] = config
+        self.connected: bool = False
         self.connect()
         self.initializeTable()
-        self.connected: bool = False
 
     def __del__(self):
         self.disconnect()
 
-    @abc.abstractmethod
     def connect(self, reconnect=False):
         """
         Establish a connection to the database.
@@ -33,20 +32,18 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def _connect(self):
         pass
 
-    @abc.abstractmethod
     def disconnect(self):
         """
         End connection to the database gracefully.
         """
-        if not self.connected:
-            raise AssertionError
-        self._disconnect()
+        if self.connected:
+            self._disconnect()
+        self.connected = False
 
     @abc.abstractmethod
     def _disconnect(self):
         pass
 
-    @abc.abstractmethod
     def initializeTable(self):
         """
         Create a table in the database.
@@ -55,11 +52,10 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
             raise AssertionError
         self._initializeTable()
 
-    abc.abstractmethod
+    @abc.abstractmethod
     def _initializeTable(self):
         pass
 
-    @abc.abstractmethod
     def insertOne(self, dataPoint: Dict[str, JSONObject]):
         """
         Check for validity of dataPoint, then insert into the table.
@@ -73,7 +69,6 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def _insertOne(self):
         pass
 
-    @abc.abstractmethod
     def insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         """
         Check for validity of each dataPoint,then insert into the table.

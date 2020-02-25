@@ -24,19 +24,23 @@ class Configuration(ABC):
         return dumps(output)
 
     def _isValidField(self, field: str) -> bool:
-        return field not in self.requiredFields and field not in self.optionalFields
+        # return field not in self.requiredFields and field not in
+        # self.optionalFields
+        return field in self.requiredFields or field in self.optionalFields
 
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         for field in configMap:
             if not self._isValidField(field):
-                raise AssertionError
+                raise AssertionError(field)
 
         for field, fieldType in self.requiredFields.items():
-            if not field in configMap or not isinstance(configMap[field], fieldType):
+            if field not in configMap or not isinstance(
+                    configMap[field], fieldType):
                 raise ValueError
 
         for field, fieldType in self.optionalFields.items():
-            if field in configMap and not isinstance(configMap[field], fieldType):
+            if field in configMap and not isinstance(
+                    configMap[field], fieldType):
                 raise ValueError
 
     def _validateSubsetConfig(self, newConfig: JSONDict) -> None:
