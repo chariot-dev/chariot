@@ -55,6 +55,7 @@ def modifyNetwork():
     # through this endpoint, a network can have its name and/or description changed
     # it must be that the old name('NetworkName') is specified and a new name('NewName') is given in the payload
     requestContent = request.get_json()
+    hasNewName = True
 
     # check that a network name is specified in the payload
     oldNetworkName = PayloadParser.getNameInPayload(requestContent)
@@ -63,10 +64,17 @@ def modifyNetwork():
 
     networkDesc: str = PayloadParser.getNetworkDescription(requestContent)  # note that description is optional
 
-    NetworkManager.modifyNetworkNameByName(newName, oldNetworkName)
-    if networkDesc:
-        NetworkManager.modifyNetworkDescriptionByName(networkDesc, newName)
+    if newName is not None:
+        NetworkManager.modifyNetworkNameByName(newName, oldNetworkName)
+    else:
+        # no NewName for network provided
+        hasNewName = False
 
+    if networkDesc is not None:
+        if hasNewName:
+            NetworkManager.modifyNetworkDescriptionByName(networkDesc, newName)
+        else:
+            NetworkManager.modifyNetworkDescriptionByName(networkDesc, oldNetworkName)
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
@@ -99,7 +107,7 @@ def getSupportedDeviceConfig():
     deviceTemplateName = PayloadParser.getDeviceNameInURL(request)
     config: Dict[str, str] = {}
 
-    #include generic required fields
+    # include generic required fields
     genericTemplate = DeviceConfiguration.requiredFields
 
     # get specified device template

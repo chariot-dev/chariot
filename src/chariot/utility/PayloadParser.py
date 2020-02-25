@@ -26,9 +26,6 @@ class PayloadParser:
     def getNewNetworkName(requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
         newNetworkName: str = requestContent.get('NewName')
-
-        if not newNetworkName:
-            raise NoIdentifierError(' new Network name')
         return newNetworkName
 
     @staticmethod
