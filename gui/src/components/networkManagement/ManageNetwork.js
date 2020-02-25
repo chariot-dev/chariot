@@ -6,12 +6,13 @@ class ManageNetwork extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      networkName: this.props.location.networkProps["Network Name"]
+      networkName: this.props.location.networkProps["Network Name"], // this.props.location.networkProps obtained from jsx Link in ManageExistingNetworks
+      deviceName: this.props.location.networkProps["Device Name"]
     }
   }
 
 
-  render() {
+  render() {    
     return (
       <div className="container">
         <h1>{this.state.networkName}</h1>
@@ -19,7 +20,7 @@ class ManageNetwork extends React.Component {
 
         <Link to={{pathname:"/manageExistingNetwork/" + this.state.networkName + "/networkConfiguration", networkProps:{'Network Name': this.state.networkName} }}>Edit Network Settings</Link>
         <br></br>
-        <Link to="/welcome">Edit Connected IoT Device Settings</Link>
+        <Link to={{pathname:"/manageExistingDevices/devices/" + this.state.networkName, networkProps:{'Network Name': this.state.networkName} }}>Edit Connected IoT Device Settings</Link>
 
         <br></br>
 

@@ -38,6 +38,7 @@ class AddDeviceVars extends Component {
     this.sendSpecificToForm = this.sendSpecificToForm.bind(this);
   }
 
+
   handleChange(event) {
     // Remove spaces from variable name and replace with %20 to create state attribute variable
     var updatedNewDeviceTypeConfigVals = this.state.newDeviceTypeConfigVals; // Store from current state
@@ -45,10 +46,13 @@ class AddDeviceVars extends Component {
     this.setState({ newDeviceTypeConfigVals: updatedNewDeviceTypeConfigVals }); // Update the state
   }
 
+
+  // Couldn't call onFormSubmit() explicitly on click. Needed event.preventDefault()
   sendSpecificToForm(event) {
     this.props.onFormSubmit(this.state);
     event.preventDefault();
   }
+
 
   createDeviceFields = () => {
     var deviceConfig = this.state.newDeviceTypeGeneralVals.newDeviceTypeConfig[this.state.newDeviceTypeGeneralVals['Device Type']];
@@ -60,7 +64,6 @@ class AddDeviceVars extends Component {
     for (var i = 0; i < deviceSettings.length; i++) {
       var curFieldTitle = deviceSettings[i].title;
       var curFieldIsRequired = deviceSettings[i].required;
-      console.log(curFieldIsRequired + '   ' + curFieldTitle);
 
       deviceSpecificForm.push(
         <div className="form-group" key={i}><input required={curFieldIsRequired} className="form-control" id={curFieldTitle} name={curFieldTitle} placeholder={curFieldTitle} onChange={this.handleChange}/></div>

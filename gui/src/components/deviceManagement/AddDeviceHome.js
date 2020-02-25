@@ -209,40 +209,7 @@ class AddDeviceHome extends Component {
 
     return confirmationDataJson;
   }
-
-  /*
-  getConfirmationForDeviceFields = () => {
-    if (this.state.deviceState.newDeviceTypeGeneralVals && this.state.deviceState.newDeviceTypeConfigVals) {
-      var confirmationElement = [];
-
-      var networkName = this.props.location.networkProps['Network Name']; // Obtained from passing prop through link from AddNetwork.js
-
-      confirmationElement.push(<p>Before {this.state.newDeviceTypeGeneralVals['Device Nickname']} is added to {networkName}, please confirm that the information below is correct.</p>);
-
-      for (var curGeneralValsKey in this.state.deviceState.newDeviceTypeGeneralVals) {
-        if (curGeneralValsKey !== 'newDeviceTypeConfig') {
-          var curGeneralValsVal = this.state.deviceState.newDeviceTypeGeneralVals[curGeneralValsKey];
-
-          confirmationElement.push(
-            <div key={curGeneralValsKey}><b>{curGeneralValsKey}</b>: {curGeneralValsVal}</div>
-          );
-        }
-      }
-
-      for (var curConfigValsKey in this.state.deviceState.newDeviceTypeConfigVals) {
-        if (curConfigValsKey !== 'newDeviceTypeConfig') {
-          var curConfigValsVal = this.state.deviceState.newDeviceTypeConfigVals[curConfigValsKey];
-
-          confirmationElement.push(
-            <div key={curConfigValsKey}><b>{curConfigValsKey}</b>: {curConfigValsVal}</div>
-          );
-        }
-      }
-    }
-
-    return confirmationElement;
-  }
-  */
+  
 
   /*
     Returns three separate objects with their unique keys. The first object
@@ -275,6 +242,7 @@ class AddDeviceHome extends Component {
               </select>
           </div>
 
+            {/* onFormSubmit() callback. Pass in as prop basically. */}
             {this.state.showDeviceSpecificSettings ? <AddDeviceVars params={this.state} onFormSubmit={this.handleNewDeviceCreation}></AddDeviceVars> : null}
         </form>
 

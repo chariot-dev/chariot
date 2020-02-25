@@ -1,5 +1,8 @@
 /*
-
+  This component handles the user having to choose a network to run the data collection episode on.
+  The body of the screen (network/device info) is generated through the NetworkDeviceCellScreenTemplate 
+  child component. Since the buttons in this component links the user to other components, a callback 
+  to update this component's state isn't necessary. 
 
 */
 
@@ -8,6 +11,8 @@ import Dropdown from '../shared/Dropdown';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
+import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
+
 const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
 const xhr = new XMLHttpRequest();
 
@@ -15,8 +20,7 @@ class ChooseNetwork extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      options: ['jioif']
-
+      existingNetworks: []
     }
   }
 
@@ -30,12 +34,13 @@ class ChooseNetwork extends Component {
         if (xhr.status === 200) {
           var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
 
-          var networkNames = [];
+          var updatedNetworksJsonArray = this.state.existingNetworks; 
+
           for (var i = 0; i < responseJsonArray.length; i++) {
-            networkNames.push(responseJsonArray[i]["NetworkName"]);
+            updatedNetworksJsonArray.push(responseJsonArray[i]);
           }
 
-          this.setState({options: networkNames})
+          this.setState({ existingNetworks: updatedNetworksJsonArray });
         }
       }
     }
@@ -44,23 +49,21 @@ class ChooseNetwork extends Component {
   }
 
   render() {
+    console.log(this.state.existingNetworks);
+    
     return (
       <div className="container">
         <h1>Choose a Network</h1>
-        <p className="screenInfo">Select a network to begin data collection process.</p>
+        <p className="screenInfo">
+          Select a network to begin data collection process.
+        </p>
 
-        <form>
-          <Dropdown id="chooseNetwork" defaultOption="Select a Network" availableOptions={this.state.options}></Dropdown>
+        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={true} type="choose"></NetworkDeviceCellScreenTemplate> : null}
 
-          <Link to="/welcome">
-            <Button variant="primary" className="float-left footer-button">Back</Button>
-          </Link>
-          <Link to="/databaseConnection">
-            <Button variant="primary" className="float-right footer-button">Next</Button>
-          </Link>
-        </form>
         
-
+        <Link to="/welcome">
+          <Button variant="primary" className="float-left footer-button">Back</Button>
+        </Link>
       </div>
     );
   }

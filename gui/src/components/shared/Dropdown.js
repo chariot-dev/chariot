@@ -11,8 +11,7 @@ class Dropdown extends Component {
     
     this.state = {
         id: this.props.id,
-        defaultOption: this.props.defaultOption,
-        availableOptions: this.props.availableOptions,
+        availableOptions: this.props.availableOptions, // Component that will use a dropdown passes its options through as props
         selectedOption: '', 
         message : ''
     };
@@ -29,8 +28,6 @@ class Dropdown extends Component {
   parseAvailableOptions= () => {
     var dropdownOptionsElement = [];
     var availableOptions = this.props.availableOptions;
-
-    dropdownOptionsElement.push(<option key="chooseNetworkDropdownTitle" selected default disabled value="">{this.state.defaultOption}</option>)
 
     for (var i = 0; i < availableOptions.length; i++) {
       dropdownOptionsElement.push(<option key={availableOptions[i]} value={availableOptions[i]}>{availableOptions[i]}</option>);

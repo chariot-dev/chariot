@@ -95,10 +95,10 @@ class AddNetwork extends Component {
           
           <form id="createNetworkForm" onSubmit={this.toggleConfirmationModal}>
             <div className="form-group">
-              <input required className="form-control" id="networkNameInput" name="Network Name" placeholder="Network Name" onChange={this.handleChange}/>
+              Network Name: <input required className="form-control" id="networkNameInput" name="Network Name" onChange={this.handleChange}/>
             </div>
             <div className="form-group">
-              <textarea required className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" placeholder="Network Description" onChange={this.handleChange}></textarea>
+              Network Description: <textarea required className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
             </div>
             <Link to="/networkManager">
               <Button variant="primary" className="float-left footer-button">Back</Button>
@@ -121,7 +121,6 @@ class AddNetwork extends Component {
       </Modal>,
 
       <Modal show={this.state.successIsOpen} key="addNetworkSuccessModal">
-
         <SuccessModalBody successMessage="Your network was succesfully added! Would you like to add a device to this network as well?">
         </SuccessModalBody>
 

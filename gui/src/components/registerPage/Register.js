@@ -150,7 +150,7 @@ class Register extends Component {
                 </div>
 
                 <div className="form-group">
-                  <Dropdown id="securityQuestion" defaultOption="Select a Security Question" availableOptions={this.state.securityQuestionOptions} onChange={this.handleChange}></Dropdown>
+                  <Dropdown id="securityQuestion" availableOptions={this.state.securityQuestionOptions} onChange={this.handleChange}></Dropdown>
                 </div>
 
                 <div className="form-group">

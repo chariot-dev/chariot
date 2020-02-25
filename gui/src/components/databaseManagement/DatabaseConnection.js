@@ -10,7 +10,10 @@ import ErrorModalBody from '../shared/ErrorModalBody';
 class DatabaseConnection extends Component {
   constructor(props) {
     super(props);
+
+    console.log(this.props.location.networkProps['Network Name'])
     this.state = {
+      chosenNetwork: this.props.location.networkProps['Network Name'],
       formControls: {
           "IP Address": '',
           "Name": '',
