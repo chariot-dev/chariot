@@ -114,7 +114,6 @@ def getSupportedDeviceConfig():
 @app.route(nManagerBaseUrl + '/network/device', methods=['GET'])
 def getDeviceDetails():
     # ensure that a network is specified in the payload
-    requestContent = request.get_json()
     networkName = PayloadParser.getNameInURL(request)
     network: Network = NetworkManager.findNetworkByNetworkName(networkName)
 
