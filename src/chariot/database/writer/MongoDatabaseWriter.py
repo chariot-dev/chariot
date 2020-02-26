@@ -18,7 +18,7 @@ class MongoDatabaseWriter(DatabaseWriter):
     def _connect(self):
         connectStr: str = 'mongodb://'
         if hasattr(self.config, 'username'):
-            connectStr += f'{self.config.username}:{self.config.username}@'
+            connectStr += f'{self.config.username}:{self.config.password}@'
         connectStr += f'{self.config.host}:{self.config.port}/{self.config.databaseName}'
         self.client = MongoClient(connectStr)
 
