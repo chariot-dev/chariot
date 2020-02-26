@@ -12,3 +12,6 @@ chariot.egg-info
 # python
 *.py[cod]
 __pycache__/
+
+# Test folder
+/src/testing

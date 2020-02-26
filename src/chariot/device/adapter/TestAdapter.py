@@ -32,9 +32,9 @@ class TestAdapter(DeviceAdapter):
             seed()
         else:
             seed(seedVal)
-        bufSize = self._conifg.buffSize
+        bufSize = self._config.buffSize
         while self.inCollectionEpisode:
-            buf: List[float] = [0 for _ in bufSize]
+            buf: List[float] = list(range(bufSize))
             for i in range(bufSize):
                 buf[i] = random()
             self.dataQueue.put(buf, block=True)
