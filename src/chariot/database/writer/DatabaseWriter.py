@@ -19,14 +19,14 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def __del__(self):
         self.disconnect()
 
-    def connect(self, reconnect=False):
+    def connect(self, reconnect: bool = False):
         """
         Establish a connection to the database.
         """
         if reconnect or not self.connected:
             self._connect()
-        self.connected = True
-        self._initializeTable()
+            self._initializeTable()
+            self.connected = True
 
     @abc.abstractmethod
     def _connect(self):
