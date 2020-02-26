@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from threading import Thread
 # unused right now, but will be useful for scaling past a couple of devices
 from multiprocessing.queues import Queue as ProcessQueue
@@ -20,9 +19,10 @@ class WorkerThread(Thread):
 
     def run(self):
         try:
-            self.target(*self.args)
+            self.target()
         except Exception as err:
             # add the error to the errorQueue for handling on the main thread
+            # args[0]: the errorQueue passed in
             self.args[0].put((self.name, exc_info()))
         finally:
             # https://github.com/python/cpython/blob/9c87fbe54e1c797e3c690c6426bdf5e79c457cf1/Lib/threading.py#L872
@@ -34,10 +34,10 @@ class DataCollectionManager:
     # is responsible for housing multiple user-defined networks. Once a network has been selected
     # for data collection, this class interacts with the NetworkManager to start and stop data collection
     # of all devices from the selected network
-    DEFAULT_TIMEOUT = 5
-    ERROR_CHECK_TIMEOUT = 0.5
-    PRODUCERS_PER_CONSUMER = 2
-    THREAD_JOIN_TIMEOUT = 2.0
+    DEFAULT_TIMEOUT: float = 5.0
+    ERROR_CHECK_TIMEOUT: float = 0.5
+    PRODUCERS_PER_CONSUMER: int = 2
+    THREAD_JOIN_TIMEOUT:float = 2.0
 
     # TODO: complete handleError method to continuously examine the error queue
     # TODO: when DatabaseWriter is implemented, remove quotes around type definition
@@ -90,8 +90,8 @@ class DataCollectionManager:
 
     def _handleErrorsInQueue(self) -> None:
         MAX_ATTEMPTS: int = 3
-        disconnectedDevices: OrderedDict[str, int] = OrderedDict()          # Used with DeviceNotConncectedErrors to track how many attempts were made to reconnect
-        failedCollections: OrderedDict[str, int] = OrderedDict()            # Used with FailedToBeginCollectionErrors to track attempts to begin collecting
+        disconnectedDevices: Dict[str, int] = {}          # Used with DeviceNotConncectedErrors to track how many attempts were made to reconnect
+        failedCollections: Dict[str, int] = {}           # Used with FailedToBeginCollectionErrors to track attempts to begin collecting
 
         while self._inCollectionEpisode:
             try:
@@ -130,10 +130,10 @@ class DataCollectionManager:
                         else:
                             #LOG: f'Attempting to begin {deviceID}'s collection'
                             disconnectedDevices[deviceID] += 1
-                            errorDevice.beginDataCollection(self.errorQueue)
+                            errorDevice.beginDataCollection()
                     else:
                         disconnectedDevices[deviceID] = 0
-                        errorDevice.beginDataCollection(self.errorQueue)
+                        errorDevice.beginDataCollection()
                 else:   #Unkown error, stop device before it floods queues with useless data, or causes damages to the physical device
                     #LOG: f'{deviceID} has encountered a fatal error.
                     errorDevice.stopDataCollection()

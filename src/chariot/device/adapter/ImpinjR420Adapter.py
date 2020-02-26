@@ -1,4 +1,3 @@
-from queue import Queue
 from sllurp.llrp import LLRPClientFactory
 from twisted.internet import reactor
 from typing import Dict, Optional
@@ -15,7 +14,7 @@ class ImpinjR420Adapter(DeviceAdapter):
     def _reportData(self, data: Dict[str, JSONObject]):
         self.dataQueue.put(data, block=True)
 
-    def _beginDataCollection(self, errorQueue: Queue) -> None:
+    def _beginDataCollection(self) -> None:
         self.llrpFactory.addTagReportCallback(self._reportData)
         reactor.run()
 

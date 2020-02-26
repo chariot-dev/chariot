@@ -14,14 +14,14 @@ class DeviceAdapter(metaclass=ABCMeta):
         self.inCollectionEpisode = False
 
     # this method should only be run as the target of a ProducerThread
-    def beginDataCollection(self, errorQueue: Queue) -> None:
+    def beginDataCollection(self) -> None:
         if self.inCollectionEpisode:
             raise AssertionError
         self.inCollectionEpisode = True
-        self._beginDataCollection(errorQueue)
+        self._beginDataCollection()
 
     @abstractmethod
-    def _beginDataCollection(self, errorQueue: Queue) -> None:
+    def _beginDataCollection(self) -> None:
         pass
 
     # any procedures necessary to start capturing data from the device

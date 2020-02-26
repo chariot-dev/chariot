@@ -1,5 +1,4 @@
 import requests
-from queue import Queue 
 from base64 import b64encode
 from json import dumps
 from time import sleep
@@ -108,7 +107,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
         response: requests.Response = requests.post(stopUrl, headers=self.session.tokenAuthHeaders)
         return
 
-    def _beginDataCollection(self, errorQueue: Queue) -> None:
+    def _beginDataCollection(self) -> None:
         while self.inCollectionEpisode:
             if not self.connected:
                 raise DeviceNotConnectedError()
