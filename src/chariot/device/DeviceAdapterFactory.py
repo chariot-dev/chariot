@@ -23,7 +23,7 @@ class _DeviceAdapterFactory:
 
     def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:
         if config['deviceType'] not in self._supportedDevices:
-            raise DeviceNotSupported(ErrorStrings.ERR_Device_Not_Supported)
+            raise DeviceNotSupported(ErrorStrings.ERR_Device_Not_Supported.value)
 
         instance: Type[DeviceAdapter] = self.deviceMap[config['deviceType']](config)
         return instance
@@ -54,23 +54,16 @@ class _DeviceAdapterFactory:
             with open(f'{currentPath}/driver/GenericRequiredFields.json') as genericTemplate:
                 return load(genericTemplate)
         except:
-            raise DeviceNotSupported(ErrorStrings.ERR_Generic_Device_Template)
+            raise DeviceNotSupported(ErrorStrings.ERR_Generic_Device_Template.value)
 
     # use this method to combine settings from a specific configuration instance with the generic required fields
     def combineConfigWithGeneric(self, config: JSONDict, deviceType: str):
         # combine settings of the config with the generic required fields
         genericDict: JSONDict = self.getGenericTemplate()
         combinedDict = config
-        print("************ before combination *************")
-        print(config)
 
         for field in genericDict["settings"]:
             combinedDict[deviceType]["settings"].insert(0, field)  # add required field add beginning of list
-        print()
-        print()
-        print("********************* after combination ***************")
-        print(combinedDict)
-
 
         return combinedDict
 

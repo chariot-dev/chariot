@@ -9,7 +9,7 @@ class ImpinjR420Configuration(DeviceConfiguration):
         'tag_population': int,
     }
     optionalFields: Dict[str, Type[JSONObject]] = {
-        'antennas': List[int],
+        'antennas': List,
         'report_every_n_tags': int,
         'tx_power': int,
         'session': int,
@@ -32,13 +32,13 @@ class ImpinjR420Configuration(DeviceConfiguration):
     def __init__(self, configMap: JSONDict):
         self.requiredFields.update(super().requiredFields)
         self.optionalFields.update(super().optionalFields)
-        #super().__init__(self._flattenSettingsGroups(configMap))
+        super().__init__(self._flattenSettingsGroups(configMap))
 
     def _flattenSettingsGroups(self, configMap: JSONDict) -> JSONDict:
         # since some R420 settings come in as a group, we need to flatten them to make verification easier
-        for _, entry in configMap:
+        for _, entry in configMap.items():
             if isinstance(entry, JSONDict):
-                for key, value in entry:
+                for key, value in entry.items():
                     configMap[key] = value
         return configMap
 

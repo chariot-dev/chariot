@@ -14,14 +14,14 @@ class DeviceConfiguration(ABC):
 
     def __init__(self, configMap: JSONDict):
         self._validateInitialConfig(configMap)
-        for key, value in configMap:
+        for key, value in configMap.items():
             setattr(self, key, value)
 
     def __iter__(self):
         for key in self.requiredFields:
-            yield(key, getattr(self, key))
+            yield (key, getattr(self, key))
         for key in self.optionalFields:
-            yield(key, getattr(self, key))
+            yield (key, getattr(self, key))
 
     def __str__(self):
         output: JSONDict = dict(self)
@@ -35,13 +35,13 @@ class DeviceConfiguration(ABC):
             if not self._isValidField(field):
                 raise AssertionError
 
-        for field, fieldType in self.requiredFields:
-            if not field in configMap or not isinstance(configMap[field], fieldType):
+        for field, fieldType in self.requiredFields.items():
+            if not field in configMap or not isinstance(configMap[field], type(fieldType)):
                 raise ValueError
 
-        for field, fieldType in self.optionalFields:
+        for field, fieldType in self.optionalFields.items():
             if field in configMap and not isinstance(configMap[field], fieldType):
-                raise ValueError
+                    raise ValueError
 
     def _validateSubsetConfig(self, newConfig: JSONDict) -> None:
         for field, value in newConfig:
