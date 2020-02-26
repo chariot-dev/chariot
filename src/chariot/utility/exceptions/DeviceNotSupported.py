@@ -1,6 +1,6 @@
 
 
-class DuplicateNameError(Exception):
+class DeviceNotSupported(Exception):
     status_code = 400
 
     def __init__(self, msg: str, errCode: int = None):

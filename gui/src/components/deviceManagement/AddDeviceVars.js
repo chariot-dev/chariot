@@ -106,7 +106,10 @@ class AddDeviceVars extends Component {
       var curFieldIsRequired = deviceSettings[key].required;
 
       deviceSpecificForm.push(
-        <div className="form-group" key={curFieldAlias}><input required={curFieldIsRequired} className="form-control" id={curFieldAlias} name={key} placeholder={key} onChange={this.handleChange}/></div>
+        <div className="form-group" key={curFieldAlias}>
+          <label>{key}:</label>
+          <input required={curFieldIsRequired} className="form-control" id={curFieldAlias} name={key} placeholder={key} onChange={this.handleChange}/>
+        </div>
       );
 
     }

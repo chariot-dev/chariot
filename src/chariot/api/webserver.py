@@ -14,6 +14,7 @@ from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
 from chariot.utility.exceptions.NameNotFoundError import NameNotFoundError
 from chariot.utility.exceptions.DuplicateNameError import DuplicateNameError
+from chariot.utility.exceptions.DeviceNotSupported import DeviceNotSupported
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -105,16 +106,9 @@ def getSupportedDevices():
 @app.route(nManagerBaseUrl + '/network/device/config', methods=['GET'])
 def getSupportedDeviceConfig():
     deviceTemplateName = PayloadParser.getDeviceNameInURL(request)
-    config: Dict[str, str] = {}
-
-    # include generic required fields
-    genericTemplate = DeviceConfiguration.requiredFields
 
     # get specified device template
     deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
-
-    for requiredField in genericTemplate:
-        deviceTemplate[deviceTemplateName][requiredField] = ""
 
     return jsonify(deviceTemplate)
 
@@ -213,6 +207,12 @@ def handle_invalid_usage(error):
 
 
 @app.errorhandler(DuplicateNameError)
+def handle_duplicate_name(error):
+    res = jsonify(error.to_dict())
+    res.status_code = error.status_code
+    return res
+
+@app.errorhandler(DeviceNotSupported)
 def handle_duplicate_name(error):
     res = jsonify(error.to_dict())
     res.status_code = error.status_code

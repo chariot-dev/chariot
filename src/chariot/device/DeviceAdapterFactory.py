@@ -6,6 +6,8 @@ from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 from chariot.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
 from chariot.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
+from chariot.utility.exceptions.DeviceNotSupported import DeviceNotSupported
+from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 
 
 class _DeviceAdapterFactory:
@@ -21,8 +23,7 @@ class _DeviceAdapterFactory:
 
     def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:
         if config['deviceType'] not in self._supportedDevices:
-            # raise UnsupportedDeviceError
-            raise AssertionError
+            raise DeviceNotSupported(ErrorStrings.ERR_Device_Not_Supported)
 
         instance: Type[DeviceAdapter] = self.deviceMap[config['deviceType']](config)
         return instance
@@ -32,20 +33,46 @@ class _DeviceAdapterFactory:
 
     def getDeviceInformation(self, deviceName: str) -> JSONDict:
         if deviceName not in self._supportedDevices:
-            # raise UnsupportedDeviceError
-            raise AssertionError
+            raise DeviceNotSupported(ErrorStrings.ERR_Device_Not_Supported)
         return self._supportedDevices[deviceName]
 
     # this method returns a specified device json file
     def getSpecifiedDeviceTemplate(self, deviceName) -> JSONDict:
-        #build path to json file
+        # build path to json file
         currentPath = path.dirname(path.abspath(__file__))
         try:
             with open(f'{currentPath}/driver/{deviceName}.json') as deviceTemplate:
-                return load(deviceTemplate)
+                # now combine the specified device template with that of the generic template
+                specificDevice = load(deviceTemplate)
+                return self.combineConfigWithGeneric(specificDevice, deviceName)
         except:
-            # make custom exception for device not supported
-            pass
+            raise DeviceNotSupported(ErrorStrings.ERR_Device_Not_Supported)
+
+    def getGenericTemplate(self) -> JSONDict:
+        currentPath = path.dirname(path.abspath(__file__))
+        try:
+            with open(f'{currentPath}/driver/GenericRequiredFields.json') as genericTemplate:
+                return load(genericTemplate)
+        except:
+            raise DeviceNotSupported(ErrorStrings.ERR_Generic_Device_Template)
+
+    # use this method to combine settings from a specific configuration instance with the generic required fields
+    def combineConfigWithGeneric(self, config: JSONDict, deviceType: str):
+        # combine settings of the config with the generic required fields
+        genericDict: JSONDict = self.getGenericTemplate()
+        combinedDict = config
+        print("************ before combination *************")
+        print(config)
+
+        for field in genericDict["settings"]:
+            combinedDict[deviceType]["settings"].insert(0, field)  # add required field add beginning of list
+        print()
+        print()
+        print("********************* after combination ***************")
+        print(combinedDict)
+
+
+        return combinedDict
 
 
 # return a singleton instance
