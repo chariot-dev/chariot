@@ -34,13 +34,11 @@ class Configuration(ABC):
                 raise AssertionError(field)
 
         for field, fieldType in self.requiredFields.items():
-            if field not in configMap or not isinstance(
-                    configMap[field], fieldType):
+            if field not in configMap or not isinstance(configMap[field], fieldType):
                 raise ValueError
 
         for field, fieldType in self.optionalFields.items():
-            if field in configMap and not isinstance(
-                    configMap[field], fieldType):
+            if field in configMap and not isinstance(configMap[field], fieldType):
                 raise ValueError
 
     def _validateSubsetConfig(self, newConfig: JSONDict) -> None:

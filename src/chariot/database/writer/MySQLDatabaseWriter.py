@@ -5,14 +5,14 @@ from chariot.utility.JSONTypes import JSONDict, JSONObject
 from chariot.database.writer.DatabaseWriter import DatabaseWriter
 from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
 from chariot.database.configuration.MySQLDatabaseConfiguration import MySQLDatabaseConfiguration
-from typing import Dict, List, Tuple, Type, Union
+from typing import Dict, List, Tuple, Optional, Type
 
 
 class MySQLDatabaseWriter(DatabaseWriter):
     def __init__(self, config: MySQLDatabaseConfiguration):
         super().__init__(config)
-        # self.connection: Union[MySQLConnection, None] = None
-        # self.cursor: Union[MySQLCursor, None] = None
+        self.connection: Optional[MySQLConnection] = None
+        self.cursor: Optional[MySQLCursor] = None
 
     def _connect(self):
         self.connection = connector.connect(
@@ -24,10 +24,8 @@ class MySQLDatabaseWriter(DatabaseWriter):
         )
         if self.connection.is_connected():
             self.cursor = self.connection.cursor()
-            self.connected = True
         else:
-            self.connected = False
-            raise RuntimeError("Could not connect to database")
+            raise RuntimeError('Could not connect to database')
 
     def _disconnect(self):
         self.connection.close()

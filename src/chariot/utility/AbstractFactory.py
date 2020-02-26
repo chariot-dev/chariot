@@ -11,8 +11,7 @@ class AbstractFactory:
     def getInstance(self, config: Type[Configuration]) -> Any:
         instanceType: str = config.type
         if instanceType not in self.instanceMap:
-            raise AssertionError(
-                'Unsupported {self.instanceName} type "{instanceType}"')
+            raise AssertionError(f'Unsupported {self.instanceName} type "{instanceType}"')
         instance: Any = self.instanceMap[instanceType](config)
         return instance
 
