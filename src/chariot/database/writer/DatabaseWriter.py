@@ -15,8 +15,6 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def __init__(self, config: Type[DatabaseConfiguration]):
         self.config: Type[DatabaseConfiguration] = config
         self.connected: bool = False
-        self.connect()
-        self.initializeTable()
 
     def __del__(self):
         self.disconnect()
@@ -28,6 +26,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         if reconnect or not self.connected:
             self._connect()
         self.connected = True
+        self._initializeTable()
 
     @abc.abstractmethod
     def _connect(self):
@@ -44,14 +43,6 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _disconnect(self):
         pass
-
-    def initializeTable(self):
-        """
-        Create a table in the database.
-        """
-        if not self.connected:
-            raise AssertionError
-        self._initializeTable()
 
     @abc.abstractmethod
     def _initializeTable(self):

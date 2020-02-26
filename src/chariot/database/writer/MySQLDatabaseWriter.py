@@ -10,9 +10,9 @@ from typing import Dict, List, Optional
 
 class MySQLDatabaseWriter(DatabaseWriter):
     def __init__(self, config: MySQLDatabaseConfiguration):
+        super().__init__(config)
         self.connection: Optional[MySQLConnection] = None
         self.cursor: Optional[MySQLCursor] = None
-        super().__init__(config)
 
     def _connect(self):
         self.connection = connector.connect(
