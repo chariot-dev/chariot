@@ -1,4 +1,3 @@
-from queue import Queue
 from typing import List
 from random import random, seed
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
@@ -11,7 +10,7 @@ class TestAdapter(DeviceAdapter):
     def __init__(self, config: TestConfiguration):
         super().__init__(config)
 
-    def _beginDataCollection(self, errorQueue: Queue) -> None:
+    def _beginDataCollection(self) -> None:
         self.randomizer()
 
     def _connect(self) -> None:
