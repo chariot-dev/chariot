@@ -33,14 +33,9 @@ class TestAdapter(DeviceAdapter):
             seed(seedVal)
         bufSize = self._conifg.buffSize
         while self.inCollectionEpisode:
-            buf: List[float] = [0 for _ in bufSize]`
+            buf: List[float] = [0 for _ in bufSize]
             for i in range(bufSize):
                 buf[i] = random()
             self.dataQueue.put(buf, block=True)
 
 __all__ = ['TestAdapter']
-
-
-if __name__ == '__main__':
-
-

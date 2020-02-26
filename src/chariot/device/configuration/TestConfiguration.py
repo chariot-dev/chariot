@@ -1,6 +1,8 @@
 from typing import Dict, List, Type
 from chariot.utility.JSONTypes import JSONDict, JSONObject
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
+#temp
+from json import dumps
 
 class TestConfiguration(DeviceConfiguration):
     requiredFields: Dict[str, Type[JSONObject]] = {
