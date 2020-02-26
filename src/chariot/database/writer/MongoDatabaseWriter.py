@@ -1,10 +1,9 @@
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
-from typing import Dict, List, Optional, Type
-from time import time
+from typing import Dict, List, Optional
 
-from chariot.utility.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONObject
 from chariot.database.writer.DatabaseWriter import DatabaseWriter
 from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
 from chariot.database.configuration.MongoDatabaseConfiguration import MongoDatabaseConfiguration
@@ -32,10 +31,7 @@ class MongoDatabaseWriter(DatabaseWriter):
         self.table = database[self.config.tableName]
 
     def _insertOne(self, dataPoint: Dict[str, JSONObject]):
-        dataPoint['db_insertion_time'] = int(round(time() * 1000))  # Millis since epoch
         self.table.insert_one(dataPoint)
 
     def _insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
-        for dataPoint in dataPoints:
-            dataPoint['db_insertion_time'] = int(round(time() * 1000))  # Millis since epoch
         self.table.insert_many(dataPoints)

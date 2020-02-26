@@ -1,5 +1,6 @@
 import abc
 from typing import Dict, List, Type
+from time import time
 
 from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
 from chariot.utility.JSONTypes import JSONObject
@@ -58,11 +59,13 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
 
     def insertOne(self, dataPoint: Dict[str, JSONObject]):
         """
-        Check for validity of dataPoint, then insert into the table.
+        Check for validity of dataPoint, add insertion_time field, then insert into the table.
         """
         if not self.connected:
             raise AssertionError
         self.validateDataPoint(dataPoint)
+        dataPoint['insertion_time'] = int(
+            round(time() * 1000))  # Millis since epoch
         self._insertOne(dataPoint)
 
     @abc.abstractmethod
@@ -77,6 +80,8 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
             raise AssertionError
         for dataPoint in dataPoints:
             self.validateDataPoint(dataPoint)
+            dataPoint['insertion_time'] = int(
+                round(time() * 1000))  # Millis since epoch
         self._insertMany(dataPoints)
 
     @abc.abstractmethod
