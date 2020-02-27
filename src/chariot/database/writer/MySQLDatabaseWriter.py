@@ -20,7 +20,8 @@ class MySQLDatabaseWriter(DatabaseWriter):
             password=self.config.password,
             host=self.config.host,
             port=self.config.port,
-            database=self.config.databaseName
+            database=self.config.databaseName,
+            connection_timeout=round(self.config.timeoutMS / 1000)
         )
         if self.connection.is_connected():
             self.cursor = self.connection.cursor()

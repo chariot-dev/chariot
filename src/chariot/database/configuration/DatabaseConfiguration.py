@@ -14,12 +14,15 @@ class DatabaseConfiguration(Configuration):
     optionalFields: Dict[str, Type[JSONObject]] = {
         'port': int,
         'tableName': str,
+        'timeoutMS': int
     }
 
     def __init__(self, configMap):
         super().__init__(configMap)
         if not hasattr(self, 'tableName'):
             setattr(self, 'tableName', 'data')
+        if not hasattr(self, 'timeoutMS'):
+            setattr(self, 'timeoutMS', 5000)
 
     def _validateSubsetConfig(self, newConfig: JSONDict) -> None:
         super()._validateSubsetConfig(newConfig)
