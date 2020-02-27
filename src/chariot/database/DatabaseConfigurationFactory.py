@@ -3,6 +3,7 @@ from chariot.database.configuration.DatabaseConfiguration import DatabaseConfigu
 from chariot.database.configuration.MongoDatabaseConfiguration import MongoDatabaseConfiguration
 from chariot.database.configuration.MySQLDatabaseConfiguration import MySQLDatabaseConfiguration
 from chariot.utility.AbstractFactory import AbstractFactory
+from chariot.utility.JSONTypes import JSONObject
 
 
 class _DatabaseConfigurationFactory(AbstractFactory):
@@ -11,7 +12,11 @@ class _DatabaseConfigurationFactory(AbstractFactory):
             'MongoDB': MongoDatabaseConfiguration,
             'MySQL': MySQLDatabaseConfiguration
         }
+        self.typeField = 'type'
         self.instanceName: str = 'database configuration'
+
+        def getInstance(self, config: JSONObject) -> DatabaseConfiguration:
+            return super().getInstance(config)
 
 
 # Return singleton 

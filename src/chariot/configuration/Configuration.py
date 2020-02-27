@@ -35,11 +35,11 @@ class Configuration(ABC):
 
         for field, fieldType in self.requiredFields.items():
             if field not in configMap or not isinstance(configMap[field], fieldType):
-                raise ValueError
+                raise ValueError(field)
 
         for field, fieldType in self.optionalFields.items():
             if field in configMap and not isinstance(configMap[field], fieldType):
-                raise ValueError
+                raise ValueError(field)
 
     def _validateSubsetConfig(self, newConfig: JSONDict) -> None:
         for field, value in newConfig.items():
@@ -47,10 +47,10 @@ class Configuration(ABC):
                 raise AssertionError
             if field in self.optionalFields:
                 if not isinstance(value, self.optionalFields[field]):
-                    raise ValueError
+                    raise ValueError(field)
             elif field in self.requiredFields:
                 if not isinstance(value, self.requiredFields[field]):
-                    raise ValueError
+                    raise ValueError(field)
 
     def modifyConfig(self, newConfig: JSONDict) -> None:
         self._validateSubsetConfig(newConfig)

@@ -7,7 +7,7 @@ class DeviceConfiguration(Configuration):
     requiredFields: Dict[str, Type[JSONObject]] = {
         'deviceId': str,
         'deviceType': str,
-        'pollDelay': str,
+        'pollDelay': int,
     }
 
     def _validateSubsetConfig(self, newConfig: JSONDict) -> None:

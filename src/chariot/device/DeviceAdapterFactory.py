@@ -1,6 +1,7 @@
 from typing import Dict, Type
 from json import load
 from os import path
+from chariot.utility.AbstractFactory import AbstractFactory
 from chariot.utility.JSONTypes import JSONDict
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
@@ -15,10 +16,14 @@ class _DeviceAdapterFactory(AbstractFactory):
             'Impinj Speedway R420': ImpinjR420Adapter
         }
         self.instanceName: str = 'device'
+        self.typeField: str = 'deviceType'
 
         currentPath = path.dirname(path.abspath(__file__))
         with open(f'{currentPath}/driver/supportedDevices.json') as deviceList:
             self._supportedDevices: JSONDict = load(deviceList)
+
+    def getInstance(self, config: DeviceConfiguration) -> DeviceAdapter:
+        return super().getInstance(config)
 
     def getsupportedDevices(self) -> JSONDict:
         return self._supportedDevices

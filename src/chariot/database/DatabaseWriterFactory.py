@@ -13,6 +13,10 @@ class _DatabaseWriterFactory(AbstractFactory):
             'MySQL': MySQLDatabaseWriter
         }
         self.instanceName: str = 'database'
+        self.typeField: str = 'type'
+    
+    def getInstance(self, config: DatabaseConfiguration) -> DatabaseWriter:
+        return super().getInstance(config)
 
 
 # Return singleton
