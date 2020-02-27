@@ -20,7 +20,10 @@ class MongoDatabaseWriter(DatabaseWriter):
         if hasattr(self.config, 'username'):
             connectStr += f'{self.config.username}:{self.config.password}@'
         connectStr += f'{self.config.host}:{self.config.port}/{self.config.databaseName}'
-        self.client = MongoClient(connectStr)
+        self.client = MongoClient(
+            connectStr,
+            serverSelectionTimeoutMS=self.config.timeoutMS)
+        self.client.server_info()  # This will raise error if connection invalid
 
     def _disconnect(self):
         self.client.close()
