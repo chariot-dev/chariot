@@ -27,7 +27,7 @@ class DatabaseConfiguration(Configuration):
     def _validateSubsetConfig(self, newConfig: JSONDict) -> None:
         super()._validateSubsetConfig(newConfig)
         for field in newConfig:
-            if field == 'databaseType':
+            if field == 'type':
                 # cannot edit databaseType
                 raise AssertionError
 
