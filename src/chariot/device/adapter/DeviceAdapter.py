@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from sys import exc_info
 from typing import Type
 from queue import Queue
-from chariot.JSONTypes import JSONObject
+from chariot.utility.JSONTypes import JSONObject
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 
 class DeviceAdapter(metaclass=ABCMeta):
@@ -36,7 +36,7 @@ class DeviceAdapter(metaclass=ABCMeta):
     # https://stackoverflow.com/questions/2829329/catch-a-threads-exception-in-the-caller-thread-in-python
     # "hack" to generate the entire stack trace since beginDataCollection is called in a different thread
     # might add the thread's name explicitly so the DataCollectionManager knows which device produced the error
-    def _generateStackTrace(error: Exception):
+    def _generateStackTrace(self, error: Exception):
         try:
             raise error
         except Exception:

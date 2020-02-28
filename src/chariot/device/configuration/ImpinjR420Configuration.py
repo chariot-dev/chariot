@@ -1,5 +1,5 @@
 from typing import Dict, List, Type
-from chariot.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONDict, JSONObject
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 
 
@@ -36,9 +36,9 @@ class ImpinjR420Configuration(DeviceConfiguration):
 
     def _flattenSettingsGroups(self, configMap: JSONDict) -> JSONDict:
         # since some R420 settings come in as a group, we need to flatten them to make verification easier
-        for _, entry in configMap:
+        for _, entry in configMap.items():
             if isinstance(entry, JSONDict):
-                for key, value in entry:
+                for key, value in entry.items():
                     configMap[key] = value
         return configMap
 
