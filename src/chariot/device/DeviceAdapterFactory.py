@@ -1,6 +1,7 @@
 from typing import Dict, Type
 from json import load
 from os import path
+from chariot.utility.AbstractFactory import AbstractFactory
 from chariot.utility.JSONTypes import JSONDict
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
@@ -9,25 +10,22 @@ from chariot.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
 from chariot.device.adapter.TestAdapter import TestAdapter
 
 
-class _DeviceAdapterFactory:
+class _DeviceAdapterFactory(AbstractFactory):
     def __init__(self):
-        self.deviceMap: Dict[str, Type[DeviceAdapter]] = {
+        self.instanceMap: Dict[str, Type[DeviceAdapter]] = {
             'Impinj xArray': ImpinjXArrayAdapter,
             'Impinj Speedway R420': ImpinjR420Adapter,
             'Test Device': TestAdapter
         }
+        self.instanceName: str = 'device'
+        self.typeField: str = 'deviceType'
 
         currentPath = path.dirname(path.abspath(__file__))
         with open(f'{currentPath}/driver/supportedDevices.json') as deviceList:
             self._supportedDevices: JSONDict = load(deviceList)
 
-    def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:
-        if config.deviceType not in self._supportedDevices:
-            # raise UnsupportedDeviceError
-            raise AssertionError
-
-        instance: DeviceAdapter = self.deviceMap[config.deviceType](config)
-        return instance
+    def getInstance(self, config: DeviceConfiguration) -> DeviceAdapter:
+        return super().getInstance(config)
 
     def getsupportedDevices(self) -> JSONDict:
         return self._supportedDevices
@@ -41,6 +39,5 @@ class _DeviceAdapterFactory:
 
 # return a singleton instance
 DeviceAdapterFactory = _DeviceAdapterFactory()
-
 
 __all__ = ['DeviceAdapterFactory']

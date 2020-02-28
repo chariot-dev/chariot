@@ -2,7 +2,7 @@
 bin/
 include/
 lib/
-lib64/
+lib64
 pyvenv.cfg
 share/
 .mypy_cache/

@@ -1,0 +1,9 @@
+MONGODB
+To start the server using a specified directory, run `mongod --dbpath /path/to/directory`.
+
+To start a client (so that you can see changes the MongoDatabaseWriter makes), run `mongo mongodb://localhost:27017/`.
+
+MYSQL
+To start the server, run `sudo service mysql start`.
+
+To start a client (so that you can see changes), run `sudo mysql -u root -p`
