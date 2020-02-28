@@ -30,7 +30,7 @@ This project is licensed under the GNU Lesser General Public License v3.0. See t
 * [John Ho](https://github.com/jh3377)
 * [Medard Azandegbe](https://github.com/maa433)
 * [Kamalludin Colaire](https://github.com/kac486)
-* [Christopher Mak](https://github.com/kac486)
+* [Christopher Mak](https://github.com/auronsento)
 
 ## Acknowledgments
 The team would like to thank:

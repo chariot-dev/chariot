@@ -3,7 +3,7 @@ from typing import Dict
 from sllurp.llrp import LLRPClientFactory
 from twisted.internet import reactor
 from typing import Union
-from chariot.JSONTypes import JSONObject
+from chariot.utility.JSONTypes import JSONObject
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
 

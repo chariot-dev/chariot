@@ -1,5 +1,5 @@
 from typing import Dict, List, Type
-from chariot.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONDict, JSONObject
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 
 

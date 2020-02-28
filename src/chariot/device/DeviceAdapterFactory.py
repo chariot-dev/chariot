@@ -1,7 +1,8 @@
 from typing import Dict, Type
 from json import load
 from os import path
-from chariot.JSONTypes import JSONDict
+from chariot.utility.AbstractFactory import AbstractFactory
+from chariot.utility.JSONTypes import JSONDict
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 from chariot.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
@@ -10,23 +11,21 @@ from chariot.utility.exceptions.DeviceNotSupported import DeviceNotSupported
 from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 
 
-class _DeviceAdapterFactory:
+class _DeviceAdapterFactory(AbstractFactory):
     def __init__(self):
-        self.deviceMap: Dict[str, Type[DeviceAdapter]] = {
-            'ImpinjxArray': ImpinjXArrayAdapter,
-            'ImpinjSpeedwayR420': ImpinjR420Adapter
+        self.instanceMap: Dict[str, Type[DeviceAdapter]] = {
+            'Impinj xArray': ImpinjXArrayAdapter,
+            'Impinj Speedway R420': ImpinjR420Adapter
         }
+        self.instanceName: str = 'device'
+        self.typeField: str = 'deviceType'
 
         currentPath = path.dirname(path.abspath(__file__))
         with open(f'{currentPath}/driver/supportedDevices.json') as deviceList:
             self._supportedDevices: JSONDict = load(deviceList)
 
-    def getInstance(self, config: Type[DeviceConfiguration]) -> Type[DeviceAdapter]:
-        if config['deviceType'] not in self._supportedDevices:
-            raise DeviceNotSupported(ErrorStrings.ERR_Device_Not_Supported.value)
-
-        instance: Type[DeviceAdapter] = self.deviceMap[config['deviceType']](config)
-        return instance
+    def getInstance(self, config: DeviceConfiguration) -> DeviceAdapter:
+        return super().getInstance(config)
 
     def getsupportedDevices(self) -> JSONDict:
         return self._supportedDevices
