@@ -8,15 +8,18 @@ from chariot.device.DeviceAdapterFactory import DeviceAdapterFactory
 from chariot.device.DeviceConfigurationFactory import DeviceConfigurationFactory
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.configuration.Configuration import Configuration
-from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
-from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
-from chariot.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
+from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
+from chariot.database.DatabaseConfigurationFactory import DatabaseConfigurationFactory
+from chariot.database.DatabaseWriterFactory import DatabaseWriterFactory
+from chariot.database.writer.DatabaseWriter import DatabaseWriter
 from chariot.utility.PayloadParser import PayloadParser
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
 from chariot.utility.exceptions.NameNotFoundError import NameNotFoundError
 from chariot.utility.exceptions.DuplicateNameError import DuplicateNameError
 from chariot.utility.exceptions.DeviceNotSupported import DeviceNotSupported
+from chariot.utility.exceptions.DatabaseConnectionError import DatabaseConnectionError
+from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -154,6 +157,9 @@ def createDevice():
 
 @app.route(nManagerBaseUrl + '/network/device', methods=['PUT'])
 def modifyDevice():
+    # through this endpoint, a device can have its configuration changed
+    # it must be that the old name('deviceId') is specified and a new name('NewDeviceId') is given in the payload
+
     # ensure that a network is specified in the payload
     requestContent = request.get_json()
 
@@ -197,6 +203,47 @@ def deleteDevice():
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
+# ---  This section of endpoints deals with databases  --- #
+@app.route(nManagerBaseUrl + '/database/test', methods=['POST'])
+def testDBConfiguration():
+    payloadConfig = request.get_json()
+
+    dbConfig: DatabaseConfiguration = DatabaseConfigurationFactory.getInstance(payloadConfig)
+
+    # with configuration validated, now use the factory to create a dbWriter instance
+    dbWriter: DatabaseWriter = DatabaseWriterFactory.getInstance(dbConfig)
+
+    try:
+        dbWriter.connect()
+    except:
+        raise DatabaseConnectionError(ErrorStrings.ERR_DB_Not_Connected.value)
+
+    dbWriter.disconnect()
+
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+
+@app.route(nManagerBaseUrl + '/database', methods=['POST'])
+def createDBConfiguration():
+    payloadConfig = request.get_json()
+
+    dbConfig: DatabaseConfiguration = DatabaseConfigurationFactory.getInstance(payloadConfig)
+
+    # with configuration validated, now use the factory to create a dbWriter instance
+    dbWriter: DatabaseWriter = DatabaseWriterFactory.getInstance(dbConfig)
+
+    try:
+        dbWriter.connect()
+    except:
+        raise DatabaseConnectionError(ErrorStrings.ERR_DB_Not_Connected.value)
+
+    dbWriter.disconnect()
+
+    # add to dbManager
+
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+
 # ---  This section deals with errorHandlers  --- #
 @app.errorhandler(NameNotFoundError)
 def handle_invalid_usage(error):
@@ -214,6 +261,13 @@ def handle_duplicate_name(error):
 
 @app.errorhandler(DeviceNotSupported)
 def handle_duplicate_name(error):
+    res = jsonify(error.to_dict())
+    res.status_code = error.status_code
+    return res
+
+
+@app.errorhandler(DatabaseConnectionError)
+def handle_Database_Not_Connected(error):
     res = jsonify(error.to_dict())
     res.status_code = error.status_code
     return res
