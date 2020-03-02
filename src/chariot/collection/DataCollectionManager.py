@@ -7,12 +7,13 @@ from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.utility.JSONTypes import JSONObject
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
+from chariot.database.writer.DatabaseWriter import DatabaseWriter
 from chariot.utility.ChariotExceptions import *
 from sys import exc_info
 
 class WorkerThread(Thread):
     def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
-        super().__init__(group=group, target=target, name=name, verbose=verbose)
+        super().__init__(group=group, target=target, name=name)
         self.args = args
         self.kwargs = kwargs
         self.target = target
@@ -43,7 +44,7 @@ class DataCollectionManager:
     # TODO: when DatabaseWriter is implemented, remove quotes around type definition
     # TODO: add __del__ method to stop data collection when this object goes out of scope
     # TODO: add DataOutputStream for outputThread to also send data to
-    def __init__(self, network: Optional[Network], dbWriter: 'DatabaseWriter'):
+    def __init__(self, network: Optional[Network], dbWriter: DatabaseWriter):
         self.activeNetwork: Optional[Network] = network
         self.devices: List[DeviceAdapter] = network.getDevices() if network is not None else []
         self.consumerThreads: List[WorkerThread] = []
@@ -51,7 +52,7 @@ class DataCollectionManager:
         self.outputThread: WorkerThread = WorkerThread(target=self._outputData)
         self.errorQueue: ThreadQueue = ThreadQueue()
         self.dataQueue: ThreadQueue = ThreadQueue()
-        self.databaseWriter: 'DatabaseWriter' = dbWriter
+        self.databaseWriter: DatabaseWriter = dbWriter
         self._inCollectionEpisode: bool = False
         self._episodeStartTime: float = 0.0
 
@@ -95,7 +96,7 @@ class DataCollectionManager:
 
         while self._inCollectionEpisode:
             try:
-                # Errors received are a tuple of the Thread name/id and the stacktrace 
+                # Errors received are a tuple of the Thread name/id and the stacktrace
                 deviceID, error = self.errorQueue.get(block=True, timeout=self.ERROR_CHECK_TIMEOUT)
 
                 # For making changes to the correct device in the producerThreads
@@ -111,7 +112,7 @@ class DataCollectionManager:
                             #LOG: f'{deviceID} has failed to reconnect. Stopping collection from device.'
                             errorDevice.stopDataCollection()
                             disconnectedDevices[deviceID] += 1
-                        else: 
+                        else:
                             #LOG: f'Attemtpting to reconnect to {deviceID}'
                             disconnectedDevices[deviceID] += 1
                             errorDevice.connect()
@@ -221,14 +222,14 @@ class DataCollectionManager:
 
         # begin the error-handling procedure on the main thread till we stop data collection
         self._handleErrorsInQueue()
-        
+
 
     def stopDataCollection(self) -> None:
         if not self._inCollectionEpisode:
             raise NotInCollectionEpisodeError()
         for device in self.devices:
             device.stopDataCollection()
-        
+
         self._inCollectionEpisode = False
         for producer in self.producerThreads.values():
             producer.join(self.THREAD_JOIN_TIMEOUT)
