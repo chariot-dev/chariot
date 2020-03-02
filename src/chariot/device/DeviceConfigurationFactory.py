@@ -9,8 +9,8 @@ from chariot.utility.JSONTypes import JSONObject
 class _DeviceConfigurationFactory(AbstractFactory):
     def __init__(self):
         self.instanceMap: Dict[str, Type[DeviceConfiguration]] = {
-            'Impinj xArray': ImpinjXArrayConfiguration,
-            'Impinj Speedway R420': ImpinjR420Configuration
+            'ImpinjXArray': ImpinjXArrayConfiguration,
+            'ImpinjSpeedwayR420': ImpinjR420Configuration
         }
         self.typeField = 'deviceType'
         self.instanceName: str = 'device configuration'

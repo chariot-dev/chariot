@@ -80,6 +80,23 @@ class Network:
 
         return network
 
+    # This method gives a new device name to an already defined device
+    def modifyDeviceNameByName(self, newName: str, toFind: str):
+        # check that newName is unique to avoid data overwrites
+        if not self.isDeviceNameUnique(newName):
+            raise DuplicateNameError(
+                ErrorStrings.ERR_Not_Unique_Network_Name.value.format(newName)
+            )
+
+        device: DeviceAdapter = self.getDeviceByDeviceName(toFind)
+
+        # update device name
+        device.setId(newName)
+
+        # update collection, make new key and delete the old one
+        self.devices[newName] = self.devices[toFind]
+        del self.devices[toFind]
+
     # importDeviceConfig
     # exportNetwork - again seems like a utility method
     # saveNetwork - idea is to save this network configuration to the UserAccount

@@ -31,7 +31,10 @@ class DeviceAdapter(metaclass=ABCMeta):
         return self._config.deviceType
 
     def getId(self) -> str:
-        return self._config['deviceId']
+        return self._config.deviceId
+
+    def setId(self, newId) -> str:
+        self._config.deviceId = newId
 
     # https://stackoverflow.com/questions/2829329/catch-a-threads-exception-in-the-caller-thread-in-python
     # "hack" to generate the entire stack trace since beginDataCollection is called in a different thread
@@ -48,5 +51,7 @@ class DeviceAdapter(metaclass=ABCMeta):
     def getDeviceConfiguration(self) -> Type[DeviceConfiguration]:
         return self._config
 
+    def setDeviceConfiguration(self, config: Type[DeviceConfiguration]) -> None:
+        self._config = config
 
 __all__ = ['DeviceAdapter']

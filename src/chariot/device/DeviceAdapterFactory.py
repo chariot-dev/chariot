@@ -14,8 +14,8 @@ from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 class _DeviceAdapterFactory(AbstractFactory):
     def __init__(self):
         self.instanceMap: Dict[str, Type[DeviceAdapter]] = {
-            'Impinj xArray': ImpinjXArrayAdapter,
-            'Impinj Speedway R420': ImpinjR420Adapter
+            'ImpinjXArray': ImpinjXArrayAdapter,
+            'ImpinjSpeedwayR420': ImpinjR420Adapter
         }
         self.instanceName: str = 'device'
         self.typeField: str = 'deviceType'

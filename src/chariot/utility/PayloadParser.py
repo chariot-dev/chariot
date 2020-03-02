@@ -1,4 +1,5 @@
 from chariot.utility.exceptions import NoIdentifierError
+from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 
 
 class PayloadParser:
@@ -14,6 +15,10 @@ class PayloadParser:
     def getNameInURL(requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
         networkName: str = requestContent.args['NetworkName']
+        if networkName is None:
+            raise NoIdentifierError(
+                ErrorStrings.ERR_Specify_Network_Identifier.value
+            )
         return networkName
 
     @staticmethod
@@ -31,15 +36,21 @@ class PayloadParser:
     @staticmethod
     def getDeviceNameInPayload(requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
-        deviceName: str = requestContent.get('DeviceName')
-        if not deviceName:
-            raise NoIdentifierError('device name')
+        deviceName: str = requestContent.get('deviceId')
+        return deviceName
+
+    @staticmethod
+    def getNewDeviceNameInPayload(requestContent) -> str:
+        # first ensure that a network name has been given to specify which network is to be modified
+        deviceName: str = requestContent.get('NewDeviceId')
         return deviceName
 
     @staticmethod
     def getDeviceNameInURL(requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
-        deviceName: str = requestContent.args['DeviceName']
+        deviceName: str = requestContent.args['deviceId']
         if not deviceName:
-            raise NoIdentifierError('device name')
+            raise NoIdentifierError(
+                ErrorStrings.ERR_Specify_Device_Identifier.value
+            )
         return deviceName

@@ -93,7 +93,6 @@ class _NetworkManager:
 
     # def importNetworkConfiguration
     # def exportNetworkConfiguration
-    # https://blog.miguelgrinberg.com/index/page/3
 
 
 # return a singleton instance

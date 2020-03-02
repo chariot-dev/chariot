@@ -27,7 +27,7 @@ class ImpinjXArrayConfiguration(DeviceConfiguration):
 
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
-        if configMap['deviceType'] != 'Impinj xArray':
+        if configMap['deviceType'] != 'ImpinjXArray':
             raise AssertionError
 
 
