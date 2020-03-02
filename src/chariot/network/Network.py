@@ -25,20 +25,20 @@ class Network:
     # figure out how much error-checking to do
     def addDevice(self, device: DeviceAdapter):
         # Currently just restricting adding a device that already exists in collection
-        if self.getDeviceByDeviceName(device.getDeviceName()) is None:
+        if self.getDeviceByDeviceName(device.getId()) is None:
             self.devices.append(device)
         # else: have a device by the same name already in collection
 
     def getDeviceByDeviceName(self, nameToFind: str) -> DeviceAdapter:
         i: int = 0
         while i < len(self.devices):
-            if self.devices[i].getDeviceName == nameToFind:
+            if self.devices[i].getId() == nameToFind:
                 return self.devices[i]
 
     def getDeviceIndexByName(self, nameToFind: str) -> int:
         i: int = 0
         while i < len(self.devices):
-            if self.devices[i].getDeviceName == nameToFind:
+            if self.devices[i].getId() == nameToFind:
                 return i
             i = i + 1
         return -1
