@@ -1,6 +1,7 @@
 from typing import Dict, List
-from chariot.utility.exceptions import NoIdentifierError, DuplicateNameError, ErrorStrings, NameNotFoundError
+from chariot.utility.exceptions.CustomExceptions import NoIdentifierError, DuplicateNameError, NameNotFoundError
 from chariot.network.Network import Network
+from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 
 
 class _NetworkManager:

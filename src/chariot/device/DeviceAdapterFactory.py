@@ -7,8 +7,8 @@ from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 from chariot.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
 from chariot.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
-from chariot.utility.exceptions import DeviceNotSupported, ErrorStrings
-
+from chariot.utility.exceptions.CustomExceptions import DeviceNotSupported
+from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 
 class _DeviceAdapterFactory(AbstractFactory):
     def __init__(self):

@@ -1,7 +1,7 @@
 import json
 import flask
 from typing import List, Dict
-from flask import jsonify, request
+from flask import jsonify, request, app
 from flask_cors import CORS
 
 from chariot.device.DeviceAdapterFactory import DeviceAdapterFactory
@@ -15,8 +15,8 @@ from chariot.database.writer.DatabaseWriter import DatabaseWriter
 from chariot.utility.PayloadParser import PayloadParser
 from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
-from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, DeviceNotSupported
-from chariot.utility.exceptions import DatabaseConnectionError
+from chariot.utility.exceptions.CustomExceptions import NameNotFoundError, DuplicateNameError, DeviceNotSupported
+from chariot.utility.exceptions.CustomExceptions import DatabaseConnectionError
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -24,6 +24,7 @@ app.config["DEBUG"] = True
 
 nManagerBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
+defaultSuccessCode: int = 200
 
 
 # --- This section of api endpoints deals with netowrks  --- #
@@ -32,14 +33,14 @@ parser: PayloadParser = PayloadParser()
 # This method will return all network names known to the networkManager and their descriptions
 def retrieveAllNetworkNames():
     allNetworks: Dict[str, str] = NetworkManager.getAllNetworkNamesAndDesc()
-    return jsonify(allNetworks)
+    return buildSuccessfulRequest(allNetworks, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/networks/all', methods=['GET'])
 # This method will return all known networks along with their devices
 def retrieveAllNetworkDetails():
     networksAndDevices = NetworkManager.getAllNetworkNamesAndDevices()
-    return jsonify(networksAndDevices)
+    return buildSuccessfulRequest(networksAndDevices, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network', methods=['POST'])
@@ -51,13 +52,13 @@ def createNetwork():
     networkDesc: str = parser.getNetworkDescription(requestContent)  # note that description is optional
 
     NetworkManager.addNetwork(networkName, networkDesc)
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network', methods=['PUT'])
 def modifyNetwork():
     # through this endpoint, a network can have its name and/or description changed
-    # it must be that the old name('NetworkName') is specified and a new name('NewName') is given in the payload
+    # it must be that the old name('networkName') is specified and a new name('NewName') is given in the payload
     requestContent = request.get_json()
     hasNewName = True
 
@@ -79,14 +80,14 @@ def modifyNetwork():
             NetworkManager.modifyNetworkDescriptionByName(networkDesc, newName)
         else:
             NetworkManager.modifyNetworkDescriptionByName(networkDesc, oldNetworkName)
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network', methods=['DELETE'])
 def deleteNetwork():
     networkToDelete = parser.getNameInURL(request)
     NetworkManager.deleteNetworkByName(networkToDelete)
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network', methods=['GET'])
@@ -96,14 +97,14 @@ def getNetworkDetails():
     network: Network = NetworkManager.findNetworkByNetworkName(networkName)
 
     # convert into JSON and return
-    return jsonify(network.toString())  # take a dictionary as input and returns a string as output
+    return buildSuccessfulRequest(network.toString(), defaultSuccessCode)
 
 
 # ---  This section of endpoints deals with devices  --- #
 
 @app.route(nManagerBaseUrl + '/network/devices/supportedDevices', methods=['GET'])
 def getSupportedDevices():
-    return jsonify(DeviceAdapterFactory.getsupportedDevices())
+    return buildSuccessfulRequest(DeviceAdapterFactory.getsupportedDevices())
 
 
 @app.route(nManagerBaseUrl + '/network/device/config', methods=['GET'])
@@ -113,7 +114,7 @@ def getSupportedDeviceConfig():
     # get specified device template
     deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
 
-    return jsonify(deviceTemplate)
+    return buildSuccessfulRequest(deviceTemplate, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network/device', methods=['GET'])
@@ -126,7 +127,7 @@ def getDeviceDetails():
     deviceName: str = parser.getDeviceNameInURL(request)
     deviceConfig: Configuration = network.getDeviceByDeviceName(deviceName).getDeviceConfiguration()
 
-    return json.dumps(deviceConfig.toDict()), 200, {'ContentType': 'application/json'}
+    return buildSuccessfulRequest(deviceConfig.toDict(), defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network/device', methods=['POST'])
@@ -139,7 +140,7 @@ def createDevice():
 
     # build dictionary from payload and remove non-device fields
     payloadConfig = requestContent
-    del payloadConfig["NetworkName"]
+    del payloadConfig["networkName"]
 
     # build configuration for device
     deviceConfig: Configuration = DeviceConfigurationFactory.getInstance(payloadConfig)
@@ -150,7 +151,7 @@ def createDevice():
     # add device to specified network
     network.addDevice(device)
 
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network/device', methods=['PUT'])
@@ -173,10 +174,10 @@ def modifyDevice():
 
     # remove fields not in device configuration
     newConfiguration = requestContent
-    del newConfiguration['NetworkName']
+    del newConfiguration['networkName']
 
     if newName is not None:
-        del newConfiguration['NewDeviceId']
+        del newConfiguration['newDeviceId']
 
     # now attempt to modify device configuration
     oldConfiguration.modifyConfig(newConfiguration)
@@ -185,7 +186,7 @@ def modifyDevice():
     if newName is not None:
         network.modifyDeviceNameByName(newName, deviceToFind)
 
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network/device', methods=['DELETE'])
@@ -198,7 +199,7 @@ def deleteDevice():
 
     # now delete device from specified network
     network.deleteDeviceByName(deviceName)
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 # ---  This section of endpoints deals with databases  --- #
@@ -218,7 +219,7 @@ def testDBConfiguration():
 
     dbWriter.disconnect()
 
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/database', methods=['POST'])
@@ -239,7 +240,7 @@ def createDBConfiguration():
 
     # add to dbManager
 
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 # ---  This section deals with errorHandlers  --- #
@@ -276,6 +277,19 @@ def to_dict(e):
     rv = dict()
     rv["message"] = e
     return rv
+
+
+def buildSuccessfulRequest(data, code):
+    # NOTE: data should be in dictionary format
+    if data is None:
+        data = {'success': True}
+
+    if code is None:
+        code = 200
+
+    response = jsonify(data)
+
+    return response, code
 
 
 app.run()
