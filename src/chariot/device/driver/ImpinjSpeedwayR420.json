@@ -1,116 +1,5 @@
 {
-    "ImpinjxArray": {
-        "imgSrc": "some_imgur_link",
-        "description": "The Impinj xArray gateway is a fixed infrastructure RAIN RFID reader system that provides always-on, wide-area monitoring, location, and direction of items.",
-        "settings": [
-            {
-                "title": "Itemsense Server IP Address",
-                "alias": "ipAddress",
-                "description": "",
-                "type": "String",
-                "inputType": "text",
-                "required": true,
-                "maxLength": 14,
-                "validationRegex": "TODO"
-            },
-            {
-                "title": "Itemsense Recipe Name",
-                "alias": "recipeName",
-                "description": "Which recipe to run. This is optional, except when using multiple facilities",
-                "type": "String",
-                "inputType": "text",
-                "required": false
-            },
-            {
-                "title": "Itemsense Job Name",
-                "alias": "jobName",
-                "description": "The optional name of the job",
-                "type": "String",
-                "inputType": "text",
-                "required": false,
-                "maxLength": null
-            },
-            {
-                "title": "Facility",
-                "alias": "facility",
-                "description": "The name of the facility which the job will be run in",
-                "type": "String",
-                "inputType": "text",
-                "required": false
-            },
-            {
-                "title": "Itemsense Job Start Delay",
-                "alias": "startDelay",
-                "description": "An ISO 8601 format duration for which to delay the job's start. If not specified, defaults to 3 minutes, \"PT3M\"",
-                "type": "String",
-                "inputType": "text",
-                "required": false,
-                "validationRegex": "TODO"
-            },
-            {
-                "title": "Itemsense Username",
-                "alias": "authUsername",
-                "description": "",
-                "type": "String",
-                "inputType": "text",
-                "required": true
-            },
-            {
-                "title": "Itemsense Password",
-                "alias": "authPassword",
-                "description": "",
-                "type": "String",
-                "inputType": "password",
-                "required": true
-            },
-            {
-                "title": "Reader Groups",
-                "alias": "readerGroups",
-                "description": "The set of reader groups on which to start the job. May not be specified when a threshold recipe is used",
-                "type": "Array",
-                "elementType": "String",
-                "inputType": "textArray",
-                "required": false
-            },
-            {
-                "title": "Report to Items Database",
-                "alias": "reportToDatabaseEnabled",
-                "description": "Flag for determining if the job should relay tag reads into the Items database. Note that if this value if false, then data is not available via the Items API. Defaults to yes",
-                "type": "Boolean",
-                "inputType": "checkbox",
-                "required": false,
-                "maxLength": null
-            },
-            {
-                "title": "Report to Item History Database",
-                "alias": "reportToHistoryEnabled",
-                "description": "Flag for determining if the job should relay tag reads into the Item History database. Note that if this value if false, then data is not available via the Item History API. Defaults to yes",
-                "type": "Boolean",
-                "inputType": "checkbox",
-                "required": false,
-                "maxLength": null
-            },
-            {
-                "title": "Report to Message Queue",
-                "alias": "reportToMessageQueueEnabled",
-                "description": "Flag for determining if the job should report configured queue events. Note that if this value is false, then data is not available via the Message Queue interface. Defaults to yes",
-                "type": "Boolean",
-                "inputType": "checkbox",
-                "required": false,
-                "maxLength": null
-            },
-            {
-                "title": "User Data from Other Jobs",
-                "alias": "useOtherJobData",
-                "description": "Flag for determining if the job should consider data from previous or other active jobs when calculating item zone changes. Defaults to yes",
-                "type": "Boolean",
-                "inputType": "checkbox",
-                "required": false,
-                "maxLength": null
-            }
-        ]
-    },
-    "ImpinjSpeedwayR420": {
+   "ImpinjSpeedwayR420": {
         "imgSrc": "some_imgur_link",
         "description": "",
         "settings": [
@@ -123,25 +12,6 @@
                 "required": true,
                 "maxLength": 14,
                 "validationRegex": "TODO"
-            },
-            {
-                "title": "Port Number",
-                "alias": "port",
-                "description": "",
-                "type": "Number",
-                "inputType": "number",
-                "required": true,
-                "maxLength": 4,
-                "validationRegex": "TODO"
-            },
-            {
-                "title": "Tag Report Rate",
-                "alias": "report_every_n_tags",
-                "description": "The value of this field is how many tags will be collected before reporting",
-                "type": "Number",
-                "inputType": "number",
-                "required": false,
-                "validationRegex": "\\d+"
             },
             {
                 "title": "Antennas",
@@ -254,7 +124,7 @@
                     },
                     {
                         "title": "Enable Peak RSSI",
-                        "alias": "EnablePeakRSSI_General",
+                        "alias": "EnablePeakRSSI",
                         "description": "",
                         "type": "Boolean",
                         "inputType": "checkbox",
@@ -291,6 +161,14 @@
                         "type": "Boolean",
                         "inputType": "checkbox",
                         "required": false
+                    },
+                    {
+                        "title": "Enable Tag Seen Count",
+                        "alias": "EnableTagSeenCount",
+                        "description": "",
+                        "type": "Boolean",
+                        "inputType": "checkbox",
+                        "required": false
                     }
                 ]
             },
@@ -300,7 +178,7 @@
                 "settingsList": [
                     {
                         "title": "Enable Peak RSSI",
-                        "alias": "EnablePeakRSSI_Impinj",
+                        "alias": "EnablePeakRSSI",
                         "description": "",
                         "type": "Boolean",
                         "inputType": "checkbox",

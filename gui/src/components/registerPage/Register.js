@@ -13,16 +13,28 @@ import Button from 'react-bootstrap/Button';
 import hiddenPasswordImg from "../images/hiddenPassword.PNG";
 import showPasswordImg from "../images/showPassword.PNG";
 
+import ConfirmationModalBody from '../shared/ConfirmationModalBody';
+import SuccessModalBody from '../shared/SuccessModalBody';
+
 class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      fullname: "", // Full-name account attribute
-      username: "", // Username for  attribute
-      password: "", // Password for account
-      emailAddress: "", // Email-address for account
-      securityQuestion: "", // Security question for account in the event the user forgets their password
-      securityQuestionAnswer: "", // Answer to security question
+      accountInfo : {
+        "Full Name": "", // Full-name account attribute
+        "Username": "", // Username for  attribute
+        "Password": "", // Password for account
+        "Email Address": "", // Email-address for account
+        "Security Question": "", // Security question for account in the event the user forgets their password
+        "Security Question Answer": "" // Answer to security question
+      },
+      securityQuestionOptions : [
+        'What was your first pet\'s name?', 
+        'What is your dad\'s middle name?',
+        'What town or city were you born in?',
+        'In what town or city was your first full time job?',
+        'What is your favorite sport\'s mascot?'
+      ],
       isSubmitted: false, // Whether or not the account information is ready to be sent to the server
       passwordVisible: false, // Whether or not the password is visible on the screen
       passwordImg: hiddenPasswordImg, // Current passwordImg that is shown (hidden/visible)
@@ -39,7 +51,10 @@ class Register extends Component {
     Updates prop values (account-related) as they are entered by the user.
   */
   handleChange(event) {
-    this.setState({[event.target.name]: event.target.value});
+    var updatedAccountInfo = this.state.accountInfo; // Store from current state
+    updatedAccountInfo[event.target.name] = event.target.value; // Update the json
+    
+    this.setState({ accountInfo: updatedAccountInfo }); // Update the state
   }
 
   /* 
@@ -68,39 +83,13 @@ class Register extends Component {
     this.setState({
       successIsOpen: !this.state.successIsOpen
     });
-
-
-
   }
-  
-  componentDidMount() {
-    fetch("https://api.example.com/items")
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            isLoaded: true,
-            items: result.items
-          });
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          this.setState({
-            isLoaded: true,
-            error
-          });
-        }
-      )
-  }
+
 
   /*
     Called when the user clicks the button to view/unview the password they entered.
   */
   changePasswordVisibility() {
-    console.log(this.state.passwordImg);
-
     if (this.state.passwordImg === hiddenPasswordImg) {
       this.setState({passwordImg: showPasswordImg});
       this.setState({passwordVisible: true});
@@ -109,10 +98,8 @@ class Register extends Component {
       this.setState({passwordImg: hiddenPasswordImg});
       this.setState({passwordVisible: false});
     }
-
-    console.log(this.state.passwordImg);
   }
-  
+
   /*
     Returns three separate objects with their unique keys. The first object
     is the Registration screen itself. This screen contains the fields that
@@ -139,38 +126,40 @@ class Register extends Component {
               <form onSubmit={this.handleSubmit}>
                 {/* As fields are typed into, call handleChange() to update and keep track of the values */}
                 <div className="form-group">
-                  <input required type="text" className="form-control" id="fullname" name="fullname" placeholder="Full Name" onChange={this.handleChange}/>
+                  <input required type="text" className="form-control" id="fullname" name="Full Name" placeholder="Full Name" onChange={this.handleChange}/>
                 </div>
                 
                 <div className="form-group">
-                  <input required type="text" className="form-control" id="username" name="username" placeholder="Username" onChange={this.handleChange}/>
+                  <input required type="text" className="form-control" id="username" name="Username" placeholder="Username" onChange={this.handleChange}/>
                 </div>
 
                 {/* Two fields for password and confirm password */}
                 <div className="form-group input-group">
-                    <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="password" name="password" placeholder="Password" />
-                    <span className="input-group-addon">&nbsp;&nbsp;</span>
-                    <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="confirmPassword" name="password" placeholder="Confirm Password" onChange={this.handleChange}/>
-                    <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
+                  <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="password" name="Password" placeholder="Password" />
+                  <span className="input-group-addon">&nbsp;&nbsp;</span>
+                  <input required type={this.state.passwordVisible ? "text" : "password"} className="form-control" id="confirmPassword" name="Password" placeholder="Confirm Password" onChange={this.handleChange}/>
+                  <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
                 </div>
 
                 <div className="form-group">
-                    <input required type="email" className="form-control" id="emailAddress" name="emailAddress" placeholder="Email Address" onChange={this.handleChange}/>
-                    You'll need to verify that this email belongs to you.
+                  <input required type="email" className="form-control" id="emailAddress" name="Email Address" placeholder="Email Address" onChange={this.handleChange}/>
+                  You'll need to verify that this email belongs to you.
                 </div>
 
                 <div className="form-group">
-                    <select required className="form-control" id="securityQuestion" name="securityQuestion" onChange={this.handleChange}>
-                      <option selected disabled hidden value="">Select a Security Question</option>
-                      <option>What was your first pet's name?</option>
-                      <option>What is your dad's middle name?</option>
-                      <option>What city were you born in?</option>
-                      <option>What is your favorite sport's mascot?</option>
-                    </select>
+                  <select required className="form-control" id="securityQuestion" name="Security Question" onChange={this.handleChange}>
+                    <option selected disabled hidden value="">Select a Security Question</option>
+                    <option>What was the house number you lived in as a child?</option>
+                    <option>What high school did you attend?</option>
+                    <option>What is your mother's maiden name?</option>
+                    <option>What is your favorite food?</option>
+                    <option>What is your favorite sports mascot?</option>
+                    <option>What is town/city were you born in?</option>
+                  </select>
                 </div>
 
                 <div className="form-group">
-                    <input required type="text" className="form-control" id="securityQuestionAnswer" name="securityQuestionAnswer" placeholder="Security Question Answer" onChange={this.handleChange}/>
+                  <input required type="text" className="form-control" id="securityQuestionAnswer" name="Security Question Answer" placeholder="Security Question Answer" onChange={this.handleChange}/>
                 </div>
 
                 <br></br>
@@ -193,36 +182,22 @@ class Register extends Component {
 
       // Confirmation modal element for Register component
       <Modal show={this.state.confirmIsOpen} key="registerConfirmModal">
-
-        <Modal.Body>
-          Is this information for your account correct?
-          <br></br>
-          <p>
-            <b>Name:</b> {this.state.fullname}
-            <br></br>
-            <b>Username:</b> {this.state.username}
-            <br></br>
-            <b>Password:</b> {this.state.password}
-            <br></br>
-            <b>Email Address:</b> {this.state.emailAddress}
-            <br></br>
-            <b>Security Question:</b> {this.state.securityQuestion}
-            <br></br>
-            <b>Security Question Answer:</b> {this.state.securityQuestionAnswer}
-          </p>
-        </Modal.Body>
-
+        <ConfirmationModalBody
+          confirmationQuestion='Is this information for your account correct?'
+          confirmationData = {this.state.accountInfo}
+          >
+        </ConfirmationModalBody>
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
           <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
         </Modal.Footer>
-
       </Modal>,
 
       // Sucess modal element for Register component
       <Modal show={this.state.successIsOpen} key="registerSuccessModal">
 
-        <Modal.Body>To complete the account creation process, please check your email to complete the account creation process.</Modal.Body>
+        <SuccessModalBody successMessage="To complete the account creation process, please check your email to complete the account creation process.">
+        </SuccessModalBody>
 
         <Modal.Footer>
           <Link to="/">

@@ -65,8 +65,21 @@
   z-index:1000;
 }
 
+.existingNetworkBox {
+  border-bottom: solid 1px lightslategray;
+}
+
+.existingNetworkCell {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
 .link {
   border-top: 20px;
+}
+
+.networksDeviceLink {
+  padding-left: 25px;
 }
 
 .login-button {
@@ -81,4 +94,22 @@
 
 .screenInfo {
   padding-bottom: 20px;
+}
+
+.successConfirmationImg {
+  float: left;
+  height: 50px;
+  width: 50px;
+  padding-right: 12px;
+}
+
+.errorConfirmationImg {
+  float: left;
+  height: 50px;
+  width: 50px;
+  padding-right: 12px;
+}
+
+.button-mid-bottom {
+  margin-left: 37%;
 }

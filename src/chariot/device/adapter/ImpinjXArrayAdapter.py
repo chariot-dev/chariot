@@ -1,4 +1,5 @@
 import requests
+import json
 from queue import Queue 
 from base64 import b64encode
 from json import dumps
@@ -131,7 +132,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
                     if 'nextPageMarker' in jsonData:
                         self.session.dataRequestBody['pageMarker'] = jsonData['nextPageMarker']
                     else:
-                    collectedAllPages = True
+                        collectedAllPages = True
                 except Exception as err:
                     stackTrace = self._generateStackTrace(err)
                     errorQueue.put(stackTrace, block=True)
