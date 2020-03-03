@@ -1,10 +1,6 @@
 from typing import Dict, List
-
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.utility.exceptions.DuplicateNameError import DuplicateNameError
-from chariot.utility.exceptions.NameNotFoundError import NameNotFoundError
-from chariot.utility.exceptions.NoIdentifierError import NoIdentifierError
-from chariot.utility.exceptions.ErrorStrings import ErrorStrings
+from chariot.utility.exceptions import NameNotFoundError, NoIdentifierError, DuplicateNameError, ErrorStrings
 
 
 class Network:
@@ -71,7 +67,7 @@ class Network:
 
         return devices
 
-    def toString(self):
+    def toDict(self):
         network: Dict[str, str] = {'NetworkName': self.networkName, 'Description': self.networkDesc}
 
         # add each deviceId as key and the configuration as value
