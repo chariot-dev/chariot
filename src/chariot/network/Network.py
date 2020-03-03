@@ -73,7 +73,7 @@ class Network:
 
         # add each deviceId as key and the configuration as value
         for key in self.devices:
-            network[key] = self.getDeviceByDeviceName(key).getDeviceConfiguration()
+            network[key] = self.getDeviceByDeviceName(key).getDeviceConfiguration().toDict()
 
         return network
 

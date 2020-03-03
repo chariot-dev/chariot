@@ -97,7 +97,7 @@ def getNetworkDetails():
     network: Network = NetworkManager.findNetworkByNetworkName(networkName)
 
     # convert into JSON and return
-    return buildSuccessfulRequest(network.toString(), defaultSuccessCode)
+    return buildSuccessfulRequest(network.toDict(), defaultSuccessCode)
 
 
 # ---  This section of endpoints deals with devices  --- #
@@ -246,34 +246,34 @@ def createDBConfiguration():
 # ---  This section deals with errorHandlers  --- #
 @app.errorhandler(NameNotFoundError)
 def handleInvalidUsage(error):
-    res = jsonify(error.to_dict())
+    res = jsonify(toDict(error.message))
     res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(DuplicateNameError)
 def handleDuplicateName(error):
-    res = jsonify(error.to_dict())
+    res = jsonify(toDict(error.message))
     res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(DeviceNotSupported)
 def handleDeviceNotSupported(error):
-    res = jsonify(error.to_dict())
+    res = jsonify(toDict(error.message))
     res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(DatabaseConnectionError)
 def handleDatabaseNotConnected(error):
-    res = jsonify(error.to_dict())
+    res = jsonify(toDict(error.message))
     res.status_code = error.status_code
     return res
 
 
 # -- useful utility methods --
-def to_dict(e):
+def toDict(e):
     rv = dict()
     rv["message"] = e
     return rv
