@@ -86,3 +86,9 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         for key in dataPoint:
             if key not in self.validDataFields:
                 raise AssertionError(f'an invalid field "{key}" was included in the data point')
+
+    def getConfiguration(self):
+        return self.config
+
+    def modifyConfiguration(self, config: Type[DatabaseConfiguration]):
+        self.config.modifyConfig(config)

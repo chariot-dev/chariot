@@ -1,7 +1,6 @@
-import json
 import flask
-from typing import List, Dict
-from flask import jsonify, request, app
+from typing import Dict
+from flask import jsonify, request
 from flask_cors import CORS
 
 from chariot.device.DeviceAdapterFactory import DeviceAdapterFactory
@@ -17,6 +16,8 @@ from chariot.network.Network import Network
 from chariot.network.NetworkManager import NetworkManager
 from chariot.utility.exceptions.CustomExceptions import NameNotFoundError, DuplicateNameError, DeviceNotSupported
 from chariot.utility.exceptions.CustomExceptions import DatabaseConnectionError
+from chariot.network.configuration.NetworkConfiguration import NetworkConfiguration
+from chariot.database.DatabaseManager import DatabaseManager
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -32,14 +33,14 @@ defaultSuccessCode: int = 200
 @app.route(nManagerBaseUrl + '/networks/names', methods=['GET'])
 # This method will return all network names known to the networkManager and their descriptions
 def retrieveAllNetworkNames():
-    allNetworks: Dict[str, str] = NetworkManager.getAllNetworkNamesAndDesc()
+    allNetworks: Dict[str, str] = NetworkManager.getAllNetworks()
     return buildSuccessfulRequest(allNetworks, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/networks/all', methods=['GET'])
 # This method will return all known networks along with their devices
 def retrieveAllNetworkDetails():
-    networksAndDevices = NetworkManager.getAllNetworkNamesAndDevices()
+    networksAndDevices = NetworkManager.getDeviceNames()
     return buildSuccessfulRequest(networksAndDevices, defaultSuccessCode)
 
 
@@ -47,46 +48,49 @@ def retrieveAllNetworkDetails():
 def createNetwork():
     requestContent = request.get_json()
 
-    # check that a network name is specified in the payload
-    networkName = parser.getNameInPayload(requestContent)
-    networkDesc: str = parser.getNetworkDescription(requestContent)  # note that description is optional
+    # build a NetworkConfiguration from payload and verify it
+    networkConfig: NetworkConfiguration = NetworkConfiguration(requestContent)
 
-    NetworkManager.addNetwork(networkName, networkDesc)
+    # if configuration is successful, then create a Network and add it to the NetworkManager
+    network: Network = Network(networkConfig)
+    NetworkManager.addNetwork(network)
+
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network', methods=['PUT'])
 def modifyNetwork():
     # through this endpoint, a network can have its name and/or description changed
-    # it must be that the old name('networkName') is specified and a new name('NewName') is given in the payload
+    # it must be that the old name('networkName') is specified and a new name('newNetworkName') is given in the payload
+
     requestContent = request.get_json()
-    hasNewName = True
+    hasNewName = False
+    networkName: str = parser.getNameInPayload(requestContent)
 
-    # check that a network name is specified in the payload
-    oldNetworkName = parser.getNameInPayload(requestContent)
-    # check that a new name is found in the payload
-    newName = parser.getNewNetworkName(requestContent)
+    # check if a new network name is specified in the payload, if so capture old name so its deleted from collection
+    if parser.getNewNetworkNameStr() in requestContent:
+        hasNewName = True
+        # for configuration validation, alter keys from 'newNetworkName' to 'networkName'
+        requestContent[parser.getNetworkNameStr()] = requestContent[parser.getNewNetworkNameStr()]
+        del requestContent[parser.getNewNetworkNameStr()]
 
-    networkDesc: str = parser.getNetworkDescription(requestContent)  # note that description is optional
+    # at this point, 'newNetworkName' is not a key, so validate configuration and update
+    NetworkManager.getNetwork(networkName).getConfiguration.updateConfig(requestContent)
 
-    if newName is not None:
-        NetworkManager.modifyNetworkNameByName(newName, oldNetworkName)
-    else:
-        # no NewName for network provided
-        hasNewName = False
+    # if applicable, modify collection so the new network name is in collection and old one is deleted
+    if hasNewName:
+        # notice that requestContent[parser.getNetworkNameStr()] is used, this will return the new name since keys were
+        # updated. So 'networkName' would be the old name of the network
+        NetworkManager.replaceNetwork(requestContent[parser.getNetworkNameStr()], networkName)
 
-    if networkDesc is not None:
-        if hasNewName:
-            NetworkManager.modifyNetworkDescriptionByName(networkDesc, newName)
-        else:
-            NetworkManager.modifyNetworkDescriptionByName(networkDesc, oldNetworkName)
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 @app.route(nManagerBaseUrl + '/network', methods=['DELETE'])
 def deleteNetwork():
     networkToDelete = parser.getNameInURL(request)
-    NetworkManager.deleteNetworkByName(networkToDelete)
+    NetworkManager.deleteNetwork(networkToDelete)
+
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
@@ -94,9 +98,8 @@ def deleteNetwork():
 def getNetworkDetails():
     # this method returns a specific network details
     networkName = parser.getNameInURL(request)
-    network: Network = NetworkManager.findNetworkByNetworkName(networkName)
+    network: Network = NetworkManager.replaceNetwork(networkName)
 
-    # convert into JSON and return
     return buildSuccessfulRequest(network.toDict(), defaultSuccessCode)
 
 
@@ -104,7 +107,8 @@ def getNetworkDetails():
 
 @app.route(nManagerBaseUrl + '/network/devices/supportedDevices', methods=['GET'])
 def getSupportedDevices():
-    return buildSuccessfulRequest(DeviceAdapterFactory.getsupportedDevices())
+    # returns a dictionary of supported devices, with key as deviceType and value as the configuration
+    return buildSuccessfulRequest(DeviceAdapterFactory.getsupportedDevices(), None)
 
 
 @app.route(nManagerBaseUrl + '/network/device/config', methods=['GET'])
@@ -157,7 +161,7 @@ def createDevice():
 @app.route(nManagerBaseUrl + '/network/device', methods=['PUT'])
 def modifyDevice():
     # through this endpoint, a device can have its configuration changed
-    # it must be that the old name('deviceId') is specified and a new name('NewDeviceId') is given in the payload
+    # it must be that the old name('deviceId') is specified and a new name('newDeviceId') is given in the payload
 
     # ensure that a network is specified in the payload
     requestContent = request.get_json()
@@ -239,8 +243,72 @@ def createDBConfiguration():
     dbWriter.disconnect()
 
     # add to dbManager
+    DatabaseManager.addDbWriter(dbWriter)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
+
+
+@app.route(nManagerBaseUrl + '/database', methods=['PUT'])
+def modifyDatabaseConfiguration():
+    # through this endpoint, a database can have its id and/or attributes changed
+    # it must be that the old name('dbId') is specified and a new name('newDbId') is given in the payload
+
+    requestContent = request.get_json()
+    hasNewName = False
+    dbId: str = parser.getDbInPayload(requestContent)
+
+    # check if a new dbId is specified in the payload, if so capture old name so its deleted from collection
+    if parser.getNewDbNameStr() in requestContent:
+        hasNewName = True
+        # for configuration validation, alter keys from 'dbId' to 'newDbId'
+        requestContent['dbId'] = requestContent['newDbId']
+        del requestContent['newDbId']
+
+    # at this point, 'newDbId' is not a key, so validate configuration and update
+    DatabaseManager.getDbWriter(dbId).modifyConfiguration(requestContent)
+
+    # if applicable, modify collection so the new dbId is in collection and old one is deleted
+    if hasNewName:
+        # notice that requestContentrequestContent['dbId'] is used, this will return the new name since keys were
+        # updated. So variable dbId would be the old name of the network
+        DatabaseManager.replaceDbWriter(requestContent['dbId'], dbId)
+
+    return buildSuccessfulRequest(None, defaultSuccessCode)
+
+
+@app.route(nManagerBaseUrl + '/database', methods=['DELETE'])
+def deleteDatabaseConfiguration():
+    dbId = parser.getNameInURL(request)
+    DatabaseManager.deleteDbWriter(dbId)
+
+    return buildSuccessfulRequest(None, defaultSuccessCode)
+
+
+@app.route(nManagerBaseUrl + '/database', methods=['GET'])
+def getDatabaseConfiguration():
+    # this method returns a specific database config
+    dbId = parser.getDbNameInURL(request)
+    db: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
+
+    return buildSuccessfulRequest(DatabaseWriter.getConfiguration(), defaultSuccessCode)
+
+
+# ---  This section of endpoints deals with devices  --- #
+
+@app.route(nManagerBaseUrl + '/database/supportedDatabases', methods=['GET'])
+def getSupportedDatabases():
+    # returns a dictionary of supported devices, with key as deviceType and value as the configuration
+    return buildSuccessfulRequest(DatabaseConfigurationFactory.getSupportedDatabases(), None)
+
+
+@app.route(nManagerBaseUrl + '/database/config', methods=['GET'])
+def getSupportedDatabaseConfig():
+    deviceTemplateName = parser.getDeviceNameInURL(request)
+
+    # get specified device template
+    deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
+
+    return buildSuccessfulRequest(deviceTemplate, defaultSuccessCode)
 
 
 # ---  This section deals with errorHandlers  --- #

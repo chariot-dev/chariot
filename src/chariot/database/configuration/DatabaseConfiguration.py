@@ -6,6 +6,7 @@ from typing import Dict, Type
 
 class DatabaseConfiguration(Configuration):
     requiredFields: Dict[str, Type[JSONObject]] = {
+        'dbId': str,
         'databaseName': str,
         'type': str,
         'host': str,
@@ -30,6 +31,12 @@ class DatabaseConfiguration(Configuration):
             if field == 'type':
                 # cannot edit databaseType
                 raise AssertionError
+
+    def getId(self) -> str:
+        return getattr(self, 'dbId')
+
+    def getIdField(self) -> str:
+        return 'dbId'
 
 
 __all__ = ['DatabaseConfiguration']

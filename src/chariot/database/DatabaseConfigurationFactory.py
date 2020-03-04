@@ -18,6 +18,12 @@ class _DatabaseConfigurationFactory(AbstractFactory):
     def getInstance(self, config: JSONObject) -> DatabaseConfiguration:
         return super().getInstance(config)
 
+    def getSupportedDatabases(self):
+        return {
+            'MongoDB': MongoDatabaseConfiguration.toJSON(),
+            'MySQL': MySQLDatabaseConfiguration.toJSON()
+        }
+
 
 # Return singleton 
 DatabaseConfigurationFactory = _DatabaseConfigurationFactory()

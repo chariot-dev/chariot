@@ -1,27 +1,31 @@
-from typing import Dict, List
+from typing import Dict, List, Type
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.utility.exceptions.CustomExceptions import NameNotFoundError, NoIdentifierError, DuplicateNameError
 from chariot.utility.exceptions.ErrorStrings import ErrorStrings
+from chariot.network.configuration.NetworkConfiguration import NetworkConfiguration
+from chariot.utility.JSONTypes import JSONDict
 
 
 class Network:
 
-    def __init__(self, networkName: str, networkDesc: str):
-        self.networkName = networkName
-        self.networkDesc = networkDesc
+    def __init__(self, config: Type[NetworkConfiguration]):
+        self._config: Type[NetworkConfiguration] = config
         self.devices: Dict[str, DeviceAdapter] = {}
 
-    def modifyNetworkName(self, newName: str):
-        self.networkName = newName
-
-    def modifyNetworkDesc(self, newDesc: str):
-        self.networkDesc = newDesc
-
     def getNetworkName(self) -> str:
-        return self.networkName
+        return self._config.networkName
 
-    def getNetworkDesc(self) -> str:
-        return self.networkDesc
+    def getDescription(self) -> str:
+        return self._config.description
+
+    def modifyConfiguration(self, config: JSONDict):
+        try:
+            self._config.modifyConfig(config)
+        except Exception as e:
+            raise e
+
+    def getConfiguration(self) -> NetworkConfiguration:
+        return self._config
 
     # figure out how much error-checking to do
     def addDevice(self, device: DeviceAdapter):
@@ -60,7 +64,7 @@ class Network:
 
         return isUnique
 
-    def getAllDeviceNamesOnNetwork(self) -> List[str]:
+    def getDeviceNames(self) -> List[str]:
         devices: List[str] = []
 
         for deviceName in self.devices:
@@ -69,7 +73,7 @@ class Network:
         return devices
 
     def toDict(self):
-        network: Dict[str, str] = {'NetworkName': self.networkName, 'Description': self.networkDesc}
+        network: Dict[str, str] = {'NetworkName': self._config.networkName, 'Description': self._config.description}
 
         # add each deviceId as key and the configuration as value
         for key in self.devices:

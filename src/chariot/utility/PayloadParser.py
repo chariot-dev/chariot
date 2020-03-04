@@ -12,6 +12,23 @@ class PayloadParser:
         self.descriptionStr: str = 'description'
         self.deviceIdStr: str = 'deviceId'
         self.newDeviceIdStr: str = 'newDeviceId'
+        self.dbIdStr: str = 'dbId'
+        self.newDbIdStr: str = 'newDbId'
+
+    def getNetworkNameStr(self) -> str:
+        return self.networkNameStr
+
+    def getNewNetworkNameStr(self) -> str:
+        return self.newNetworkNameStr
+
+    def getDescriptionStr(self) -> str:
+        return self.descriptionStr
+
+    def getDeviceIdStr(self) -> str:
+        return self.deviceIdStr
+
+    def getNewDeviceIdStr(self) -> str:
+        return self.newDeviceIdStr
 
     def getNameInPayload(self, requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
@@ -55,3 +72,22 @@ class PayloadParser:
                 ErrorStrings.ERR_Specify_Device_Identifier.value
             )
         return deviceName
+
+    def getDbNameInPayload(self, requestContent) -> str:
+        # first ensure that a network name has been given to specify which network is to be modified
+        dbId: str = requestContent.get(self.dbIdStr)
+        return dbId
+
+    def getNewDbNameInPayload(self, requestContent) -> str:
+        # first ensure that a network name has been given to specify which network is to be modified
+        dbId: str = requestContent.get(self.newDbIdStr)
+        return dbId
+
+    def getDbNameInURL(self, requestContent) -> str:
+        # first ensure that a network name has been given to specify which network is to be modified
+        dbId: str = requestContent.args[self.dbIdStr]
+        if not dbId:
+            raise NoIdentifierError(
+                ErrorStrings.ERR_Specify_Device_Identifier.value
+            )
+        return dbId

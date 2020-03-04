@@ -1,6 +1,5 @@
 from chariot.configuration.Configuration import Configuration
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from json import dumps
 from typing import Dict, Type
 
 class DeviceConfiguration(Configuration):
@@ -16,6 +15,12 @@ class DeviceConfiguration(Configuration):
                 # cannot edit deviceType
                 raise AssertionError
         super()._validateSubsetConfig(newConfig)
+
+    def getId(self) -> str:
+        return getattr(self, 'deviceId')
+
+    def getIdField(self) -> str:
+        return 'deviceId'
 
 
 __all__ = ['DeviceConfiguration']
