@@ -1,7 +1,5 @@
 from typing import Dict, Type
-from chariot.database.configuration import DatabaseConfiguration
-from chariot.database.configuration import MongoDatabaseConfiguration
-from chariot.database.configuration import MySQLDatabaseConfiguration
+from chariot.database.configuration import DatabaseConfiguration, MongoDatabaseConfiguration, MySQLDatabaseConfiguration
 from chariot.utility import AbstractFactory
 from chariot.utility.JSONTypes import JSONObject
 
@@ -19,7 +17,7 @@ class _DatabaseConfigurationFactory(AbstractFactory):
         return super().getInstance(config)
 
 
-# Return singleton 
+# Return singleton
 DatabaseConfigurationFactory = _DatabaseConfigurationFactory()
 
 __all__ = ['DatabaseConfigurationFactory']

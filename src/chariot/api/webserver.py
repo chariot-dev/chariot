@@ -4,17 +4,14 @@ from typing import List, Dict
 from flask import jsonify, request, app
 from flask_cors import CORS
 
-from chariot.device import DeviceAdapterFactory
-from chariot.device import DeviceConfigurationFactory
+from chariot.device import DeviceAdapterFactory, DeviceConfigurationFactory
 from chariot.device.adapter import DeviceAdapter
 from chariot.configuration import Configuration
 from chariot.database.configuration import DatabaseConfiguration
-from chariot.database import DatabaseConfigurationFactory
-from chariot.database import DatabaseWriterFactory
+from chariot.database import DatabaseConfigurationFactory, DatabaseWriterFactory
 from chariot.database.writer import DatabaseWriter
 from chariot.utility import PayloadParser
-from chariot.network import Network
-from chariot.network import NetworkManager
+from chariot.network import Network, NetworkManager
 from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, DeviceNotSupported, DatabaseConnectionError
 
 

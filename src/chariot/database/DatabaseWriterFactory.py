@@ -1,9 +1,7 @@
 from typing import Dict, Type
-from chariot.database.writer import DatabaseWriter
-from chariot.database.writer import MongoDatabaseWriter
-from chariot.database.writer import MySQLDatabaseWriter
+from chariot.database.writer import DatabaseWriter, MongoDatabaseWriter, MySQLDatabaseWriter
 from chariot.database.configuration import DatabaseConfiguration
-from chariot.utility.AbstractFactory import AbstractFactory
+from chariot.utility import AbstractFactory
 
 
 class _DatabaseWriterFactory(AbstractFactory):

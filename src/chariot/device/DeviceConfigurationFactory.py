@@ -1,7 +1,5 @@
 from typing import Dict, Type
-from chariot.device.configuration import DeviceConfiguration
-from chariot.device.configuration import ImpinjR420Configuration
-from chariot.device.configuration import ImpinjXArrayConfiguration
+from chariot.device.configuration import DeviceConfiguration, ImpinjR420Configuration, ImpinjXArrayConfiguration
 from chariot.utility import AbstractFactory
 from chariot.utility.JSONTypes import JSONObject
 

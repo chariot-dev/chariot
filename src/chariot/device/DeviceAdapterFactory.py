@@ -3,12 +3,10 @@ from json import load
 from os import path
 from chariot.utility import AbstractFactory
 from chariot.utility.JSONTypes import JSONDict
-from chariot.device.adapter import DeviceAdapter
+from chariot.device.adapter import DeviceAdapter, ImpinjR420Adapter, ImpinjXArrayAdapter
 from chariot.device.configuration import DeviceConfiguration
-from chariot.device.adapter import ImpinjR420Adapter
-from chariot.device.adapter import ImpinjXArrayAdapter
-from chariot.utility.exceptions import DeviceNotSupported
-from chariot.utility.exceptions import ErrorStrings
+from chariot.utility.exceptions import DeviceNotSupported, ErrorStrings
+
 
 class _DeviceAdapterFactory(AbstractFactory):
     def __init__(self):
