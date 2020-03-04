@@ -15,8 +15,8 @@ class _DatabaseConfigurationFactory(AbstractFactory):
         self.typeField = 'type'
         self.instanceName: str = 'database configuration'
 
-        def getInstance(self, config: JSONObject) -> DatabaseConfiguration:
-            return super().getInstance(config)
+    def getInstance(self, config: JSONObject) -> DatabaseConfiguration:
+        return super().getInstance(config)
 
 
 # Return singleton 

@@ -1,3 +1,4 @@
+from typing import Dict
 from sllurp.llrp import LLRPClientFactory
 from twisted.internet import reactor
 from typing import Dict, Optional

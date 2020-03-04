@@ -54,14 +54,23 @@ class DeviceAdapter(metaclass=ABCMeta):
     def getId(self) -> str:
         return self._config.deviceId
 
+    def setId(self, newId) -> str:
+        self._config.deviceId = newId
+
     def stopDataCollection(self) -> None:
         if not self.inCollectionEpisode:
             raise AssertionError
         self._stopDataCollection()
         self.inCollectionEpisode = False
 
+    @abstractmethod
     def _stopDataCollection(self) -> None:
         pass
 
+    def getDeviceConfiguration(self) -> Type[DeviceConfiguration]:
+        return self._config
+
+    def setDeviceConfiguration(self, config: Type[DeviceConfiguration]) -> None:
+        self._config = config
 
 __all__ = ['DeviceAdapter']
