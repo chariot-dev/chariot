@@ -17,7 +17,7 @@ class TestConfiguration(DeviceConfiguration):
 
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
-        if configMap['deviceType'] != 'Test Device':
+        if configMap['deviceType'] != 'TestDevice':
             raise AssertionError
 
 __all__ = ['TestConfiguration']
