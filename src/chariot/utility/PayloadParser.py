@@ -1,5 +1,5 @@
-from chariot.utility.exceptions.CustomExceptions import NoIdentifierError
-from chariot.utility.exceptions.ErrorStrings import ErrorStrings
+from chariot.utility.exceptions import NoIdentifierError
+from chariot.utility.exceptions import ErrorStrings
 
 
 class PayloadParser:

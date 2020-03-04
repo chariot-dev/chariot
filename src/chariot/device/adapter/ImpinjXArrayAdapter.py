@@ -6,8 +6,8 @@ from json import dumps
 from time import sleep
 from typing import Dict, Union
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
+from chariot.device.adapter import DeviceAdapter
+from chariot.device.configuration import ImpinjXArrayConfiguration
 
 
 class ItemsenseSession:

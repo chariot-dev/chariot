@@ -2,9 +2,9 @@ from mysql import connector
 from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
 from chariot.utility.JSONTypes import JSONObject
-from chariot.database.writer.DatabaseWriter import DatabaseWriter
-from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
-from chariot.database.configuration.MySQLDatabaseConfiguration import MySQLDatabaseConfiguration
+from chariot.database.writer import DatabaseWriter
+from chariot.database.configuration import DatabaseConfiguration
+from chariot.database.configuration import MySQLDatabaseConfiguration
 from typing import Dict, List, Optional
 
 

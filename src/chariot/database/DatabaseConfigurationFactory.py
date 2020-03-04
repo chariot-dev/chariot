@@ -1,8 +1,8 @@
 from typing import Dict, Type
-from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
-from chariot.database.configuration.MongoDatabaseConfiguration import MongoDatabaseConfiguration
-from chariot.database.configuration.MySQLDatabaseConfiguration import MySQLDatabaseConfiguration
-from chariot.utility.AbstractFactory import AbstractFactory
+from chariot.database.configuration import DatabaseConfiguration
+from chariot.database.configuration import MongoDatabaseConfiguration
+from chariot.database.configuration import MySQLDatabaseConfiguration
+from chariot.utility import AbstractFactory
 from chariot.utility.JSONTypes import JSONObject
 
 

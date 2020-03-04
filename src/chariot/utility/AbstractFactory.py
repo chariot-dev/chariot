@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import Any, Dict, Type, Union
-from chariot.configuration.Configuration import Configuration
+from chariot.configuration import Configuration
 from chariot.utility.JSONTypes import JSONObject
 
 
