@@ -9,7 +9,7 @@ class ImpinjR420Configuration(DeviceConfiguration):
         'tag_population': int,
     }
     optionalFields: Dict[str, Type[JSONObject]] = {
-        'antennas': Type[List[int]],
+        'antennas': Type[List],
         'report_every_n_tags': int,
         'tx_power': int,
         'session': int,
@@ -44,7 +44,7 @@ class ImpinjR420Configuration(DeviceConfiguration):
 
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
-        if configMap['deviceType'] != 'Impinj Speedway R420':
+        if configMap['deviceType'] != 'ImpinjSpeedwayR420':
             raise AssertionError
 
 

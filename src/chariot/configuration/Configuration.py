@@ -17,7 +17,7 @@ class Configuration(ABC):
         for key in self.requiredFields:
             yield(key, getattr(self, key))
         for key in self.optionalFields:
-            yield(key, getattr(self, key))
+            yield(key, getattr(self, key, None))
 
     def __str__(self):
         output: JSONDict = dict(self)

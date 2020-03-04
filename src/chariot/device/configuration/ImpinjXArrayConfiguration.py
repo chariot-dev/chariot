@@ -13,7 +13,7 @@ class ImpinjXArrayConfiguration(DeviceConfiguration):
         'jobName': str,
         'facility': str,
         'startDelay': str,
-        'readerGroups': Type[List[str]],
+        'readerGroups': Type[List],
         'reportToDatabaseEnabled': bool,
         'reportToHistoryEnabled': bool,
         'reportToMessageQueueEnabled': bool,
@@ -27,7 +27,7 @@ class ImpinjXArrayConfiguration(DeviceConfiguration):
 
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
-        if configMap['deviceType'] != 'Impinj xArray':
+        if configMap['deviceType'] != 'ImpinjXArray':
             raise AssertionError
 
 
