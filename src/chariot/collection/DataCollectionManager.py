@@ -13,7 +13,6 @@ from chariot.database.writer.DatabaseWriter import DatabaseWriter
 from chariot.utility.ChariotExceptions import *
 
 
-
 class WorkerThread(Thread):
     def run(self):
         try:
@@ -36,13 +35,14 @@ class DataCollectionManager:
     DEFAULT_TIMEOUT: float = 5.0
     ERROR_CHECK_TIMEOUT: float = 0.5
     PRODUCERS_PER_CONSUMER: int = 2
-    THREAD_JOIN_TIMEOUT:float = 2.0
+    THREAD_JOIN_TIMEOUT: float = 2.0
 
     # TODO: add __del__ method to stop data collection when this object goes out of scope
     # TODO: add DataOutputStream for outputThread to also send data to
     def __init__(self, network: Optional[Network], dbWriter: DatabaseWriter):
         self.activeNetwork: Optional[Network] = network
-        self.devices: List[DeviceAdapter] =[device for _, device in network.getDevices().items()] if network is not None else []
+        self.devices: List[DeviceAdapter] = [
+            device for _, device in network.getDevices().items()] if network is not None else []
         self.consumerThreads: List[WorkerThread] = []
         self.producerThreads: Dict[str, WorkerThread] = {}
         self.errorQueue: ThreadQueue = ThreadQueue()
@@ -50,14 +50,16 @@ class DataCollectionManager:
         self.databaseWriter: DatabaseWriter = dbWriter
         self._inCollectionEpisode: bool = False
         self._episodeStartTime: int = 0
-        self.outputThread: WorkerThread = WorkerThread(name='Output-Handler', target=self._outputData, args=(self.errorQueue,))
+        self.outputThread: WorkerThread = WorkerThread(
+            name='Output-Handler', target=self._outputData, args=(self.errorQueue,))
 
     def _consumeDataFromDevice(self, deviceIdx: int) -> None:
         device: DeviceAdapter = self.devices[deviceIdx]
         while self._inCollectionEpisode:
             output: List[JSONObject] = []
             try:
-                data: JSONObject = device.getDataQueue().get(block=True, timeout=self.DEFAULT_TIMEOUT)
+                data: JSONObject = device.getDataQueue().get(
+                    block=True, timeout=self.DEFAULT_TIMEOUT)
                 output.append(data)
             except QueueEmptyException:
                 pass
@@ -78,7 +80,8 @@ class DataCollectionManager:
                 output: List[JSONObject] = []
                 for i in range(startIdx, startIdx + numDevices):
                     try:
-                        data: JSONObject = self.devices[i].getDataQueue().get_nowait()
+                        data: JSONObject = self.devices[i].getDataQueue(
+                        ).get_nowait()
                         output.append(data)
                     except QueueEmptyException:
                         continue
@@ -87,16 +90,18 @@ class DataCollectionManager:
 
     def _handleErrorsInQueue(self) -> None:
         MAX_ATTEMPTS: int = 3
-        disconnectedDevices: Dict[str, int] = {}          # Used with DeviceNotConncectedErrors to track how many attempts were made to reconnect
-        failedCollections: Dict[str, int] = {}           # Used with FailedToBeginCollectionErrors to track attempts to begin collecting
+        disconnectedDevices: Dict[str, int] = {}
+        failedCollections: Dict[str, int] = {}
 
         while self._inCollectionEpisode:
             try:
                 # Errors received are a tuple of the Thread name/id and the stacktrace
-                deviceID, error = self.errorQueue.get(block=True, timeout=self.ERROR_CHECK_TIMEOUT)
+                deviceID, error = self.errorQueue.get(
+                    block=True, timeout=self.ERROR_CHECK_TIMEOUT)
 
                 # For making changes to the correct device in the producerThreads
-                errorDevice: DeviceAdapter = self.activeNetwork.getDeviceByDeviceName(deviceID)
+                errorDevice: DeviceAdapter = self.activeNetwork.getDeviceByDeviceName(
+                    deviceID)
                 exc_type, exc_val, exc_trace = error
 
                 if isinstance(exc_val, DeviceNotConnectedError):
@@ -114,8 +119,8 @@ class DataCollectionManager:
                             errorDevice.connect()
                     else:
                         #LOG: f'Attempting to reconnect to {deviceID}'
-                            disconnectedDevices[deviceID] = 0
-                            errorDevice.connect()
+                        disconnectedDevices[deviceID] = 0
+                        errorDevice.connect()
                 elif isinstance(exc_val, FailedToBeginCollectionError):
                     if deviceID in failedCollections:
                         if failedCollections[deviceID] > MAX_ATTEMPTS:
@@ -125,14 +130,14 @@ class DataCollectionManager:
                             #LOG: f'{deviceID} has failed to start collecting data after {MAX_ATTEMPTS} attempts.'
                             disconnectedDevices[deviceID] += 1
                         else:
-                            #LOG: f'Attempting to begin {deviceID}'s collection'
+                            # LOG: f'Attempting to begin {deviceID}'s collection'
                             disconnectedDevices[deviceID] += 1
                             errorDevice.beginDataCollection()
                     else:
                         disconnectedDevices[deviceID] = 0
                         errorDevice.beginDataCollection()
                 else:
-                    #LOG: f'{deviceID} has encountered a fatal error.
+                    # LOG: f'{deviceID} has encountered a fatal error.
                     errorDevice.stopDataCollection()
                     errorDevice.disconnect()
             except QueueEmptyException:
@@ -142,7 +147,8 @@ class DataCollectionManager:
         while self._inCollectionEpisode:
             output: List[JSONObject] = []
             try:
-                data: JSONObject = self.dataQueue.get(block=True, timeout=self.DEFAULT_TIMEOUT)
+                data: JSONObject = self.dataQueue.get(
+                    block=True, timeout=self.DEFAULT_TIMEOUT)
                 for dataPoint in data:
                     dataPoint['relative_time'] -= self._episodeStartTime
                 output.append(data)
@@ -166,8 +172,6 @@ class DataCollectionManager:
 
     def setActiveNetwork(self, network: Optional[Network]):
         if self._inCollectionEpisode:
-            # can't set an active network during a data collection episode
-            # to support concurrent network data collection, a new instance of DataCollectionManager has to be spawned
             raise InCollectionEpisodeError()
         self.activeNetwork = network
         if self.activeNetwork is not None:
@@ -182,11 +186,12 @@ class DataCollectionManager:
         if self._inCollectionEpisode:
             raise InCollectionEpisodeError()
 
+        self.databaseWriter.connect()
         self._episodeStartTime = int(round(time() * 1000))
 
         if len(self.devices) == 0:
-            # can't collect data from a network with no devices
-            raise AssertionError('Must have at least one device to collect from.')
+            raise AssertionError(
+                'Must have at least one device to collect from.')
         for device in self.devices:
             producer = WorkerThread(
                 name=f'Producer-{device.getId()}', target=device.beginDataCollection, args=(self.errorQueue,))
@@ -198,7 +203,8 @@ class DataCollectionManager:
             numConsumers = 1
 
         if numConsumers > 1:
-            mismatch: bool = len(self.devices) % self.PRODUCERS_PER_CONSUMER != 0
+            mismatch: bool = len(
+                self.devices) % self.PRODUCERS_PER_CONSUMER != 0
             for i in range(numConsumers):
                 startIdx = self.PRODUCERS_PER_CONSUMER * i
                 numDevices = self.PRODUCERS_PER_CONSUMER
@@ -210,14 +216,13 @@ class DataCollectionManager:
                         numDevices += leftOver
                     else:
                         self.consumerThreads.append(WorkerThread(name=f'Consumer-{startIdx + numDevices - 1}',
-                            target=self._consumeDataFromDevices, args=(self.errorQueue, startIdx + numDevices - 1, leftOver,)))
+                                                                 target=self._consumeDataFromDevices, args=(self.errorQueue, startIdx + numDevices - 1, leftOver,)))
 
-                # TODO: add names of devices assigned as names of the threads for easier debugging
                 self.consumerThreads.append(WorkerThread(name=f'Consumer-{startIdx}',
-                    target=self._consumeDataFromDevices, args=(self.errorQueue, startIdx, numDevices,)))
+                                                         target=self._consumeDataFromDevices, args=(self.errorQueue, startIdx, numDevices,)))
         else:
             self.consumerThreads.append(WorkerThread(name=f'Consumer-0',
-                target=self._consumeDataFromDevices, args=(self.errorQueue, 0, 1,)))
+                                                     target=self._consumeDataFromDevices, args=(self.errorQueue, 0, 1,)))
 
         self._inCollectionEpisode = True
 
@@ -230,7 +235,6 @@ class DataCollectionManager:
         # begin the error-handling procedure on the main thread till we stop data collection
         self._handleErrorsInQueue()
 
-
     def stopDataCollection(self) -> None:
         if not self._inCollectionEpisode:
             raise NotInCollectionEpisodeError()
@@ -238,8 +242,16 @@ class DataCollectionManager:
             device.stopDataCollection()
 
         self._inCollectionEpisode = False
-        for producer in self.producerThreads.values():
-            producer.join(self.THREAD_JOIN_TIMEOUT)
-        for consumer in self.consumerThreads:
-            consumer.join(self.THREAD_JOIN_TIMEOUT)
-        self.outputThread.join(self.THREAD_JOIN_TIMEOUT)
+        anyThreadsAlive: bool = True
+        while anyThreadsAlive:
+            anyThreadsAlive = False 
+            for producer in self.producerThreads.values():
+                producer.join(self.THREAD_JOIN_TIMEOUT)
+                anyThreadsAlive = anyThreadsAlive or producer.isAlive()
+            for consumer in self.consumerThreads:
+                consumer.join(self.THREAD_JOIN_TIMEOUT)
+                anyThreadsAlive = anyThreadsAlive or consumer.isAlive()
+            self.outputThread.join(self.THREAD_JOIN_TIMEOUT)
+            anyThreadsAlive = anyThreadsAlive or self.outputThread.isAlive()
+        self.databaseWriter.disconnect()
+
