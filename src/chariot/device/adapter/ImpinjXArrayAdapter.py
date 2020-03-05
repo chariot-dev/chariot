@@ -4,9 +4,8 @@ from json import dumps
 from time import sleep
 from typing import Dict, Optional
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.device.configuration.ImpinjXArrayConfiguration import ImpinjXArrayConfiguration
-from chariot.utility.ChariotExceptions import *
+from chariot.device.adapter import DeviceAdapter
+from chariot.device.configuration import ImpinjXArrayConfiguration
 
 
 class ItemsenseSession:
@@ -110,7 +109,8 @@ class ImpinjXArrayAdapter(DeviceAdapter):
     def _beginDataCollection(self) -> None:
         while self.inCollectionEpisode:
             if not self.connected:
-                raise DeviceNotConnectedError()
+                # raise DeviceNotConnectedError()
+                raise AssertionError
 
             collectedAllPages: bool = False
             while not collectedAllPages:

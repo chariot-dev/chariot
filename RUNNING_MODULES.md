@@ -17,8 +17,8 @@ Suppose you want to run a submodule within the Chariot backend package - for exa
 Suppose that you want to import one Chariot submodule into another. For example, let's look at the imports in `chariot/src/chariot/device/adapter/ImpinjR420Adapter.py`:
 
 `from chariot.utility.JSONTypes import JSONObject`
-`from chariot.device.adapter.DeviceAdapter import DeviceAdapter`
-`from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration`
+`from chariot.device.adapter import DeviceAdapter`
+`from chariot.device.configuration import ImpinjR420Configuration`
 
 This submodule imports:
 

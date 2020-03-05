@@ -4,19 +4,16 @@ from typing import List, Dict
 from flask import jsonify, request, app
 from flask_cors import CORS
 
-from chariot.device.DeviceAdapterFactory import DeviceAdapterFactory
-from chariot.device.DeviceConfigurationFactory import DeviceConfigurationFactory
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.configuration.Configuration import Configuration
-from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
-from chariot.database.DatabaseConfigurationFactory import DatabaseConfigurationFactory
-from chariot.database.DatabaseWriterFactory import DatabaseWriterFactory
-from chariot.database.writer.DatabaseWriter import DatabaseWriter
-from chariot.utility.PayloadParser import PayloadParser
-from chariot.network.Network import Network
-from chariot.network.NetworkManager import NetworkManager
-from chariot.utility.exceptions.CustomExceptions import NameNotFoundError, DuplicateNameError, DeviceNotSupported
-from chariot.utility.exceptions.CustomExceptions import DatabaseConnectionError
+from chariot.device import DeviceAdapterFactory, DeviceConfigurationFactory
+from chariot.device.adapter import DeviceAdapter
+from chariot.configuration import Configuration
+from chariot.database.configuration import DatabaseConfiguration
+from chariot.database import DatabaseConfigurationFactory, DatabaseWriterFactory
+from chariot.database.writer import DatabaseWriter
+from chariot.utility import PayloadParser
+from chariot.network import Network, NetworkManager
+from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, DeviceNotSupported, DatabaseConnectionError
+
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
