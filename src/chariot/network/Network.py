@@ -46,6 +46,9 @@ class Network:
             raise NameNotFoundError(
                 ErrorStrings.ERR_Device_Not_Found_In_Collection.value.format(nameToFind, self.getNetworkName()))
 
+    def getDevices(self) -> Dict[str, DeviceAdapter]:
+        return self.devices
+
     def deleteDeviceByName(self, deviceName: str):
         if deviceName in self.devices:
             del self.devices[deviceName]

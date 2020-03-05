@@ -1,6 +1,6 @@
 from queue import Queue
-from typing import Union
-from typing import List
+from typing import List, Union
+from time import sleep, time
 from random import random, seed
 from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.TestConfiguration import TestConfiguration
@@ -34,9 +34,8 @@ class TestAdapter(DeviceAdapter):
             seed(seedVal)
         bufSize = self._config.buffSize
         while self.inCollectionEpisode:
-            buf: List[float] = list(range(bufSize))
-            for i in range(bufSize):
-                buf[i] = random()
-            self.dataQueue.put(buf, block=True)
+            sleep(0.5)
+            buf: List[float] = [random() for _ in range(bufSize)]
+            self.dataQueue.put({'relative_time': int(round(time() * 1000)), 'freeform': buf}, block=True)
 
 __all__ = ['TestAdapter']

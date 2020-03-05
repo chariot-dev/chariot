@@ -8,7 +8,7 @@ from chariot.utility.JSONTypes import JSONObject
 
 class DatabaseWriter(metaclass=abc.ABCMeta):
     validDataFields: Dict[str, Type[JSONObject]] = {
-        'relative_time': str,
+        'relative_time': int,
         'freeform': Type[JSONObject],
     }
 
