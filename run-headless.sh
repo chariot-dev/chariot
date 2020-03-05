@@ -3,4 +3,4 @@
 cd ./src
 python3 -m venv .
 source ./bin/activate
-pip3 install -r requirements.txt
+python3 -m chariot.api.webserver

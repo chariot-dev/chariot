@@ -3,4 +3,5 @@
 cd ./src
 python3 -m venv .
 source ./bin/activate
-pip3 install -r requirements.txt
+cd ../gui
+yarn start && yarn run electron
