@@ -1,15 +1,14 @@
 from threading import Thread
 # unused right now, but will be useful for scaling past a couple of devices
 from multiprocessing.queues import Queue as ProcessQueue
-from typing import List, Dict, Optional, Type, Union
+from typing import List, Dict, Optional, Type
 from sys import exc_info
 from time import time
 from queue import Empty as QueueEmptyException, Queue as ThreadQueue
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
+from chariot.device.adapter import DeviceAdapter
 from chariot.utility.JSONTypes import JSONObject
-from chariot.network.Network import Network
-from chariot.network.NetworkManager import NetworkManager
-from chariot.database.writer.DatabaseWriter import DatabaseWriter
+from chariot.network import Network
+from chariot.database.writer import DatabaseWriter
 from chariot.utility.ChariotExceptions import *
 
 
@@ -224,8 +223,10 @@ class DataCollectionManager:
             self.consumerThreads.append(WorkerThread(name=f'Consumer-0',
                                                      target=self._consumeDataFromDevices, args=(self.errorQueue, 0, 1,)))
 
-        self._inCollectionEpisode = True
+        for device in self.devices:
+            device.connect()
 
+        self._inCollectionEpisode = True
         for producer in self.producerThreads.values():
             producer.start()
         for consumer in self.consumerThreads:
@@ -247,11 +248,14 @@ class DataCollectionManager:
             anyThreadsAlive = False 
             for producer in self.producerThreads.values():
                 producer.join(self.THREAD_JOIN_TIMEOUT)
-                anyThreadsAlive = anyThreadsAlive or producer.isAlive()
+                anyThreadsAlive |= producer.isAlive()
             for consumer in self.consumerThreads:
                 consumer.join(self.THREAD_JOIN_TIMEOUT)
-                anyThreadsAlive = anyThreadsAlive or consumer.isAlive()
+                anyThreadsAlive |= consumer.isAlive()
             self.outputThread.join(self.THREAD_JOIN_TIMEOUT)
-            anyThreadsAlive = anyThreadsAlive or self.outputThread.isAlive()
+            anyThreadsAlive |= self.outputThread.isAlive()
         self.databaseWriter.disconnect()
+
+        for device in self.devices:
+            device.disconnect()
 
