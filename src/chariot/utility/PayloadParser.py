@@ -30,6 +30,12 @@ class PayloadParser:
     def getNewDeviceIdStr(self) -> str:
         return self.newDeviceIdStr
 
+    def getNewDbIdStr(self) -> str:
+        return self.newDbIdStr
+
+    def getDbIdStr(self) -> str:
+        return self.dbIdStr
+
     def getNameInPayload(self, requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
         networkName: str = requestContent.get(self.networkNameStr)

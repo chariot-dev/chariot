@@ -10,7 +10,7 @@ class DatabaseConnectionError(Exception):
         return self.message
 
 
-class DeviceNotSupported(Exception):
+class ItemNotSupported(Exception):
     status_code = 400
 
     def __init__(self, msg: str, errCode: int = None):

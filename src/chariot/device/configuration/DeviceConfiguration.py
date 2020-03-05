@@ -2,6 +2,7 @@ from chariot.configuration.Configuration import Configuration
 from chariot.utility.JSONTypes import JSONDict, JSONObject
 from typing import Dict, Type
 
+
 class DeviceConfiguration(Configuration):
     requiredFields: Dict[str, Type[JSONObject]] = {
         'deviceId': str,

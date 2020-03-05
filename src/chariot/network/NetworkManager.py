@@ -1,5 +1,4 @@
 from typing import Dict
-from chariot.utility.exceptions.CustomExceptions import NoIdentifierError, DuplicateNameError, NameNotFoundError
 from chariot.network.Network import Network
 from chariot.utility.Manager import Manager
 
@@ -19,7 +18,7 @@ class _NetworkManager(Manager):
     def getNetwork(self, networkName: str) -> Network:
         return self._retrieveFromCollection(networkName)
 
-    # This method gives a new network name to an already defined network
+    # This method gives a new network name to an already defined network and updates the collection
     def replaceNetwork(self, newName: str, toFind: str):
         self._modifyNameInCollection(newName, toFind)
 
@@ -31,7 +30,7 @@ class _NetworkManager(Manager):
 
         return allNetworks
 
-    def getDeviceNames(self):
+    def getNetworksAndDevices(self):
         allNetworks = []
 
         for key in self.collection:
@@ -43,9 +42,6 @@ class _NetworkManager(Manager):
             allNetworks.append(networkSpecifics)
 
         return allNetworks
-
-    # def importNetworkConfiguration
-    # def exportNetworkConfiguration
 
 
 # return a singleton instance

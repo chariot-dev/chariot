@@ -7,8 +7,9 @@ from chariot.device.adapter.DeviceAdapter import DeviceAdapter
 from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
 from chariot.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
 from chariot.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
-from chariot.utility.exceptions.CustomExceptions import DeviceNotSupported
+from chariot.utility.exceptions.CustomExceptions import ItemNotSupported
 from chariot.utility.exceptions.ErrorStrings import ErrorStrings
+
 
 class _DeviceAdapterFactory(AbstractFactory):
     def __init__(self):
@@ -27,17 +28,24 @@ class _DeviceAdapterFactory(AbstractFactory):
             with open(f'{currentPath}/driver/GenericRequiredFields.json') as genericTemplate:
                 self._genericRequiredTemplate = load(genericTemplate)
         except IOError:
-            raise DeviceNotSupported(ErrorStrings.ERR_Generic_Device_Template.value)
+            raise ItemNotSupported(
+                ErrorStrings.ERR_Generic_Device_Template.value.format("/device/drive/GenericRequiredFields.json")
+            )
 
     def getInstance(self, config: DeviceConfiguration) -> DeviceAdapter:
         return super().getInstance(config)
 
     def getsupportedDevices(self) -> JSONDict:
-        return self._supportedDevices
+        # update each device configuration with generic required fields
+        fullDevices: Dict[str, DeviceConfiguration] = {}
+
+        for device in self.instanceMap.keys():
+            fullDevices.update(self.getSpecifiedDeviceTemplate(device))
+        return fullDevices
 
     def getDeviceInformation(self, deviceName: str) -> JSONDict:
         if deviceName not in self._supportedDevices:
-            raise DeviceNotSupported(ErrorStrings.ERR_Device_Not_Supported.value.format(deviceName))
+            raise ItemNotSupported(ErrorStrings.ERR_Item_Not_Supported.value.format(self.instanceName, deviceName))
         return self._supportedDevices[deviceName]
 
     # this method returns a specified device json file
@@ -50,7 +58,7 @@ class _DeviceAdapterFactory(AbstractFactory):
                 specificDevice = load(deviceTemplate)
                 return self.combineConfigWithGeneric(specificDevice, deviceName)
         except:
-            raise DeviceNotSupported(ErrorStrings.ERR_Device_Not_Supported.value.format(deviceName))
+            raise ItemNotSupported(ErrorStrings.ERR_Item_Not_Supported.value.format(self.instanceName, deviceName))
 
     # use this method to combine settings from a specific configuration instance with the generic required fields
     def combineConfigWithGeneric(self, config: JSONDict, deviceType: str):

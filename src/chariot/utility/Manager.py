@@ -18,7 +18,7 @@ class Manager(ABC):
             raise NoIdentifierError(ErrorStrings.ERR_Specify_Network_Identifier)
 
         # When adding a key, if the same key is in the dict, the values are overriden. Avoid this.
-        if id in self.collection:
+        if id not in self.collection:
             self.collection[id] = t
         else:
             raise DuplicateNameError(ErrorStrings.ERR_Not_Unique_Network_Name.value.format(id))
@@ -29,6 +29,9 @@ class Manager(ABC):
 
         if id in self.collection:
             del self.collection[id]
+        else:
+            raise NameNotFoundError(
+                ErrorStrings.ERR_Network_Not_Found_In_Collection.value.format(id))
 
     # Convenience method used to return a generic object via a given network name
     def _retrieveFromCollection(self, id: str) -> T:
@@ -49,10 +52,8 @@ class Manager(ABC):
 
         t: T = self._retrieveFromCollection(toFind)
 
-        t.getConfiguration.modifyConfig({t.getConfiguration().getIdField(): newName})
+        t.getConfiguration().updateConfig({t.getConfiguration().getIdField(): newName})
 
         # update collection, make new key and delete the old one
         self.collection[newName] = self.collection[toFind]
         del self.collection[toFind]
-
-

@@ -1,0 +1,26 @@
+{
+  "MongoDB": {
+    "settings": [
+      {
+        "title": "Username",
+        "alias": "username",
+        "description": "Username of the database",
+        "type": "String",
+        "inputType": "text",
+        "required": false,
+        "maxLength": 20,
+        "validationRegex": "TODO"
+      },
+      {
+        "title": "Password",
+        "alias": "password",
+        "description": "password used to connect to database",
+        "type": "String",
+        "inputType": "text",
+        "required": false,
+        "maxLength": 20,
+        "validationRegex": "TODO"
+      }
+    ]
+  }
+}
