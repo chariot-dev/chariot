@@ -4,10 +4,8 @@ from pymongo.collection import Collection
 from typing import Dict, List, Optional
 
 from chariot.utility.JSONTypes import JSONObject
-from chariot.database.writer.DatabaseWriter import DatabaseWriter
-from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
-from chariot.database.configuration.MongoDatabaseConfiguration import MongoDatabaseConfiguration
-
+from chariot.database.writer import DatabaseWriter
+from chariot.database.configuration import DatabaseConfiguration, MongoDatabaseConfiguration
 
 class MongoDatabaseWriter(DatabaseWriter):
     def __init__(self, config: MongoDatabaseConfiguration):

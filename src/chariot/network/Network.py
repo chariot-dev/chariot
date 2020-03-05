@@ -1,7 +1,6 @@
 from typing import Dict, List
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.utility.exceptions.CustomExceptions import NameNotFoundError, NoIdentifierError, DuplicateNameError
-from chariot.utility.exceptions.ErrorStrings import ErrorStrings
+from chariot.device.adapter import DeviceAdapter
+from chariot.utility.exceptions import ErrorStrings, NameNotFoundError, NoIdentifierError, DuplicateNameError
 
 
 class Network:

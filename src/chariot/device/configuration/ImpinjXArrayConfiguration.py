@@ -1,6 +1,6 @@
 from typing import Dict, List, Type
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
+from chariot.device.configuration import DeviceConfiguration
 
 
 class ImpinjXArrayConfiguration(DeviceConfiguration):
