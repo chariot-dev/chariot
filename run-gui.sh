@@ -3,5 +3,8 @@
 cd ./src
 python3 -m venv .
 source ./bin/activate
+python3 -m chariot.api.webserver &
 cd ../gui
-yarn start && yarn run electron
+yarn start & 
+sleep 5
+yarn run electron
