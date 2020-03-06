@@ -10,7 +10,8 @@ from chariot.database import DatabaseConfigurationFactory, DatabaseWriterFactory
 from chariot.database.writer import DatabaseWriter
 from chariot.utility import PayloadParser
 from chariot.network import Network, NetworkManager
-from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, ItemNotSupported, DatabaseConnectionError, NoIdentifierError
+from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, ItemNotSupported, DatabaseConnectionError, \
+    NoIdentifierError
 from chariot.network.configuration import NetworkConfiguration
 from chariot.database import DatabaseManager
 from chariot.utility.TypeStrings import TypeStrings
@@ -176,7 +177,8 @@ def modifyDevice():
 
     # if applicable, modify collection so the new device name is in collection and old one is deleted
     if hasNewName:
-        NetworkManager.getNetwork(networkName).replaceDevice(requestContent[TypeStrings.Device_Identifier.value], deviceName)
+        NetworkManager.getNetwork(networkName).replaceDevice(requestContent[TypeStrings.Device_Identifier.value],
+                                                             deviceName)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -325,11 +327,13 @@ def handleDatabaseNotConnected(error):
     res.status_code = error.status_code
     return res
 
+
 @app.errorhandler(NoIdentifierError)
 def handleInvalidUsage(error):
     res = jsonify(toDict(error.message))
     res.status_code = error.status_code
     return res
+
 
 # -- useful utility methods --
 def toDict(e):
