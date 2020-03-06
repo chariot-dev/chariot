@@ -2,8 +2,8 @@ from abc import ABCMeta, abstractmethod
 from sys import exc_info
 from typing import Type
 from queue import Queue
-from chariot.utility.JSONTypes import JSONObject
-from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
+from chariot.device.configuration import DeviceConfiguration
+
 
 class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):
@@ -30,12 +30,6 @@ class DeviceAdapter(metaclass=ABCMeta):
     def getDeviceType(self) -> str:
         return self._config.deviceType
 
-    def getId(self) -> str:
-        return self._config.deviceId
-
-    def setId(self, newId) -> str:
-        self._config.deviceId = newId
-
     # https://stackoverflow.com/questions/2829329/catch-a-threads-exception-in-the-caller-thread-in-python
     # "hack" to generate the entire stack trace since beginDataCollection is called in a different thread
     # might add the thread's name explicitly so the DataCollectionManager knows which device produced the error
@@ -48,10 +42,8 @@ class DeviceAdapter(metaclass=ABCMeta):
     def stopDataCollection(self) -> None:
         self.inCollectionEpisode = False
 
-    def getDeviceConfiguration(self) -> Type[DeviceConfiguration]:
+    def getConfiguration(self) -> Type[DeviceConfiguration]:
         return self._config
 
-    def setDeviceConfiguration(self, config: Type[DeviceConfiguration]) -> None:
-        self._config = config
 
 __all__ = ['DeviceAdapter']

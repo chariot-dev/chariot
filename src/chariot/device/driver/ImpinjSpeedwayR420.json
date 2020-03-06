@@ -18,7 +18,7 @@
                 "alias": "antennas",
                 "description": "",
                 "type": "Array",
-                "elementType": "Number",
+                "elementType": "number",
                 "inputType": "numberArray",
                 "required": false,
                 "maxLength": 14,
@@ -28,7 +28,7 @@
                 "title": "Report Every N Tags",
                 "alias": "report_every_n_tags",
                 "description": "",
-                "type": "Number",
+                "type": "number",
                 "inputType": "number",
                 "required": false,
                 "validationRegex": "\\d+"
@@ -37,7 +37,7 @@
                 "title": "Antenna Transmission Power",
                 "alias": "tx_power",
                 "description": "The transmisson power for one or more antennas",
-                "type": "Number",
+                "type": "number",
                 "inputType": "number",
                 "required": false,
                 "maxValue": 91,
@@ -47,7 +47,7 @@
                 "title": "Session",
                 "alias": "session",
                 "description": "",
-                "type": "Number",
+                "type": "number",
                 "inputType": "number",
                 "required": false,
                 "validationRegex": "\\d+"
@@ -64,7 +64,7 @@
                 "title": "Mode Identifier",
                 "alias": "mode_identifier",
                 "description": "",
-                "type": "Number",
+                "type": "number",
                 "inputType": "number",
                 "required": false,
                 "validationRegex": "\\d+"
@@ -73,7 +73,7 @@
                 "title": "Tag Population",
                 "alias": "tag_population",
                 "description": "",
-                "type": "Number",
+                "type": "number",
                 "inputType": "number",
                 "required": true,
                 "validationRegex": "\\d+"

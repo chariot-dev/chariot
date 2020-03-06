@@ -28,7 +28,7 @@ class ManageDeviceConfiguration extends React.Component {
 
   // Gets run upon initial component render to load the default values of the text fields  
   componentDidMount() {
-    xhr.open('GET', getDeviceConfigurationBaseUrl + '?NetworkName=' + this.state.originalNetworkName + '&DeviceName=' + this.state.originalDeviceName);
+    xhr.open('GET', getDeviceConfigurationBaseUrl + '?networkName=' + this.state.originalNetworkName + '&deviceId=' + this.state.originalDeviceName);
     xhr.setRequestHeader("Content-Type", "application/json");
 
     // Once a response is received
@@ -84,7 +84,7 @@ class ManageDeviceConfiguration extends React.Component {
   }
 
   toggleSuccessModal = () => {
-    xhr.open('DELETE', deleteDeviceBaseUrl + "?NetworkName=" + this.state.originalNetworkName + "&DeviceName=" + this.state.originalDeviceName);
+    xhr.open('DELETE', deleteDeviceBaseUrl + "?networkName=" + this.state.originalNetworkName + "&deviceId=" + this.state.originalDeviceName);
     xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.onreadystatechange = () => {

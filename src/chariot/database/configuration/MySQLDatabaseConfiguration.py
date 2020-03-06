@@ -1,7 +1,6 @@
-from typing import Dict, List, Type
-
+from typing import Dict, Type
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
+from chariot.database.configuration import DatabaseConfiguration
 
 
 class MySQLDatabaseConfiguration(DatabaseConfiguration):

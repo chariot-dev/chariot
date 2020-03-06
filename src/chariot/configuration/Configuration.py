@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Dict, Type
 from json import dumps
 from chariot.utility.JSONTypes import JSONDict, JSONObject
@@ -50,7 +50,7 @@ class Configuration(ABC):
                 if not isinstance(value, self.requiredFields[field]):
                     raise ValueError(field)
 
-    def modifyConfig(self, newConfig: JSONDict) -> None:
+    def updateConfig(self, newConfig: JSONDict) -> None:
         self._validateSubsetConfig(newConfig)
         for key, value in newConfig.items():
             setattr(self, key, value)
@@ -60,6 +60,14 @@ class Configuration(ABC):
 
     def toDict(self) -> JSONDict:
         return dict(self)
+
+    @abstractmethod
+    def getId(self) -> str:
+        pass
+
+    @abstractmethod
+    def getIdField(self) -> str:
+        pass
 
 
 __all__ = ['Configuration']
