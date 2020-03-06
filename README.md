@@ -16,6 +16,12 @@ So, despite progress in the IoT industry, it is still difficult to integrate dif
 
 ## Features
 
+Chariot offers:
+- A platform to use heterogeneous IoT devices regardless of device protocols,
+- Drop in, drop out device connection,
+- Connection to powerful database engines,
+- Modular addition of device adapters to expand Chariot's capabilities.
+
 ## Getting Started
 
 ### Prerequisites
