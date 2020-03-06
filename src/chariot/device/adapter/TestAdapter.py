@@ -2,10 +2,9 @@ from queue import Queue
 from typing import List, Union
 from time import sleep, time
 from random import random, seed
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.device.configuration.TestConfiguration import TestConfiguration
+from chariot.device.adapter import DeviceAdapter
+from chariot.device.configuration import TestConfiguration
 from chariot.utility.JSONTypes import JSONObject
-from chariot.utility.ChariotExceptions import *
 
 
 class TestAdapter(DeviceAdapter):
