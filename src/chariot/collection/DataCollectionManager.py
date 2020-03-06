@@ -9,7 +9,7 @@ from chariot.device.adapter import DeviceAdapter
 from chariot.utility.JSONTypes import JSONObject
 from chariot.network import Network
 from chariot.database.writer import DatabaseWriter
-from chariot.utility.ChariotExceptions import *
+from chariot.utility.exceptions.ChariotExceptions import *
 
 
 class WorkerThread(Thread):
@@ -146,7 +146,7 @@ class DataCollectionManager:
         while self._inCollectionEpisode:
             output: List[JSONObject] = []
             try:
-                data: JSONObject = self.dataQueue.get(
+                data: List[JSONObject] = self.dataQueue.get(
                     block=True, timeout=self.DEFAULT_TIMEOUT)
                 for dataPoint in data:
                     dataPoint['relative_time'] -= self._episodeStartTime
