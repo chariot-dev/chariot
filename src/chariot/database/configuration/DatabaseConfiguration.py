@@ -1,6 +1,5 @@
-from chariot.configuration.Configuration import Configuration
+from chariot.configuration import Configuration
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from json import dumps
 from typing import Dict, Type
 
 

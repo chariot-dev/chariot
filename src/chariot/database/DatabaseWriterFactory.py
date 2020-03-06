@@ -1,15 +1,12 @@
 from typing import Dict, Type
-from chariot.database.writer.DatabaseWriter import DatabaseWriter
-from chariot.database.writer.MongoDatabaseWriter import MongoDatabaseWriter
-from chariot.database.writer.MySQLDatabaseWriter import MySQLDatabaseWriter
-from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
-from chariot.utility.AbstractFactory import AbstractFactory
 from os import path
 from chariot.utility.JSONTypes import JSONDict
 from json import load
 from chariot.utility.exceptions.ErrorStrings import ErrorStrings
 from chariot.utility.exceptions.CustomExceptions import ItemNotSupported
-
+from chariot.database.writer import DatabaseWriter, MongoDatabaseWriter, MySQLDatabaseWriter
+from chariot.database.configuration import DatabaseConfiguration
+from chariot.utility import AbstractFactory
 
 
 class _DatabaseWriterFactory(AbstractFactory):

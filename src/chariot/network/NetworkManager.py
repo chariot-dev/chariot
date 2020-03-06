@@ -1,6 +1,6 @@
 from typing import Dict
-from chariot.network.Network import Network
-from chariot.utility.Manager import Manager
+from chariot.network import Network
+from chariot.utility import Manager
 
 
 class _NetworkManager(Manager):

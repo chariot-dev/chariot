@@ -1,8 +1,7 @@
 import abc
 from typing import Dict, List, Type
 from time import time
-
-from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
+from chariot.database.configuration import DatabaseConfiguration
 from chariot.utility.JSONTypes import JSONObject
 
 

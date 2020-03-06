@@ -1,10 +1,8 @@
 from typing import Dict, List, Type
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.utility.exceptions.CustomExceptions import NameNotFoundError, NoIdentifierError, DuplicateNameError
-from chariot.utility.exceptions.ErrorStrings import ErrorStrings
+from chariot.device.adapter import DeviceAdapter
 from chariot.network.configuration.NetworkConfiguration import NetworkConfiguration
 from chariot.utility.JSONTypes import JSONDict
-from chariot.utility.Manager import Manager
+from chariot.utility import Manager
 
 
 class Network(Manager):

@@ -1,14 +1,11 @@
 from typing import Dict, Type
 from json import load
 from os import path
-from chariot.utility.AbstractFactory import AbstractFactory
+from chariot.utility import AbstractFactory
 from chariot.utility.JSONTypes import JSONDict
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.device.configuration.DeviceConfiguration import DeviceConfiguration
-from chariot.device.adapter.ImpinjR420Adapter import ImpinjR420Adapter
-from chariot.device.adapter.ImpinjXArrayAdapter import ImpinjXArrayAdapter
-from chariot.utility.exceptions.CustomExceptions import ItemNotSupported
-from chariot.utility.exceptions.ErrorStrings import ErrorStrings
+from chariot.device.adapter import DeviceAdapter, ImpinjR420Adapter, ImpinjXArrayAdapter
+from chariot.device.configuration import DeviceConfiguration
+from chariot.utility.exceptions import ItemNotSupported, ErrorStrings
 
 
 class _DeviceAdapterFactory(AbstractFactory):
