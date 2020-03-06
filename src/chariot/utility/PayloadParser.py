@@ -1,5 +1,5 @@
 from chariot.utility.exceptions import ErrorStrings, NoIdentifierError
-from chariot.utility import TypeStrings
+from chariot.utility.TypeStrings import TypeStrings
 
 
 class PayloadParser:
@@ -26,14 +26,16 @@ class PayloadParser:
 
     def getNameInPayload(self, requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
-        networkName: str = requestContent.get(TypeStrings.Network_Identifier)
+        networkName: str = requestContent.get(TypeStrings.Network_Identifier.value)
         return networkName
 
     def getNameInURL(self, requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
-        networkName: str = requestContent.args[TypeStrings.Network_Identifier]
+        networkName: str = requestContent.args[TypeStrings.Network_Identifier.value]
         if networkName is None:
-            raise NoIdentifierError(ErrorStrings.ERR_Specify_Identifier.value.format(TypeStrings.Network_Identifier))
+            raise NoIdentifierError(
+                ErrorStrings.ERR_Specify_Identifier.value.format(TypeStrings.Network_Identifier.value)
+            )
         return networkName
 
     def getNetworkDescription(self, requestContent) -> str:
@@ -43,12 +45,12 @@ class PayloadParser:
 
     def getNewNetworkName(self, requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
-        newNetworkName: str = requestContent.get(TypeStrings.Network_Identifier)
+        newNetworkName: str = requestContent.get(TypeStrings.Network_Identifier.value)
         return newNetworkName
 
     def getDeviceNameInPayload(self, requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
-        deviceName: str = requestContent.get(TypeStrings.Device_Identifier)
+        deviceName: str = requestContent.get(TypeStrings.Device_Identifier.value)
         return deviceName
 
     def getNewDeviceNameInPayload(self, requestContent) -> str:
@@ -58,16 +60,16 @@ class PayloadParser:
 
     def getDeviceNameInURL(self, requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
-        deviceName: str = requestContent.args[TypeStrings.Device_Identifier]
+        deviceName: str = requestContent.args[TypeStrings.Device_Identifier.value]
         if not deviceName:
             raise NoIdentifierError(
-                ErrorStrings.ERR_Specify_Identifier.value.format(TypeStrings.Device_Identifier)
+                ErrorStrings.ERR_Specify_Identifier.value.format(TypeStrings.Device_Identifier.value)
             )
         return deviceName
 
     def getDbNameInPayload(self, requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
-        dbId: str = requestContent.get(TypeStrings.Database_Identifier)
+        dbId: str = requestContent.get(TypeStrings.Database_Identifier.value)
         return dbId
 
     def getNewDbNameInPayload(self, requestContent) -> str:
@@ -77,7 +79,9 @@ class PayloadParser:
 
     def getDbNameInURL(self, requestContent) -> str:
         # first ensure that a network name has been given to specify which network is to be modified
-        dbId: str = requestContent.args[TypeStrings.Database_Identifier]
+        dbId: str = requestContent.args[TypeStrings.Database_Identifier.value]
         if not dbId:
-            raise NoIdentifierError(ErrorStrings.ERR_Specify_Identifier.value.format(TypeStrings.Database_Identifier))
+            raise NoIdentifierError(
+                ErrorStrings.ERR_Specify_Identifier.value.format(TypeStrings.Database_Identifier.value)
+            )
         return dbId

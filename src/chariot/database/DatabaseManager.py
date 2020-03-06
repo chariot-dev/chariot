@@ -1,6 +1,6 @@
 from typing import Dict
 from chariot.database.writer.DatabaseWriter import DatabaseWriter
-from chariot.utility.Manager import Manager
+from chariot.utility import Manager
 
 
 class _DatabaseManager(Manager):

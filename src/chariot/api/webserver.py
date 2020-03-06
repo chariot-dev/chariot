@@ -10,10 +10,10 @@ from chariot.database import DatabaseConfigurationFactory, DatabaseWriterFactory
 from chariot.database.writer import DatabaseWriter
 from chariot.utility import PayloadParser
 from chariot.network import Network, NetworkManager
-from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, ItemNotSupported, DatabaseConnectionError
+from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, ItemNotSupported, DatabaseConnectionError, NoIdentifierError
 from chariot.network.configuration import NetworkConfiguration
 from chariot.database import DatabaseManager
-from chariot.utility import TypeStrings
+from chariot.utility.TypeStrings import TypeStrings
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -67,7 +67,7 @@ def modifyNetwork():
     if parser.getNewNetworkNameStr() in requestContent:
         hasNewName = True
         # for configuration validation, alter keys from 'newNetworkName' to 'networkName'
-        requestContent[TypeStrings.Network_Identifier] = requestContent[parser.getNewNetworkNameStr()]
+        requestContent[TypeStrings.Network_Identifier.value] = requestContent[parser.getNewNetworkNameStr()]
         del requestContent[parser.getNewNetworkNameStr()]
 
     # at this point, 'newNetworkName' is not a key, so validate configuration and update
@@ -75,9 +75,9 @@ def modifyNetwork():
 
     # if applicable, modify collection so the new network name is in collection and old one is deleted
     if hasNewName:
-        # notice that requestContent[TypeStrings.Network_Identifier] is used, this will return the new name since
+        # notice that requestContent[TypeStrings.Network_Identifier.value] is used, this will return the new name since
         # keys were updated. So 'networkName' would be the old name of the network
-        NetworkManager.replaceNetwork(requestContent[TypeStrings.Network_Identifier], networkName)
+        NetworkManager.replaceNetwork(requestContent[TypeStrings.Network_Identifier.value], networkName)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -140,7 +140,7 @@ def createDevice():
 
     # build dictionary from payload and remove non-device fields
     payloadConfig = requestContent
-    del payloadConfig[TypeStrings.Network_Identifier]
+    del payloadConfig[TypeStrings.Network_Identifier.value]
 
     # build configuration for device
     deviceConfig: Configuration = DeviceConfigurationFactory.getInstance(payloadConfig)
@@ -166,14 +166,17 @@ def modifyDevice():
     # check if a new device name is specified in the payload, if so capture old name so its deleted from collection
     if parser.getNewDeviceIdStr() in requestContent:
         hasNewName = True
-        requestContent[TypeStrings.Device_Identifier] = requestContent[parser.getNewDeviceIdStr()]
+        requestContent[TypeStrings.Device_Identifier.value] = requestContent[parser.getNewDeviceIdStr()]
         del requestContent[parser.getNewDeviceIdStr()]
+
+    # remove networkName key so that updating configuration does not raise an error
+    del requestContent[TypeStrings.Network_Identifier.value]
 
     NetworkManager.getNetwork(networkName).getDevice(deviceName).getConfiguration().updateConfig(requestContent)
 
     # if applicable, modify collection so the new device name is in collection and old one is deleted
     if hasNewName:
-        NetworkManager.getNetwork(networkName).replaceDevice(requestContent[TypeStrings.Device_Identifier], deviceName)
+        NetworkManager.getNetwork(networkName).replaceDevice(requestContent[TypeStrings.Device_Identifier.value], deviceName)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -239,7 +242,7 @@ def modifyDatabaseConfiguration():
     if parser.getNewDbIdStr() in requestContent:
         hasNewName = True
         # for configuration validation, alter keys from 'dbId' to 'newDbId'
-        requestContent[TypeStrings.Database_Identifier] = requestContent[parser.getNewDbIdStr()]
+        requestContent[TypeStrings.Database_Identifier.value] = requestContent[parser.getNewDbIdStr()]
         del requestContent[parser.getNewDbIdStr()]
 
     # at this point, 'newDbId' is not a key, so validate configuration and update
@@ -249,7 +252,7 @@ def modifyDatabaseConfiguration():
     if hasNewName:
         # notice that requestContent['dbId'] is used, this will return the new name since keys were
         # updated. So variable dbId would be the old name of the network
-        DatabaseManager.replaceDbWriter(requestContent[TypeStrings.Database_Identifier], dbId)
+        DatabaseManager.replaceDbWriter(requestContent[TypeStrings.Database_Identifier.value], dbId)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -322,6 +325,11 @@ def handleDatabaseNotConnected(error):
     res.status_code = error.status_code
     return res
 
+@app.errorhandler(NoIdentifierError)
+def handleInvalidUsage(error):
+    res = jsonify(toDict(error.message))
+    res.status_code = error.status_code
+    return res
 
 # -- useful utility methods --
 def toDict(e):
