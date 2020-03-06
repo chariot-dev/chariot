@@ -13,6 +13,7 @@ from chariot.network import Network, NetworkManager
 from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, ItemNotSupported, DatabaseConnectionError
 from chariot.network.configuration import NetworkConfiguration
 from chariot.database import DatabaseManager
+from chariot.utility import TypeStrings
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -66,7 +67,7 @@ def modifyNetwork():
     if parser.getNewNetworkNameStr() in requestContent:
         hasNewName = True
         # for configuration validation, alter keys from 'newNetworkName' to 'networkName'
-        requestContent[parser.getNetworkNameStr()] = requestContent[parser.getNewNetworkNameStr()]
+        requestContent[TypeStrings.Network_Identifier] = requestContent[parser.getNewNetworkNameStr()]
         del requestContent[parser.getNewNetworkNameStr()]
 
     # at this point, 'newNetworkName' is not a key, so validate configuration and update
@@ -74,9 +75,9 @@ def modifyNetwork():
 
     # if applicable, modify collection so the new network name is in collection and old one is deleted
     if hasNewName:
-        # notice that requestContent[parser.getNetworkNameStr()] is used, this will return the new name since keys were
-        # updated. So 'networkName' would be the old name of the network
-        NetworkManager.replaceNetwork(requestContent[parser.getNetworkNameStr()], networkName)
+        # notice that requestContent[TypeStrings.Network_Identifier] is used, this will return the new name since
+        # keys were updated. So 'networkName' would be the old name of the network
+        NetworkManager.replaceNetwork(requestContent[TypeStrings.Network_Identifier], networkName)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -139,7 +140,7 @@ def createDevice():
 
     # build dictionary from payload and remove non-device fields
     payloadConfig = requestContent
-    del payloadConfig[parser.getNetworkNameStr()]
+    del payloadConfig[TypeStrings.Network_Identifier]
 
     # build configuration for device
     deviceConfig: Configuration = DeviceConfigurationFactory.getInstance(payloadConfig)
@@ -165,14 +166,14 @@ def modifyDevice():
     # check if a new device name is specified in the payload, if so capture old name so its deleted from collection
     if parser.getNewDeviceIdStr() in requestContent:
         hasNewName = True
-        requestContent[parser.getDeviceIdStr()] = requestContent[parser.getNewDeviceIdStr()]
+        requestContent[TypeStrings.Device_Identifier] = requestContent[parser.getNewDeviceIdStr()]
         del requestContent[parser.getNewDeviceIdStr()]
 
     NetworkManager.getNetwork(networkName).getDevice(deviceName).getConfiguration().updateConfig(requestContent)
 
     # if applicable, modify collection so the new device name is in collection and old one is deleted
     if hasNewName:
-        NetworkManager.getNetwork(networkName).replaceDevice(requestContent[parser.getDeviceIdStr()], deviceName)
+        NetworkManager.getNetwork(networkName).replaceDevice(requestContent[TypeStrings.Device_Identifier], deviceName)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -238,7 +239,7 @@ def modifyDatabaseConfiguration():
     if parser.getNewDbIdStr() in requestContent:
         hasNewName = True
         # for configuration validation, alter keys from 'dbId' to 'newDbId'
-        requestContent[parser.getDbIdStr()] = requestContent[parser.getNewDbIdStr()]
+        requestContent[TypeStrings.Database_Identifier] = requestContent[parser.getNewDbIdStr()]
         del requestContent[parser.getNewDbIdStr()]
 
     # at this point, 'newDbId' is not a key, so validate configuration and update
@@ -248,7 +249,7 @@ def modifyDatabaseConfiguration():
     if hasNewName:
         # notice that requestContent['dbId'] is used, this will return the new name since keys were
         # updated. So variable dbId would be the old name of the network
-        DatabaseManager.replaceDbWriter(requestContent[parser.getDbIdStr()], dbId)
+        DatabaseManager.replaceDbWriter(requestContent[TypeStrings.Database_Identifier], dbId)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 

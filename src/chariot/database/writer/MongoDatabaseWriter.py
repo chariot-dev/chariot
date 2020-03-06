@@ -6,6 +6,7 @@ from chariot.utility.JSONTypes import JSONObject
 from chariot.database.writer import DatabaseWriter
 from chariot.database.configuration import DatabaseConfiguration, MongoDatabaseConfiguration
 
+
 class MongoDatabaseWriter(DatabaseWriter):
     def __init__(self, config: MongoDatabaseConfiguration):
         super().__init__(config)
