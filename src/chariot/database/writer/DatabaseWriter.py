@@ -89,5 +89,3 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def getConfiguration(self):
         return self.config
 
-    def modifyConfiguration(self, config: Type[DatabaseConfiguration]):
-        self.config.modifyConfig(config)

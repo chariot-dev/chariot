@@ -17,9 +17,6 @@ class Network(Manager):
     def getDescription(self) -> str:
         return self._config.description
 
-    def updateConfig(self, config: JSONDict):
-        self._config.modifyConfig(config)
-
     def getConfiguration(self) -> NetworkConfiguration:
         return self._config
 

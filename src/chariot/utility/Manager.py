@@ -1,6 +1,5 @@
 from abc import ABC
-from typing import Any, Dict
-from typing import TypeVar
+from typing import Any, Dict, TypeVar
 from chariot.utility.exceptions import NoIdentifierError, DuplicateNameError, NameNotFoundError, ErrorStrings
 
 T = TypeVar('T')  # Declare type variable
