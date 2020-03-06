@@ -10,7 +10,7 @@ class DatabaseConnectionError(Exception):
         return self.message
 
 
-class DeviceNotSupported(Exception):
+class ItemNotSupported(Exception):
     status_code = 400
 
     def __init__(self, msg: str, errCode: int = None):
@@ -58,4 +58,4 @@ class NoIdentifierError(Exception):
         return self.message
 
 
-__all__ = ['DatabaseConnectionError', 'DeviceNotSupported', 'DuplicateNameError', 'NameNotFoundError', 'NoIdentifierError']
+__all__ = ['DatabaseConnectionError', 'ItemNotSupported', 'DuplicateNameError', 'NameNotFoundError', 'NoIdentifierError']
