@@ -97,25 +97,26 @@ class DataCollectionManager:
             try:
                 # Errors received are a tuple of the Thread name/id and the stacktrace
                 threadName, error = self.errorQueue.get(block=True, timeout=self.ERROR_CHECK_TIMEOUT)
-                print(f'{threadName}: {error})')
+                print(f'{threadName}: {error}')         #for testing
+                if threadName == 'Output-Handler':
+                    continue
                 deviceID = threadName.strip('Producer-')
 
                 errorDevice: DeviceAdapter = self.activeNetwork.getDeviceByDeviceName(deviceID)
                 if isinstance(error, DeviceNotConnectedError):
                     if deviceID in disconnectedDevices:
                         if disconnectedDevices[deviceID] >= MAX_ATTEMPTS:
-                            print(f'deviceID: could not reconnect. Terminating device\'s data collection')
+                            print(f'{deviceID} could not reconnect. Terminating device\'s data collection')     #for testing
 #   Currently will cause issues with self.stopDataCollection if the device is stopped now, need to safely remove from local dicts, and lists
 #                            errorDevice.stopDataCollection()
 #                            del self.producerThreads[deviceID]
 
 
                         else:
-                            print(f'deviceID: Attempting to reconnect')
                             disconnectedDevices[deviceID] += 1
                             errorDevice.connect(True)
                             producer = WorkerThread(
-                                name=f'Producer-{deviceID}', target=errorDevice.beginDataCollection, args=(self.errorQueue,))
+                                name=threadName, target=errorDevice.beginDataCollection, args=(self.errorQueue,))
                             self.producerThreads[deviceID] = producer
                             producer.start()
 
@@ -123,52 +124,33 @@ class DataCollectionManager:
                         disconnectedDevices[deviceID] = 0
                         errorDevice.connect(True)
                         producer = WorkerThread(
-                            name=f'Producer-{deviceID}', target=errorDevice.beginDataCollection, args=(self.errorQueue,))
+                            name=threadName, target=errorDevice.beginDataCollection, args=(self.errorQueue,))
                         self.producerThreads[deviceID] = producer
                         producer.start()
+                elif isinstance(error, FailedToBeginCollectionError):
+                    if deviceID in failedCollections:
+                        if failedCollections[deviceID] >= MAX_ATTEMPTS:
+                            print(f'{deviceID} failed to start collection after {MAX_ATTEMPTS} attemts.')
+                        else:
+                            print(f'{deviceID} attempting to restart data collection. Attempt: {failedCollections[deviceID]}')
+                            failedCollections[deviceID] += 1
+                            producer = WorkerThread(
+                                name=threadName, target=errorDevice.beginDataCollection, args=(self.errorQueue,))
+                            self.producerThreads[deviceID] = producer
+                            producer.start()
+                    else:
+                        failedCollections[deviceID] = 0
+                        print(f'{deviceID} attempting to restart data collection.')
+                        producer = WorkerThread(
+                            name=threadName, target=errorDevice.beginDataCollection, args=(self.errorQueue,))
+                        self.producerThreads[deviceID] = producer
+                        producer.start()
+                else:
+                    print(f'{deviceID} has encountered an unknown error')
+                    errorDevice.inCollectionEpisode = False
 
             except QueueEmptyException:
                 continue
-
-                # For making changes to the correct device in the producerThreads
- #               exc_type, exc_val, exc_trace = error
-
-#                if isinstance(exc_val, DeviceNotConnectedError):
-#                    if deviceID in disconnectedDevices:
-#                        if disconnectedDevices[deviceID] > MAX_ATTEMPTS:
-#                            disconnectedDevices[deviceID] += 1
-#                            disconnectedDevices.move_to_end(deviceID)
-#                        elif disconnectedDevices[deviceID] == MAX_ATTEMPTS:
-                            #LOG: f'{deviceID} has failed to reconnect. Stopping collection from device.'
-#                            errorDevice.stopDataCollection()
-#                            disconnectedDevices[deviceID] += 1
-#                        else:
-                            #LOG: f'Attemtpting to reconnect to {deviceID}'
-#                            disconnectedDevices[deviceID] += 1
-#                            errorDevice.connect()
-#                    else:
-                        #LOG: f'Attempting to reconnect to {deviceID}'
-#                        disconnectedDevices[deviceID] = 0
-#                        errorDevice.connect()
-#                elif isinstance(exc_val, FailedToBeginCollectionError):
-#                    if deviceID in failedCollections:
-#                        if failedCollections[deviceID] > MAX_ATTEMPTS:
-#                            disconnectedDevices[deviceID] += 1
-#                            disconnectedDevices.move_to_end(deviceID)
-#                        elif failedCollections[deviceID] == MAX_ATTEMPTS:
-                            #LOG: f'{deviceID} has failed to start collecting data after {MAX_ATTEMPTS} attempts.'
- #                           disconnectedDevices[deviceID] += 1
- #                       else:
-                            # LOG: f'Attempting to begin {deviceID}'s collection'
- #                           disconnectedDevices[deviceID] += 1
- #                           errorDevice.beginDataCollection()
- #                   else:
- #                       disconnectedDevices[deviceID] = 0
- #                       errorDevice.beginDataCollection()
- #               else:
-                    # LOG: f'{deviceID} has encountered a fatal error.
- #                   errorDevice.stopDataCollection()
- #                   errorDevice.disconnect()
 
     def _outputData(self) -> None:
         while self._inCollectionEpisode:

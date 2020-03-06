@@ -4,6 +4,7 @@ from typing import Type
 from queue import Queue
 from chariot.utility.JSONTypes import JSONObject
 from chariot.device.configuration import DeviceConfiguration
+from chariot.utility.exceptions.ChariotExceptions import *
 
 class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):
@@ -11,13 +12,22 @@ class DeviceAdapter(metaclass=ABCMeta):
         self.connected: bool = False
         self.dataQueue: Queue = Queue()
         self.inCollectionEpisode = False
+        self.tmp = 0            #temporary counter delete from push
 
     # this method should only be run as the target of a ProducerThread
     def beginDataCollection(self) -> None:
+        if not self.connected:
+            raise DeviceNotConnectedError()
         if self.inCollectionEpisode:
-            raise AssertionError
+            raise InCollectionEpisodeError()
         self.inCollectionEpisode = True
-        self._beginDataCollection()
+
+        if self.tmp == 1:
+            self._beginDataCollection()
+        else:
+            self.tmp = 1
+            self.inCollectionEpisode = False
+            raise FailedToBeginCollectionError()
 
     @abstractmethod
     def _beginDataCollection(self) -> None:
@@ -25,8 +35,13 @@ class DeviceAdapter(metaclass=ABCMeta):
 
     # any procedures necessary to start capturing data from the device
     def connect(self, reconnect=False) -> None:
+       # if reconnect:
+       #     self.tmp = 1
         if reconnect or not self.connected:
             self._connect()
+           # if self.tmp == 0:
+           #     self.connected = False
+           # else:
             self.connected = True
 
     @abstractmethod
@@ -36,7 +51,7 @@ class DeviceAdapter(metaclass=ABCMeta):
     # gracefully close the connection to the device
     def disconnect(self) -> None:
         if not self.connected:
-            raise AssertionError
+            raise DeviceNotConnectedError()
         self._disconnect()
         self.connected = False
 
