@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-cd ./gui
+cd ../gui
 yarn install
