@@ -10,7 +10,7 @@ These instructions are split into those for the official [front-end](#setting-up
 
 ### Setting up the core
 The entirety of the core is written in Python. Thus the following are required in order to have a working dev environment:
-* NIX\* environment (Linux, WSL, macOS terminal)
+* \*nix environment (Linux, WSL, macOS terminal)
 * [Python](https://github.com/python/cpython) (3.5 and above)
 * [pip](https://github.com/pypa/pip)
 

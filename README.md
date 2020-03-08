@@ -29,13 +29,13 @@ Chariot offers:
 The Chariot core exposes a REST-ful API to manage devices, networks, and database connections. The following are required to set up and run the Chariot core:
 
 - A *nix environment,
-- Python 3.5+,
-- pip,
+- [Python 3.5+](https://github.com/python/cpython)
+- [pip](https://github.com/pypa/pip)
 - The [venv](https://docs.python.org/3/library/venv.html) Python module.
 
 The Chariot GUI interfaces with the core API. The following are required to set up and run the Chariot GUI:
 
-- Node.js (v12.x +),
+- [Node.js](https://github.com/nodejs/node) (v12.x +),
 - [Yarn](https://yarnpkg.com/).
 
 ### Installation
