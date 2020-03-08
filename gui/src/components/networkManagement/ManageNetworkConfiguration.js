@@ -100,11 +100,23 @@ class ManageNetworkConfiguration extends React.Component {
       }
     }
 
-    var data = {
-      "networkName": this.state.originalNetworkName,
-      "newNetworkName": this.state.newNetworkProperties["Network Name"],
-      "description": this.state.newNetworkProperties["Network Description"]
+    var data = {};
+
+    if (this.state.originalNetworkName == this.state.newNetworkProperties["Network Name"]) {
+      data = {
+        "networkName": this.state.originalNetworkName,
+        "description": this.state.newNetworkProperties["Network Description"]
+      }
     }
+    else {
+      data = {
+        "networkName": this.state.originalNetworkName,
+        "newNetworkName": this.state.newNetworkProperties["Network Name"],
+        "description": this.state.newNetworkProperties["Network Description"]
+      }     
+    }
+
+    console.log(data);
     
     xhr.send(JSON.stringify(data));
   }
