@@ -6,7 +6,8 @@ import Modal from 'react-bootstrap/Modal';
 //import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 
-var getDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
+const getDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
+const modifyDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
 const deleteDeviceBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
 const xhr = new XMLHttpRequest();
 
@@ -39,6 +40,7 @@ class ManageDeviceConfiguration extends React.Component {
           var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
 
           var properties = {};
+          properties["Device Name"] = this.state.originalNetworkName;
           properties["IP Address"] = responseJsonArray["ipAddress"];
           properties["Report Every n Tags"] = responseJsonArray["report_every_n_tags"];
           properties["Session"] = responseJsonArray["session"];
@@ -63,6 +65,7 @@ class ManageDeviceConfiguration extends React.Component {
     xhr.send();
   }
 
+
   createDeviceConfigurationFields = () => {
     var configurationFields = [];
 
@@ -78,12 +81,27 @@ class ManageDeviceConfiguration extends React.Component {
     return configurationFields;
   }
 
+
   toggleDeletionModal = () => {
     console.log('hi')
     this.setState({deleteIsOpen: !this.state.deleteIsOpen});
   }
+  
+  toggleModifyConfirmationModal = () => {
+    xhr.open('PUT', modifyDeviceConfigurationBaseUrl + "?networkName=" + this.state.originalNetworkName + "&deviceId=" + this.state.originalDeviceName);
+    xhr.setRequestHeader("Content-Type", "application/json");
 
-  toggleSuccessModal = () => {
+
+
+
+
+
+    
+
+    console.log("Modify");
+  }
+
+  toggleDeletionSuccessModal = () => {
     xhr.open('DELETE', deleteDeviceBaseUrl + "?networkName=" + this.state.originalNetworkName + "&deviceId=" + this.state.originalDeviceName);
     xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -115,7 +133,7 @@ class ManageDeviceConfiguration extends React.Component {
         <h1>{this.state.originalDeviceName} - Device Configuration</h1>
         <p className="screenInfo">Modifying configuration settings of {this.state.originalDeviceName} for {this.state.originalNetworkName}.</p>
 
-        <form id="modifyDeviceForm" onSubmit={this.toggleConfirmationModal}>
+        <form id="modifyDeviceForm">
           {Object.keys(this.state.newDeviceProperties).length === 0 ? null : this.createDeviceConfigurationFields()}
         </form>
 
@@ -125,7 +143,7 @@ class ManageDeviceConfiguration extends React.Component {
 
         <Button variant="danger" className="footer-button button-mid-bottom" onClick={this.toggleDeletionModal}>Delete Device</Button>
 
-        <Button variant="success" className="float-right footer-button">Save</Button>
+        <Button variant="success" className="float-right footer-button" onClick={this.toggleModifyConfirmationModal}>Save</Button>
       </div>,
 
       <Modal show={this.state.deleteIsOpen} key="deviceDeletionConfirmModal">
@@ -134,7 +152,7 @@ class ManageDeviceConfiguration extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
-          <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
+          <Button variant="primary" className="float-right" onClick={this.toggleDeletionSuccessModal}>Yes</Button>
         </Modal.Footer>
       </Modal>,
 
