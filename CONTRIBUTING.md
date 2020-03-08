@@ -6,29 +6,11 @@ This document serves as the reference for developers who would like to get the d
 
 ## Setting up the dev environment
 
-These instructions are split into those for the official [front-end](#setting-up-the-front-end) and the [core](#setting-up-the-core), since the core works independent of the front-end and exposes a REST-ful API which enables any developer to write their own front-end.
+The development environment can be setup using the `install.sh` script found in the `/install` directory. Further information on setting up the environment can be found in the [README.md](README.md) file.
 
-### Setting up the front end
+## Package structure
 
-WIP
-
-### Setting up the core
-
-The entirety of the core is written in Python. Thus the following are required in order to have a working dev environment:
-
-- NIX\* environment (Linux, WSL, macOS terminal)
-- Python (3.5 and above)
-- Pip
-
-Keep in mind that we enforce the use of python3 type hints as much as possible, to avoid obscurity.
-
-Optionally, though strongly recommended, is to install Python's virtual environment (venv) module which will help with package management and dependency isolation. The rest of this tutorial assumes you have chosen to use a venv.
-
-Follow these steps to finish setting up:
-1. Create a new virtual environment using the command `python3 -m venv .` in the `src` folder.
-2. Activate the newly created venv using any equivalent shell command to bash's `source ./bin/activate`.
-3. Install all dependencies using `pip install -r requirements.txt`.
-4. (WIP but intended workflow) run linters, typechecks and tests with the command `tox`. It will run using the configuration in the `tox.ini` file. If every test passes, you are ready to start contributing.
+Chariot's backend is implemented as a Python package. The top-level module is located at `chariot/src/chariot`.
 
 ### Running core modules
 
@@ -37,6 +19,27 @@ The system core is structured as a Python package. You may run individual module
 `python3 -m chariot.network.Network`
 
 (note, no `.py` extension)
+
+### Importing modules
+
+To import one Chariot submodule into another please follow the style used in existing modules.
+For example lests look at the imports in `chariot/src/chariot/device/adapter/ImpinjR420Adapter.py`:
+```
+from chariot.utility.JSONTypes import JSONObject
+from chariot.device.adapter import DeviceAdapter
+from chariot.device.configuration import ImpinjR420Configuration
+```
+This submodule imports:
+* The `JSONObject` constant from the submodule `chariot/src/chariot/JSONTypes.py`
+* The `DeviceAdapter` class from the submodule `chariot/src/chariot/device/adapter/DeviceAdapter.py`
+* The `ImpinjR420Configuration` class from the submodule `chariot/src/chariot/device/configuration/ImpinjR420Configuration.py`
+
+To allow new modules to use this importing style the full module must be imported to the local `__init__.py`. 
+
+## Development Practices
+
+Chariot is developed with the idea of interchangeable modules that conform to the expected APIs defined by a parent module. Any new modules must be located with other similar modules and not interfere with the function of existing modules.
+If a change must be made across multiple modules this change should be properly documented so others are aware of how to use it.
 
 ### Pushing changes
 
