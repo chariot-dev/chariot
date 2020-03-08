@@ -112,25 +112,21 @@ Thanks to running as a web server, all endpoints can be accessed with curl comma
 For documentation of all API endpoints please see the [API_ENDPOINTS.md](API_ENDPOINTS.md) file.
 
 #### GUI
-All of Chariot's features can be utilitized through the GUI. 
-The features that are functioning are:
+All of Chariot's features can be utilitized through the GUI. This is an alternative to using the CLI.
+The features that are currently functioning are:
 * Creating a network
 * Creating a device
 * Deleting a network
-* Deleting a device
-* Modifying a network's properties (still alittle buggy)
+* Deleting a device from a network
+* Modifying a network's properties (a little buggy)
 
 The features that are not fully functioning are:
 * Authentication (creating an account and logging in with said account)
-* 
-* 
-* Modifying a device
-* 
-* 
-* 
-* 
-
-
+* Connecting to database to configure data collection
+* Data collection from device
+* Modifying a device (a little buggy)
+* Monitoring device status as data collection episode is in progress
+* Performing data analysis
 
 ## Contributing
 
