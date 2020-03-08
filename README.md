@@ -122,6 +122,7 @@ The features that are currently functioning are:
 
 The features that are not fully functioning are:
 * Authentication (creating an account and logging in with said account)
+* Adding another device to existing network (a little buggy)
 * Connecting to database to configure data collection
 * Data collection from device
 * Modifying a device (a little buggy)
