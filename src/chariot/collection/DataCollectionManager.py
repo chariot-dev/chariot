@@ -1,5 +1,3 @@
-import signal
-
 from chariot.network import NetworkManager, Network
 
 

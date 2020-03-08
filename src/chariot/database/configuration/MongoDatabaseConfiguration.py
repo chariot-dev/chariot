@@ -1,6 +1,6 @@
-from chariot.database.configuration.DatabaseConfiguration import DatabaseConfiguration
+from chariot.database.configuration import DatabaseConfiguration
 from chariot.utility.JSONTypes import JSONDict, JSONObject
-from typing import Dict, List, Type
+from typing import Dict, Type
 
 
 class MongoDatabaseConfiguration(DatabaseConfiguration):

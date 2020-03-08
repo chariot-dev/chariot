@@ -29,9 +29,6 @@ class AddDeviceHome extends Component {
     super(props);
     this.state = {
       newDeviceTypeGeneralVals: {
-        'Device Nickname': null,
-        'Device Description': null,
-        'Device Type': null,
         newDeviceTypeConfig: null
       },
       showDeviceSpecificSettings: false, // Whether or not the type of device has been chosen by the user already
@@ -73,7 +70,7 @@ class AddDeviceHome extends Component {
       this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }, function () {
         console.log(this.state.newDeviceTypeGeneralVals);
 
-        xhr.open('GET', getDeviceConfigBaseUrl + "?DeviceName=" + this.state.newDeviceTypeGeneralVals['Device Type']);
+        xhr.open('GET', getDeviceConfigBaseUrl + "?deviceId=" + this.state.newDeviceTypeGeneralVals['Device Type']);
         xhr.setRequestHeader('Content-Type', 'application/json');
         
         // Once a response is received
@@ -135,22 +132,42 @@ class AddDeviceHome extends Component {
     }    
     
     var data = {};
+    data["networkName"] = this.props.location.networkProps["Network Name"];
+    data["deviceType"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Type'];
 
     console.log(this.props.location.networkProps);
     console.log(this.state.deviceState.newDeviceTypeConfigVals);
-
-
-    // ============================================ FIX POLL DELAY ==============================================
-    data["NetworkName"] = this.props.location.networkProps['Network Name'];
-    data["deviceId"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Nickname'];
-    data["deviceType"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Type'];
-    data["pollDelay"] = "xxxxxxxx";
 
     for (var key in this.state.deviceState.newDeviceTypeConfigVals) {
       console.log(key);
       console.log(this.state.deviceState.newDeviceTypeConfigVals[key]);
 
-      data[this.state.deviceState.newDeviceTypeConfigVals[key].alias] = this.state.deviceState.newDeviceTypeConfigVals[key].value;
+      var fieldVal = this.state.deviceState.newDeviceTypeConfigVals[key].value;
+
+      //only add to data if the value is not empty
+      if (fieldVal !== "") {
+          //TODO: find a better way to do this
+          var curFieldId = this.state.deviceState.newDeviceTypeConfigVals[key].alias;
+          var fieldType = this.state.deviceState.newDeviceTypeConfigVals[key].inputType;
+          if (fieldType === "number") {
+              fieldVal = parseInt(fieldVal)
+          }
+          else if (fieldType === "checkbox") {
+              fieldVal = document.getElementById(curFieldId).checked;
+          }
+          else if (fieldType === "numberArray") {
+              var inputValues = fieldVal.split(" ");
+              //again need to verify that all values will be ints
+              var arr = [];
+
+              inputValues.forEach(function (item) {
+                  arr.push(parseInt(item))
+              });
+
+              fieldVal = arr;
+          }
+          data[curFieldId] = fieldVal;
+      }
     }
 
     xhr.send(JSON.stringify(data));
@@ -184,8 +201,6 @@ class AddDeviceHome extends Component {
   parseConfirmationData = () => {
     var confirmationDataJson = {};
 
-    confirmationDataJson['Device Nickname'] = this.state.newDeviceTypeGeneralVals['Device Nickname'];
-    confirmationDataJson['Device Description'] = this.state.newDeviceTypeGeneralVals['Device Description'];
     confirmationDataJson['Device Type'] = this.state.newDeviceTypeGeneralVals['Device Type'];
 
     for (var key in this.state.deviceState.newDeviceTypeConfigVals) {
@@ -212,16 +227,10 @@ class AddDeviceHome extends Component {
 
         <form id="createDeviceForm">
           <div className="form-group">
-            <input required className="form-control" id="Device Nickname" name="Device Nickname" placeholder="Device Nickname" onChange={this.handleChange}/>
-          </div>
-          <div className="form-group">
-            <textarea required className="form-control" id="Device Description" rows="3" name="Device Description" placeholder="Device Description" onChange={this.handleChange}></textarea>
-          </div>
-          <div className="form-group">
               <select required className="form-control" id="Device Type Select" name="Device Type" onChange={this.handleDeviceTypeChange}>
                 <option selected disabled hidden value="">Select a Device Type</option>
                 <option>ImpinjSpeedwayR420</option>
-                <option>ImpinjxArray</option>
+                <option>ImpinjXArray</option>
               </select>
           </div>
 

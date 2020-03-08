@@ -4,8 +4,8 @@ from sllurp.llrp import LLRPClientFactory
 from twisted.internet import reactor
 from typing import Union
 from chariot.utility.JSONTypes import JSONObject
-from chariot.device.adapter.DeviceAdapter import DeviceAdapter
-from chariot.device.configuration.ImpinjR420Configuration import ImpinjR420Configuration
+from chariot.device.adapter import DeviceAdapter
+from chariot.device.configuration import ImpinjR420Configuration
 
 class ImpinjR420Adapter(DeviceAdapter):
     def __init__(self, config: ImpinjR420Configuration):

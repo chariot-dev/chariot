@@ -1,0 +1,44 @@
+{
+  "settings": [
+    {
+      "title": "Configuration Id",
+      "alias": "dbId",
+      "description": "The unique name for the database configuration",
+      "type": "String",
+      "inputType": "text",
+      "required": true,
+      "maxLength": 20,
+      "validationRegex": "TODO"
+    },
+    {
+      "title": "Database Name",
+      "alias": "databaseName",
+      "description": "The database name to connect to",
+      "type": "String",
+      "inputType": "text",
+      "required": "True",
+      "maxLength": 25,
+      "validationRegex": "TODO"
+    },
+    {
+      "title": "Database Type",
+      "alias": "type",
+      "description": "The database type to connect to",
+      "type": "String",
+      "inputType": "text",
+      "required": "True",
+      "maxLength": 25,
+      "validationRegex": "TODO"
+    },
+    {
+      "title": "Host",
+      "alias": "host",
+      "description": "The host to connect to",
+      "type": "String",
+      "inputType": "text",
+      "required": "True",
+      "maxLength": 25,
+      "validationRegex": "TODO"
+    }
+  ]
+}
