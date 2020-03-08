@@ -48,7 +48,11 @@ Navigate to the directory.
 
 `$ cd path/to/chariot`
 
-To install the Chariot core, run the `install-core.sh` script.
+To install both Chariot's core and GUI, run the 'install.sh' script.
+
+`$ bash install.sh`
+
+To install just Chariot core, run the `install-core.sh` script.
 
 `$ bash install-core.sh`
 
@@ -58,13 +62,51 @@ To install the Chariot GUI, run the `install-gui.sh` script.
 
 ## Usage
 
-To start the Chariot core, run the `run-core.sh` script.
+# Starting Chariot
+
+To start Chariot's webserver and utilize its backend, run the `run-core.sh` script.
 
 `$ bash run-core.sh`
 
 To start the Chariot GUI, run the `run-gui.sh` script.
+This will attempt to connect to the local server, and must be performed after it is started.
 
 `$ bash run-gui.sh`
+
+# CLI
+Chariot's server can be interacted with within a terminal environment using utilities like curl.
+Below is an example usage to create a new network, add a device, and review that network and it's device configurations.
+
+```
+(Creating a new network)
+$ curl -i -X POST localhost:5000/chariot/api/v1.0/network -H "content-Type: application/json" -d '{"networkName":"test", "description":"this is my test network"}'
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 22
+Access-Control-Allow-Origin: *
+Server: Werkzeug/0.16.0 Python/3.8.1
+Date: *Current Date and Time*
+
+{
+    "success": true
+}
+
+(Adding a device to a network)
+(Notice that the associated network must be specified by the `networkName` field.)
+$ curl -i -X POST localhost:5000/chariot/api/v1.0/network/device -H "content-Type: application/json" -d '{"networkName":"test", "deviceID":"MyDevice", "deviceType":"Device", "ipAddress":"IP Address", "pollDelay":3, *Device Specific Configurations*}'
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 22
+Access-Control-Allow-Origin: *
+Server: Werkzeug/0.16.0 Python/3.8.1
+Date: *Current Date and Time*
+
+{
+    "success": true
+}
+```
+Thanks to running as a web server, all endpoints can be accessed with curl commands like those demonstrated above. 
+For documentation of all API endpoints please see the [API_ENDPOINTS.md](API_ENDPOINTS.md) file.
 
 TODO add instructions to make REST calls via curl, instructions to use GUI.
 
