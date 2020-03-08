@@ -6,7 +6,46 @@ This document serves as the reference for developers who would like to get the d
 
 ## Setting up the dev environment
 
-The development environment can be setup using the `install.sh` script found in the `chariot/install` directory. Further information on setting up the environment can be found in the [README.md](README.md) file.
+These instructions are split into those for the official [front-end](#setting-up-the-front-end) and the [core](#setting-up-the-core), since the core works independent of the front-end and exposes a REST-ful API which enables any developer to write their own front-end.
+
+### Setting up the core
+The entirety of the core is written in Python. Thus the following are required in order to have a working dev environment:
+* NIX\* environment (Linux, WSL, macOS terminal)
+* [Python](https://github.com/python/cpython) (3.5 and above)
+* [pip](https://github.com/pypa/pip)
+
+Keep in mind that we enforce the use of python3 type hints as much as possible, to avoid obscurity.
+
+Follow these steps to finish setting up:
+```
+(Within chariot/src)
+(Create and activate a new virtual environment)
+$ python3 -m venv .
+$ source ./bin/activate
+
+(Install dependencies)
+$ pip install -r requirements.txt
+
+(Run linters, typechecks and tests)
+$ tox
+```
+If all tests have passed, you are ready to start contributing.
+
+### Setting up the GUI
+As the Core and GUI of Chariot are separated a developer could create their own GUI environment, but to contribute to the official Chariot GUI they will need the following to have a working dev environment:
+
+* [Node.js](https://github.com/nodejs/node) (v12.x +)
+* [Yarn](https://github.com/yarnpkg/yarn)
+* [Electron](https://github.com/electron/electron)
+
+The core environment is required as all logic and tasks are finally completed within the core.
+
+Follow these steps to finish setting up the GUI environment:
+```
+(Within chariot/gui)
+$ yarn install
+```
+Afterwards you should now be able to start the GUI alongside the core and begin GUI development.
 
 ## Package structure
 
@@ -15,7 +54,6 @@ Chariot's backend is implemented as a Python package. The top-level module is lo
 ### Running core modules
 
 The system core is structured as a Python package. You may run individual modules using the format
-
 `python3 -m chariot.network.Network`
 
 (note, no `.py` extension)
