@@ -48,7 +48,7 @@ Navigate to the directory.
 
 `$ cd path/to/chariot`
 
-To install both Chariot's core and GUI, run the 'install.sh' script.
+To install both Chariot's core and GUI, run the `install.sh` script.
 
 `$ bash install.sh`
 
@@ -60,9 +60,9 @@ To install the Chariot GUI, run the `install-gui.sh` script.
 
 `$ bash install-gui.sh`
 
-## Usage
+### Usage
 
-# Starting Chariot
+#### Starting Chariot
 
 To start Chariot's webserver and utilize its backend, run the `run-core.sh` script.
 
@@ -73,7 +73,7 @@ This will attempt to connect to the local server, and must be performed after it
 
 `$ bash run-gui.sh`
 
-# CLI
+#### CLI
 Chariot's server can be interacted with within a terminal environment using utilities like curl.
 Below is an example usage to create a new network, add a device, and review that network and it's device configurations.
 
@@ -108,7 +108,8 @@ Date: *Current Date and Time*
 Thanks to running as a web server, all endpoints can be accessed with curl commands like those demonstrated above. 
 For documentation of all API endpoints please see the [API_ENDPOINTS.md](API_ENDPOINTS.md) file.
 
-TODO add instructions to make REST calls via curl, instructions to use GUI.
+#### GUI
+TODO GUI instructions
 
 ## Contributing
 

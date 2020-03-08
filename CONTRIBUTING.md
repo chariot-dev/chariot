@@ -6,7 +6,7 @@ This document serves as the reference for developers who would like to get the d
 
 ## Setting up the dev environment
 
-The development environment can be setup using the `install.sh` script found in the `/install` directory. Further information on setting up the environment can be found in the [README.md](README.md) file.
+The development environment can be setup using the `install.sh` script found in the `chariot/install` directory. Further information on setting up the environment can be found in the [README.md](README.md) file.
 
 ## Package structure
 
