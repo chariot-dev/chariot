@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-import ConfirmationModalBody from '../shared/ConfirmationModalBody';
+//import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 
 var getDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
