@@ -60,11 +60,14 @@ class NetworkDeviceCellScreenTemplate extends Component {
       }
       
       if (this.state.withLinks) {
+        var curDeviceKey;
+        var curDeviceName;
+
         // Create links for network's corresponding devices
         if (this.state.dataJson[i]["Devices"].length > 0) {
           for (var k = 0; k < this.state.dataJson[i]["Devices"].length; k++) {
-            var curDeviceKey = curNetworkName + "Device" + k;
-            var curDeviceName = this.state.dataJson[i]["Devices"][k];       
+            curDeviceKey = curNetworkName + "Device" + k;
+            curDeviceName = this.state.dataJson[i]["Devices"][k];       
             deviceTags.push(
               <div key={curDeviceKey} className="networksDeviceLink">
                 <b>Device {k + 1}: </b>
@@ -105,12 +108,12 @@ class NetworkDeviceCellScreenTemplate extends Component {
       }
       else { // without links
         if (this.state.dataJson[i]["Devices"].length > 0) {
-          for (var k = 0; k < this.state.dataJson[i]["Devices"].length; k++) {
-            var curDeviceKey = curNetworkName + "Device" + k;
-            var curDeviceName = this.state.dataJson[i]["Devices"][k];       
+          for (var j = 0; j < this.state.dataJson[i]["Devices"].length; j++) {
+            curDeviceKey = curNetworkName + "Device" + j;
+            curDeviceName = this.state.dataJson[i]["Devices"][j];       
             deviceTags.push(
               <div key={curDeviceKey} className="networksDeviceLink">
-                <b>Device {k + 1}: </b>{curDeviceName}<br></br>
+                <b>Device {j + 1}: </b>{curDeviceName}<br></br>
               </div>
             );
           }
