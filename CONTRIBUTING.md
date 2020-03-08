@@ -32,10 +32,10 @@ $ tox
 If all tests have passed, you are ready to start contributing.
 
 ### Setting up the GUI
-As the Core and GUI of Chariot are separated a developer could create their own GUI environment, but to contribute to the official Chariot GUI they will need the following to have a working dev environment:
+As the Core and GUI of Chariot are separated, a developer could create their own GUI environment but to also contribute to the official Chariot GUI. After pulling in the repository, they will need the following to have a working dev environment:
 
-* [Node.js](https://github.com/nodejs/node) (v12.x +)
-* [Yarn](https://github.com/yarnpkg/yarn)
+* [Node.js](https://nodejs.org/en/download/) (v12.x +)
+* [Yarn](https://yarnpkg.com/en/docs/install)
 * [Electron](https://github.com/electron/electron)
 
 The core environment is required as all logic and tasks are finally completed within the core.
@@ -44,8 +44,10 @@ Follow these steps to finish setting up the GUI environment:
 ```
 (Within chariot/gui)
 $ yarn install
+$ yarn start
+$ yarn run electron
 ```
-Afterwards you should now be able to start the GUI alongside the core and begin GUI development.
+`yarn start` will run the dev server for the react app, and `yarn run electron` will start the electron shell. The shell should launch automatically and to access the dev server, navigate to `http://localhost:3000/`. Afterwards you should now be able to start the GUI alongside the core and begin GUI development. Source code for the gui aspects of Chariot are located within `chariot/gui/`.
 
 ## Package structure
 
