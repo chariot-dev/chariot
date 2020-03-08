@@ -118,14 +118,14 @@ The features that are currently functioning are:
 * Creating a device
 * Deleting a network
 * Deleting a device from a network
-* Modifying a network's properties (a little buggy)
+* Modifying a network's properties
 
 The features that are not fully functioning are:
 * Authentication (creating an account and logging in with said account)
 * Adding another device to existing network (a little buggy)
 * Connecting to database to configure data collection
-* Data collection from device
-* Modifying a device (a little buggy)
+* Data collection from an actual device
+* Modifying an existing device (a little buggy)
 * Monitoring device status as data collection episode is in progress
 * Performing data analysis
 
