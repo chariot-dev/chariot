@@ -135,7 +135,7 @@ Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for instructions on how t
 
 ## License
 
-This project is licensed under the GNU Lesser General Public License v3.0. See the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the GNU Lesser General Public License v3.0. See the [LICENSE](LICENSE) file for details.
 
 ## Contributors
 * [Enioluwa Segun](https://github.com/enioluwa23)
