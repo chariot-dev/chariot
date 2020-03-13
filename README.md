@@ -6,13 +6,13 @@ IoT infrastructure has exploded in the past decade, so there are devices on the 
 So, despite progress in the IoT industry, it is still difficult to integrate different types of devices into a unified system. Chariot solves this problem. Chariot is a platform for IoT device management, data storage, and analysis. Users can add, remove, and configure a variety of devices on a single network. With Chariot, a gardener could purchase a pH and humidity IoT devices off the shelf and gather data from his soil and the air from one convenient interface.
 
 ## Table of Contents
-- [Features](##Features)
-- [Getting Started](##Getting-Started)
-- [Usage](##Usage)
-- [Contributing](##Contributing)
-- [License](##License)
-- [Contributors](##Contributors)
-- [Acknowledgments](##Acknowledgments)
+- [Features](#Features)
+- [Getting Started](#Getting-Started)
+- [Usage](#Usage)
+- [Contributing](#Contributing)
+- [License](#License)
+- [Contributors](#Contributors)
+- [Acknowledgments](#Acknowledgments)
 
 ## Features
 
