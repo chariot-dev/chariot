@@ -94,7 +94,6 @@ class AddDeviceVars extends Component {
 
 
   handleChange(event) {
-    // Remove spaces from variable name and replace with %20 to create state attribute variable
     var updatedNewDeviceTypeConfigVals = this.state.newDeviceTypeConfigVals; // Store from current state
     updatedNewDeviceTypeConfigVals[event.target.name].value = event.target.value; // Update the json
     this.setState({ newDeviceTypeConfigVals: updatedNewDeviceTypeConfigVals }); // Update the state

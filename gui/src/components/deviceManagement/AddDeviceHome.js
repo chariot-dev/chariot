@@ -20,6 +20,7 @@ import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
+const getSupportedDeviceTypesBaseUrl = 'http://localhost:5000/chariot/api/v1.0'
 const getDeviceConfigBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
 const postDeviceCreationBaseUrl = "http://localhost:5000/chariot/api/v1.0/network/device";
 const xhr = new XMLHttpRequest();
@@ -31,6 +32,7 @@ class AddDeviceHome extends Component {
       newDeviceTypeGeneralVals: {
         newDeviceTypeConfig: null
       },
+      supportedDeviceTypes: [],
       showDeviceSpecificSettings: false, // Whether or not the type of device has been chosen by the user already
       isSubmitted: false, // Whether or not the device information is ready to be sent to the server
       confirmIsOpen: false, // Is the confirm modal open?
@@ -42,6 +44,34 @@ class AddDeviceHome extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleDeviceTypeChange = this.handleDeviceTypeChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  // Gets supported database types when page initially loads in order to dynamically fill in select-menu
+  componentDidMount() {
+    fetch(getSupportedDeviceTypesBaseUrl + "/network/device/supportedDevices")
+    .then(res => res.json())
+    .then(
+      (result) => {
+        var tempSupportedDeviceTypes = [];
+        for (var key in result) {
+          tempSupportedDeviceTypes.push(key);
+        }
+        this.setState({supportedDeviceTypes: tempSupportedDeviceTypes});
+      },
+      (error) => {
+        console.log(error);
+      }
+    )
+  }
+
+  getSupportedDeviceTypeOptions = () => {
+    var deviceOptionsElement = [];
+
+    for (var k = 0; k < this.state.supportedDeviceTypes.length; k++) {
+      deviceOptionsElement.push(<option>{this.state.supportedDeviceTypes[k]}</option>);
+    }
+
+    return deviceOptionsElement;
   }
 
   /*
@@ -62,7 +92,7 @@ class AddDeviceHome extends Component {
     console.log("------------------- changed -------------------");
     var lastDeviceType = this.state.newDeviceTypeGeneralVals['Device Type'];
     
-    if (lastDeviceType !== event.target.value) {
+    if (lastDeviceType !== event.target.value) { // If device type was changed
       var updatedNewDeviceTypeGeneralVals = this.state.newDeviceTypeGeneralVals; // Store from current state
       updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json with the new device type
 
@@ -77,14 +107,7 @@ class AddDeviceHome extends Component {
         xhr.onreadystatechange = () => {
           if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
               var responseJson = JSON.parse(xhr.response);
-
-              console.log(responseJson);
-
-              console.log(updatedNewDeviceTypeGeneralVals);
-
               updatedNewDeviceTypeGeneralVals['newDeviceTypeConfig'] = responseJson;
-
-              console.log(updatedNewDeviceTypeGeneralVals);
 
               // Store the device's config file to the state
               this.setState({newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals});
@@ -94,22 +117,19 @@ class AddDeviceHome extends Component {
 
         xhr.send(); // Send the request to the url with set headers
 
-        this.setState({ showDeviceSpecificSettings: false}); // Reset to false after render to get ready for next render
+        this.setState({ showDeviceSpecificSettings: false}); // Reset to false after render to get ready for next render (if user changes device type)
       });
     }
   }
 
   handleNewDeviceCreation = (submittedDeviceSpecificState) => {
-    console.log(submittedDeviceSpecificState);
     this.setState ({ deviceState: submittedDeviceSpecificState }, () => {
-      console.log(this.state.deviceState);
+      // Update state to launch confirmation modal
+      this.setState({
+        isSubmitted: !this.state.isSubmitted,
+        confirmIsOpen: !this.state.confirmIsOpen
+      }); 
     });
-
-    // Update state to launch confirmation modal
-    this.setState({
-      isSubmitted: !this.state.isSubmitted,
-      confirmIsOpen: !this.state.confirmIsOpen
-    }); 
   }
 
 
@@ -226,13 +246,19 @@ class AddDeviceHome extends Component {
         <p className="screenInfo">Please fill in the configuration fields for your new device.</p>
 
         <form id="createDeviceForm">
+
+
+
+          {/* Change to get device types using api call */}
           <div className="form-group">
               <select required className="form-control" id="Device Type Select" name="Device Type" onChange={this.handleDeviceTypeChange}>
                 <option selected disabled hidden value="">Select a Device Type</option>
-                <option>ImpinjSpeedwayR420</option>
-                <option>ImpinjXArray</option>
+                {this.getSupportedDeviceTypeOptions()}
               </select>
           </div>
+
+
+
 
             {/* onFormSubmit() callback. Pass in as prop basically. */}
             {this.state.showDeviceSpecificSettings ? <AddDeviceVars params={this.state} onFormSubmit={this.handleNewDeviceCreation}></AddDeviceVars> : null}

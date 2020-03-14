@@ -48,8 +48,6 @@ class ChooseNetwork extends Component {
   }
 
   render() {
-    console.log(this.state.existingNetworks);
-    
     return (
       <div className="container">
         <h1>Choose a Network</h1>
