@@ -95,9 +95,11 @@ class AddNetwork extends Component {
           
           <form id="createNetworkForm" onSubmit={this.toggleConfirmationModal}>
             <div className="form-group">
+              <div className="requiredStar">*</div>
               Network Name: <input required className="form-control" id="networkNameInput" name="Network Name" onChange={this.handleChange}/>
             </div>
             <div className="form-group">
+              <div className="requiredStar">*</div>
               Network Description: <textarea required className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
             </div>
             <Link to="/networkManager">

@@ -109,34 +109,22 @@ class AddDeviceVars extends Component {
 
 
   createDeviceFields = () => {
-    //var deviceConfig = this.state.newDeviceTypeGeneralVals.newDeviceTypeConfig[this.state.newDeviceTypeGeneralVals['Device Type']];
     var deviceSpecificForm = [];
     var deviceSettings = this.state.newDeviceTypeConfigVals;
-
-    console.log(deviceSettings);
 
     for (var key in deviceSettings) {
       var curFieldAlias = deviceSettings[key].alias;
       var curFieldIsRequired = deviceSettings[key].required;
       var valueType = deviceSettings[key].inputType;
 
-      if (valueType == "checkbox") {
-        deviceSpecificForm.push(
-          <div className="form-group" key={curFieldAlias}>
-            <input type={valueType}  required={curFieldIsRequired} className="deviceCreationFormCheckbox" id={curFieldAlias} name={key} onChange={this.handleChange}/>
-            <label> {key}</label>
-          </div>
-        );
-      }
-      else {
-        deviceSpecificForm.push(
-          <div className="form-group" key={curFieldAlias}>
-            <label>{key}:</label>
-            <input type={valueType}  required={curFieldIsRequired} className="form-control" id={curFieldAlias} name={key} onChange={this.handleChange}/>
-          </div>
-        );
-      }
-
+      deviceSpecificForm.push(
+        <div className="form-group" key={curFieldAlias}>
+          {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
+          {valueType === "checkbox" ? null : key}
+          <input type={valueType}  required={curFieldIsRequired} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={key} onChange={this.handleChange}/>
+          {valueType === "checkbox" ? key : null}
+        </div>
+      );
     }
 
     return (deviceSpecificForm);
@@ -146,7 +134,6 @@ class AddDeviceVars extends Component {
   render() {
     return (
       <div>
-        <br></br>
         <p className="screenInfo">Now please fill in the configuration fields for the {this.state.newDeviceTypeGeneralVals['Device Type']} device.</p>
 
         {this.createDeviceFields()}

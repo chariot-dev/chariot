@@ -131,7 +131,7 @@ class ManageDeviceConfiguration extends React.Component {
 
     // ======= When creating fields, no reference to field type, so some fields are would be sent as strings when they need to be ints. Also antenna beeds array. Need to fix ========
 
-    if (this.state.originalDeviceName == this.state.newDeviceProperties["Device Name"]) {
+    if (this.state.originalDeviceName === this.state.newDeviceProperties["Device Name"]) {
       data = {
         "networkName": this.state.originalNetworkName,
         "deviceId": this.state.newDeviceProperties['Device Name'],
