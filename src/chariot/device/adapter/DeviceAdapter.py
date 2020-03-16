@@ -2,9 +2,9 @@ from abc import ABCMeta, abstractmethod
 from sys import exc_info
 from typing import Type
 from queue import Queue
-from chariot.utility.JSONTypes import JSONObject
 from chariot.device.configuration import DeviceConfiguration
 from chariot.utility.exceptions.ChariotExceptions import *
+
 
 class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):
@@ -84,7 +84,5 @@ class DeviceAdapter(metaclass=ABCMeta):
     def getDeviceConfiguration(self) -> Type[DeviceConfiguration]:
         return self._config
 
-    def setDeviceConfiguration(self, config: Type[DeviceConfiguration]) -> None:
-        self._config = config
 
 __all__ = ['DeviceAdapter']

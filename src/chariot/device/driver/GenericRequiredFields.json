@@ -23,7 +23,7 @@
     },
     {
       "title": "Poll Delay",
-      "alias": "poll_delay",
+      "alias": "pollDelay",
       "description": "How often data should be polled from a device",
       "type": "Number",
       "inputType": "number",

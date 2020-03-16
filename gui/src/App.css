@@ -96,6 +96,15 @@
   padding-bottom: 20px;
 }
 
+.deviceCreationFormCheckbox {
+  width: 25px; 
+  height: 25px;
+  vertical-align: bottom;
+  margin-right: 7px;
+  margin-bottom: 6px;
+  *overflow: hidden;
+}
+
 .successConfirmationImg {
   float: left;
   height: 50px;

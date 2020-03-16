@@ -21,42 +21,56 @@ class AddDeviceVars extends Component {
     console.log(deviceSettings.length);
 
     for (var i = 0; i < deviceSettings.length; i++) {
+      var fieldJsonObj = {};
+      var curFieldTitle;
+      var curFieldAlias;
+      var curFieldDescription;
+      var curFieldIsRequired;
+
       if (deviceSettings[i].settingsList) {
-        console.log(deviceSettings[i].settingsList);
         for (var k = 0; k < deviceSettings[i].settingsList.length; k++) {
-          var curFieldTitle = deviceSettings[i].settingsList[k].title; 
-          var curFieldAlias = deviceSettings[i].settingsList[k].alias; 
-          var curFieldDescription = deviceSettings[i].settingsList[k].description; 
-          var curFieldIsRequired = deviceSettings[i].settingsList[k].required;
-          
-          var fieldJsonObj = {};
+          curFieldTitle = deviceSettings[i].settingsList[k].title;
+          curFieldAlias = deviceSettings[i].settingsList[k].alias;
+          curFieldDescription = deviceSettings[i].settingsList[k].description;
+          curFieldIsRequired = deviceSettings[i].settingsList[k].required;
+          var curFieldType = deviceSettings[i].settingsList[k].inputType;
+
+          fieldJsonObj["value"] = "";
+          fieldJsonObj["alias"] = curFieldAlias;
+          fieldJsonObj['description'] = curFieldDescription;
+          fieldJsonObj["required"] = curFieldIsRequired;
+          fieldJsonObj["inputType"] = curFieldType;
+
+          initializedNewDeviceTypeConfigVals[curFieldTitle] = (fieldJsonObj);
+
+          console.log(curFieldTitle);
+        }
+      }
+      else {
+        curFieldTitle = deviceSettings[i].title;
+        curFieldAlias = deviceSettings[i].alias;
+
+        // for now, hide deviceType field since it was chosen by the dropdown
+        if (curFieldAlias !== "deviceType") {
+          curFieldDescription = deviceSettings[i].description;
+          curFieldIsRequired = deviceSettings[i].required;
+
           fieldJsonObj["value"] = "";
           fieldJsonObj["alias"] = curFieldAlias;
           fieldJsonObj['description'] = curFieldDescription;
           fieldJsonObj["required"] = curFieldIsRequired;
 
+          // speedwayR420 needs this check
+          if ("inputType" in deviceSettings[i]) {
+            fieldJsonObj["inputType"] = deviceSettings[i].inputType
+          }
+
           initializedNewDeviceTypeConfigVals[curFieldTitle] = (fieldJsonObj);
-          
+
           console.log(curFieldTitle);
         }
       }
-      else {
-        var curFieldTitle = deviceSettings[i].title; 
-        var curFieldAlias = deviceSettings[i].alias; 
-        var curFieldDescription = deviceSettings[i].description; 
-        var curFieldIsRequired = deviceSettings[i].required;
-  
-        var fieldJsonObj = {};
-        fieldJsonObj["value"] = "";
-        fieldJsonObj["alias"] = curFieldAlias;
-        fieldJsonObj['description'] = curFieldDescription;
-        fieldJsonObj["required"] = curFieldIsRequired;
 
-        initializedNewDeviceTypeConfigVals[curFieldTitle] = (fieldJsonObj);
-
-        console.log(curFieldTitle);
-      }
-      
       console.log(initializedNewDeviceTypeConfigVals);
     }
 
@@ -95,7 +109,7 @@ class AddDeviceVars extends Component {
 
 
   createDeviceFields = () => {
-    var deviceConfig = this.state.newDeviceTypeGeneralVals.newDeviceTypeConfig[this.state.newDeviceTypeGeneralVals['Device Type']];
+    //var deviceConfig = this.state.newDeviceTypeGeneralVals.newDeviceTypeConfig[this.state.newDeviceTypeGeneralVals['Device Type']];
     var deviceSpecificForm = [];
     var deviceSettings = this.state.newDeviceTypeConfigVals;
 
@@ -104,13 +118,24 @@ class AddDeviceVars extends Component {
     for (var key in deviceSettings) {
       var curFieldAlias = deviceSettings[key].alias;
       var curFieldIsRequired = deviceSettings[key].required;
+      var valueType = deviceSettings[key].inputType;
 
-      deviceSpecificForm.push(
-        <div className="form-group" key={curFieldAlias}>
-          <label>{key}:</label>
-          <input required={curFieldIsRequired} className="form-control" id={curFieldAlias} name={key} placeholder={key} onChange={this.handleChange}/>
-        </div>
-      );
+      if (valueType == "checkbox") {
+        deviceSpecificForm.push(
+          <div className="form-group" key={curFieldAlias}>
+            <input type={valueType}  required={curFieldIsRequired} className="deviceCreationFormCheckbox" id={curFieldAlias} name={key} onChange={this.handleChange}/>
+            <label> {key}</label>
+          </div>
+        );
+      }
+      else {
+        deviceSpecificForm.push(
+          <div className="form-group" key={curFieldAlias}>
+            <label>{key}:</label>
+            <input type={valueType}  required={curFieldIsRequired} className="form-control" id={curFieldAlias} name={key} onChange={this.handleChange}/>
+          </div>
+        );
+      }
 
     }
 
@@ -122,7 +147,7 @@ class AddDeviceVars extends Component {
     return (
       <div>
         <br></br>
-        <p className="screenInfo">Now please fill in the configuration fields for the {this.state.newDeviceTypeGeneralVals['Device Type']} device.</p> 
+        <p className="screenInfo">Now please fill in the configuration fields for the {this.state.newDeviceTypeGeneralVals['Device Type']} device.</p>
 
         {this.createDeviceFields()}
 

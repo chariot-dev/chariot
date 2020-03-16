@@ -1,7 +1,6 @@
 import abc
 from typing import Dict, List, Type
 from time import time
-
 from chariot.database.configuration import DatabaseConfiguration
 from chariot.utility.JSONTypes import JSONObject
 
@@ -86,3 +85,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         for key in dataPoint:
             if key not in self.validDataFields:
                 raise AssertionError(f'an invalid field "{key}" was included in the data point')
+
+    def getConfiguration(self):
+        return self.config
+

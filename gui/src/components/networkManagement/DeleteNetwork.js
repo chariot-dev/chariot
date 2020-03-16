@@ -14,6 +14,8 @@ import Modal from 'react-bootstrap/Modal';
 
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 
+import SuccessModalBody from '../shared/SuccessModalBody';
+
 const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
 const deleteNetworkBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
 const xhr = new XMLHttpRequest();
@@ -72,7 +74,7 @@ class DeleteNetwork extends Component {
 
 
   toggleSuccessModal = () => {
-    xhr.open('DELETE', deleteNetworkBaseUrl + "?NetworkName=" + this.state.selectedNetworkToDelete);
+    xhr.open('DELETE', deleteNetworkBaseUrl + "?networkName=" + this.state.selectedNetworkToDelete);
     xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.onreadystatechange = () => {
@@ -117,13 +119,16 @@ class DeleteNetwork extends Component {
           To confirm the deletion of the network, {this.state.selectedNetworkToDelete}, click 'Yes'.
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
+          <Button variant="primary" className="float-left" onClick={this.hideConfirmationModal}>No</Button>
           <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
         </Modal.Footer>
       </Modal>,
 
       <Modal show={this.state.successIsOpen} key="networkDeletionSuccessModal">
-        <Modal.Body>The network has been deleted!</Modal.Body>
+
+        <SuccessModalBody successMessage="The network has been deleted!">
+        </SuccessModalBody>
+
         <Modal.Footer>
           <Link to="/welcome">
             <Button variant="primary" className="float-right">Continue</Button>
