@@ -7,9 +7,12 @@ from chariot.utility import Manager
 
 class Network(Manager):
 
-    def __init__(self, config: Type[NetworkConfiguration]):
-        self._config: Type[NetworkConfiguration] = config
+    def __init__(self, config: NetworkConfiguration):
+        self._config: NetworkConfiguration = config
         self.collection: Dict[str, DeviceAdapter] = {}
+
+    def getDevices(self) -> Dict[str, DeviceAdapter]:
+        return self.collection
 
     def getNetworkName(self) -> str:
         return self._config.networkName
@@ -41,6 +44,7 @@ class Network(Manager):
 
         return devices
 
+    # this method is redundant; can do self._config.toDict()
     def toDict(self):
         network: Dict[str, str] = {'NetworkName': self._config.networkName, 'Description': self._config.description}
 

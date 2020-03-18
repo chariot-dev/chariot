@@ -36,6 +36,6 @@ class TestAdapter(DeviceAdapter):
         while self.inCollectionEpisode:
             sleep(0.5)
             buf: List[float] = [random() for _ in range(bufSize)]
-            self.dataQueue.put({'relative_time': int(round(time() * 1000)), 'freeform': buf}, block=True)
+            self.dataQueue.put({'production_time': int(round(time() * 1000)), 'freeform': buf}, block=True)
 
 __all__ = ['TestAdapter']

@@ -7,7 +7,7 @@ from chariot.utility.JSONTypes import JSONObject
 
 class DatabaseWriter(metaclass=abc.ABCMeta):
     validDataFields: Dict[str, Type[JSONObject]] = {
-        'relative_time': int,
+        'production_time': int,
         'freeform': Type[JSONObject],
     }
 
@@ -59,7 +59,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         self._insertOne(dataPoint)
 
     @abc.abstractmethod
-    def _insertOne(self):
+    def _insertOne(self, dataPoints: List[Dict[str, JSONObject]]):
         pass
 
     def insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
@@ -75,7 +75,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         self._insertMany(dataPoints)
 
     @abc.abstractmethod
-    def _insertMany(self):
+    def _insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         pass
 
     def validateDataPoint(self, dataPoint: Dict[str, JSONObject]):

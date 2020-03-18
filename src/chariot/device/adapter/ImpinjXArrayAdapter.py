@@ -120,7 +120,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
                     headers = self.session.tokenAuthHeaders
                     )
                 jsonData: JSONDict = response.json()
-                self.dataQueue.put(jsonData, block=True)
+                self.dataQueue.put(jsonData)
                 if 'nextPageMarker' in jsonData:
                     self.session.dataRequestBody['pageMarker'] = jsonData['nextPageMarker']
                 else:

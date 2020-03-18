@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from sys import exc_info
 from typing import Type
-from queue import Queue
+from queue import SimpleQueue as Queue
 from chariot.device.configuration import DeviceConfiguration
 from chariot.utility.exceptions.ChariotExceptions import *
 
@@ -35,13 +35,8 @@ class DeviceAdapter(metaclass=ABCMeta):
 
     # any procedures necessary to start capturing data from the device
     def connect(self, reconnect=False) -> None:
-       # if reconnect:
-       #     self.tmp = 1
         if reconnect or not self.connected:
             self._connect()
-           # if self.tmp == 0:
-           #     self.connected = False
-           # else:
             self.connected = True
 
     @abstractmethod

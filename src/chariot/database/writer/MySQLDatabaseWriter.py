@@ -32,19 +32,19 @@ class MySQLDatabaseWriter(DatabaseWriter):
 
     def _initializeTable(self):
         self.cursor.execute(
-            f'CREATE TABLE IF NOT EXISTS {self.config.tableName}(id INTEGER PRIMARY KEY AUTO_INCREMENT, insertion_time BIGINT, relative_time BIGINT, freeform VARBINARY(64535))'
+            f'CREATE TABLE IF NOT EXISTS {self.config.tableName}(id INTEGER PRIMARY KEY AUTO_INCREMENT, insertion_time BIGINT, production_time BIGINT, freeform VARBINARY(64535))'
         )
 
     def _insertOne(self, dataPoint: Dict[str, JSONObject]):
         self.cursor.execute(
-            f'INSERT INTO {self.config.tableName} (relative_time, insertion_time, freeform) VALUES (%s, %s, %s)',
-            (dataPoint['relative_time'], dataPoint['insertion_time'], dataPoint['freeform'])
+            f'INSERT INTO {self.config.tableName} (production_time, insertion_time, freeform) VALUES (%s, %s, %s)',
+            (dataPoint['production_time'], dataPoint['insertion_time'], dataPoint['freeform'])
         )
         self.connection.commit()
 
     def _insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
         self.cursor.executemany(
-            f'INSERT INTO {self.config.tableName} (relative_time, insertion_time, freeform) VALUES (%s, %s, %s)',
-            [(dataPoint['relative_time'], dataPoint['insertion_time'], dataPoint['freeform']) for dataPoint in dataPoints]
+            f'INSERT INTO {self.config.tableName} (production_time, insertion_time, freeform) VALUES (%s, %s, %s)',
+            [(dataPoint['production_time'], dataPoint['insertion_time'], dataPoint['freeform']) for dataPoint in dataPoints]
         )
         self.connection.commit()
