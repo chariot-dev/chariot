@@ -14,7 +14,7 @@ class ImpinjR420Adapter(DeviceAdapter):
     def _reportData(self, data: Dict[str, JSONObject]):
         self.dataQueue.put(data)
 
-    def _beginDataCollection(self) -> None:
+    def _startDataCollection(self) -> None:
         self.llrpFactory.addTagReportCallback(self._reportData)
         reactor.run()
 

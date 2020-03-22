@@ -106,7 +106,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
         response: requests.Response = requests.post(stopUrl, headers=self.session.tokenAuthHeaders)
         return
 
-    def _beginDataCollection(self) -> None:
+    def _startDataCollection(self) -> None:
         while self.inCollectionEpisode:
             if not self.connected:
                 # raise DeviceNotConnectedError()

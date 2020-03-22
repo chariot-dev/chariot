@@ -115,7 +115,7 @@ class DataCollectionWorker:
                 'Must have at least one device to collect from.')
         for device in self._devices:
             producer = HandledThread(
-                name=f'Producer: {device.getId()}', target=device.beginDataCollection, args=(self._errorQueue,))
+                name=f'Producer: {device.getId()}', target=device.startDataCollection, args=(self._errorQueue,))
             self._producerThreads[device.getId()] = producer
 
         totalDevices: int = len(self._devices)

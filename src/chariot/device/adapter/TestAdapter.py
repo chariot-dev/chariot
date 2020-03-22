@@ -12,7 +12,7 @@ class TestAdapter(DeviceAdapter):
     def __init__(self, config: TestConfiguration):
         super().__init__(config)
 
-    def _beginDataCollection(self) -> None:
+    def _startDataCollection(self) -> None:
         self._inCollectionEpisode = True
         self._randomizer()
 

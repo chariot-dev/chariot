@@ -15,7 +15,7 @@ class DeviceAdapter(metaclass=ABCMeta):
         self.tmp = 0            #temporary counter delete from push
 
     # this method should only be run as the target of a ProducerThread
-    def beginDataCollection(self) -> None:
+    def startDataCollection(self) -> None:
         if not self.connected:
             raise DeviceNotConnectedError()
         if self.inCollectionEpisode:
@@ -23,14 +23,14 @@ class DeviceAdapter(metaclass=ABCMeta):
         self.inCollectionEpisode = True
 
         if self.tmp == 1:
-            self._beginDataCollection()
+            self._startDataCollection()
         else:
             self.tmp = 1
             self.inCollectionEpisode = False
             raise FailedToBeginCollectionError()
 
     @abstractmethod
-    def _beginDataCollection(self) -> None:
+    def _startDataCollection(self) -> None:
         pass
 
     # any procedures necessary to start capturing data from the device
