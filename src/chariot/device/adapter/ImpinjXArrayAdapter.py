@@ -120,12 +120,12 @@ class ImpinjXArrayAdapter(DeviceAdapter):
                     headers = self.session.tokenAuthHeaders
                     )
                 jsonData: JSONDict = response.json()
-                self.dataQueue.put(jsonData)
+                self._reportData(jsonData)
                 if 'nextPageMarker' in jsonData:
                     self.session.dataRequestBody['pageMarker'] = jsonData['nextPageMarker']
                 else:
                     collectedAllPages = True
-                sleep(self._config.pollDelay)
+            sleep(self._config.pollDelay)
         self.session.dataRequestBody.pop('nextPageMarker', None)
 
     # any procedures necessary to start capturing data from the device

@@ -1,3 +1,4 @@
+from time import time
 from typing import Dict
 from sllurp.llrp import LLRPClientFactory
 from twisted.internet import reactor
@@ -11,9 +12,6 @@ class ImpinjR420Adapter(DeviceAdapter):
         super().__init__(config)
         self.llrpFactory: Optional[LLRPClientFactory] = None
 
-    def _reportData(self, data: Dict[str, JSONObject]):
-        self.dataQueue.put(data)
-
     def _startDataCollection(self) -> None:
         self.llrpFactory.addTagReportCallback(self._reportData)
         reactor.run()
@@ -23,7 +21,7 @@ class ImpinjR420Adapter(DeviceAdapter):
         self.llrpFactory = LLRPClientFactory(
             report_every_n_tags=self._config.report_every_n_tags,
             tx_power=self._config.tx_power,
-            session=self._config.session,  
+            session=self._config.session,
             start_inventory=self._config.start_inventory,
             mode_identifier=self._config.mode_indentifier,
             tag_population=self._config.tag_population,
@@ -33,7 +31,7 @@ class ImpinjR420Adapter(DeviceAdapter):
                 'EnableInventoryParameterSpecID': self._config.EnableInventoryParameterSpecID,
                 'EnableAntennaID': self._config.EnableAntennaID,
                 'EnableChannelIndex': self._config.EnableChannelIndex,
-                'EnablePeakRSSI': self._config.EnablePeakRSSI_General,  
+                'EnablePeakRSSI': self._config.EnablePeakRSSI_General,
                 'EnableFirstSeenTimestamp': self._config.EnableFirstSeenTimestamp,
                 'EnableLastSeenTimestamp': self._config.EnableLastSeenTimestamp,
                 'EnableTagSeenCount': self._config.EnableTagSeenCount,

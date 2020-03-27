@@ -5,7 +5,7 @@ from chariot.utility.JSONTypes import JSONDict, JSONObject
 from typing import Dict, Type
 
 
-class DataCollectionConfiguation(Configuration):
+class DataCollectionConfiguration(Configuration):
     requiredFields: Dict[str, Type[JSONObject]] = {
         'configId': str,
         'network': Network,

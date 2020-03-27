@@ -1,8 +1,12 @@
+# vscode
+.vscode/
+
 # python3 venv
 bin/
 include/
 lib/
 lib64
+Scripts/
 pyvenv.cfg
 share/
 .mypy_cache/

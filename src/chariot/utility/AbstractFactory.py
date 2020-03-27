@@ -1,8 +1,6 @@
 from abc import ABC
 from typing import Any, Dict, Type, Union
-from chariot.configuration import Configuration
 from chariot.utility.JSONTypes import JSONObject
-
 
 class AbstractFactory(ABC):
     def __init__(self):
@@ -11,7 +9,7 @@ class AbstractFactory(ABC):
         self.typeField: str = 'type'
         self.instanceName: str = 'instance'
 
-    def getInstance(self, config: Union[Dict[str, JSONObject], Configuration]) -> Any:
+    def getInstance(self, config: Any) -> Any:
         instanceType: str = str()
         if isinstance(config, Dict):
             instanceType = config.get(self.typeField)

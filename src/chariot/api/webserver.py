@@ -78,7 +78,7 @@ def modifyNetwork():
     if hasNewName:
         # notice that requestContent[TypeStrings.Network_Identifier.value] is used, this will return the new name since
         # keys were updated. So 'networkName' would be the old name of the network
-        NetworkManager.replaceNetwork(requestContent[TypeStrings.Network_Identifier.value], networkName)
+        NetworkManager.replaceNetwork(networkName, requestContent[TypeStrings.Network_Identifier.value])
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 

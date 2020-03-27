@@ -81,5 +81,5 @@ class NoIdentifierError(Exception):
         return self.message
 
 
-__all__ = ['DatabaseConnectionError', 'DeviceNotSupported', 'DuplicateNameError', 'NameNotFoundError', 'NoIdentifierError', 
-    'DeviceNotConnectedError', 'InCollectionEpisodeError', 'NotInCollectionEpisodeError', 'FailedToBeginCollectionError']
+# __all__ = ['DatabaseConnectionError', 'DuplicateNameError', 'ItemNotSupported', 'NameNotFoundError', 'NoIdentifierError',
+#     'DeviceNotConnectedError', 'InCollectionEpisodeError', 'NotInCollectionEpisodeError', 'FailedToBeginCollectionError']

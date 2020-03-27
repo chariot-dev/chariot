@@ -19,7 +19,7 @@ class _NetworkManager(Manager):
         return self._retrieveFromCollection(networkName)
 
     # This method gives a new network name to an already defined network and updates the collection
-    def replaceNetwork(self, newName: str, toFind: str):
+    def replaceNetwork(self, toFind: str, newName: str):
         self._modifyNameInCollection(newName, toFind)
 
     # Returns a list of networks names found in the userNetworks

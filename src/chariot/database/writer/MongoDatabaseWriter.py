@@ -31,8 +31,8 @@ class MongoDatabaseWriter(DatabaseWriter):
         database: Database = self.client[self.config.databaseName]
         self.table = database[self.config.tableName]
 
-    def _insertOne(self, dataPoint: Dict[str, JSONObject]):
-        self.table.insert_one(dataPoint)
+    def _insertOne(self, record: Dict[str, JSONObject]):
+        self.table.insert_one(record)
 
-    def _insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
-        self.table.insert_many(dataPoints)
+    def _insertMany(self, records: List[Dict[str, JSONObject]]):
+        self.table.insert_many(records)

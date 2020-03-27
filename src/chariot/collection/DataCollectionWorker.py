@@ -1,7 +1,9 @@
 from math import ceil
+from multiprocessing import Event
+import signal
 from time import time
-from threading import Thread
-from typing import Callable, Dict, List, Set
+from threading import current_thread, main_thread, Thread
+from typing import Callable, Dict, List, Optional, Set
 from queue import SimpleQueue as Queue, Empty as QueueEmptyException
 from chariot.device.adapter import DeviceAdapter
 from chariot.utility.concurrency import HandledThread
@@ -10,10 +12,10 @@ from chariot.utility.JSONTypes import JSONObject
 
 
 class DataCollectionWorker:
-    DEFAULT_TIMEOUT: float = 5.0
+    DEFAULT_TIMEOUT: float = 1.0
     ERROR_CHECK_TIMEOUT: float = 0.5
     PRODUCERS_PER_CONSUMER: int = 2
-    THREAD_JOIN_TIMEOUT: float = 2.0
+    THREAD_JOIN_TIMEOUT: float = 1.0
 
     def __init__(self, devices: List[DeviceAdapter]):
         self._devices = devices
@@ -23,11 +25,14 @@ class DataCollectionWorker:
         self._running: bool = False
         self._producerThreads: Dict[str, HandledThread] = {}
         self._outputHooks: Set[Callable] = set()
-        self._outputThread: HandledThread(name='Output-Handler', target=self._outputData, args=(self._errorQueue,))
+        self._outputThread: Optional[HandledThread] = None
+        self._stopThread: Optional[HandledThread] = None
+
+    def __del__(self) -> None:
+        self.stop()
 
     def _consumeDataFromDevice(self, deviceIdx: int) -> None:
         device: DeviceAdapter = self._devices[deviceIdx]
-        device.connect()
         while self._running:
             output: List[JSONObject] = []
             try:
@@ -43,16 +48,14 @@ class DataCollectionWorker:
                     output.append(data)
                 except QueueEmptyException:
                     break
-            self._dataQueue.put(output, block=True)
-        device.disconnect()
+            if len(output) > 0:
+                self._dataQueue.put(output, block=True)
 
     def _consumeDataFromDevices(self, startIdx: int, numDevices: int) -> None:
         if numDevices == 1:
             self._consumeDataFromDevice(startIdx)
         else:
             endIdx: int =  min(startIdx + numDevices, len(self._devices))
-            for i in range(startIdx, endIdx):
-                self._devices[i].connect()
             while self._running:
                 output: List[JSONObject] = []
                 for i in range(startIdx, endIdx):
@@ -65,12 +68,9 @@ class DataCollectionWorker:
                 if len(output) > 0:
                     self._dataQueue.put(output, block=True)
 
-        for i in range(startIdx, endIdx):
-            self._devices[i].disconnect()
-
     def _outputData(self) -> None:
         while self._running:
-            output: List[JSONObject] = []
+            output: List[List[JSONObject]] = []
             try:
                 data: List[JSONObject] = self._dataQueue.get(
                     block=True, timeout=self.DEFAULT_TIMEOUT)
@@ -84,8 +84,9 @@ class DataCollectionWorker:
                     output.append(data)
                 except QueueEmptyException:
                     break
+
             for chunk in output:
-                self._callOutputHooks(data)
+                self._callOutputHooks(chunk)
 
     def addOutputHook(self, hook: Callable) -> None:
         self._outputHooks.add(hook)
@@ -106,13 +107,13 @@ class DataCollectionWorker:
     def removeOutputHook(self, hook: Callable) -> None:
         self._outputHooks.remove(hook)
 
-    def start(self) -> None:
+    def start(self, stopEvent: Event) -> None:
         if self._running:
             raise AssertionError
 
         if len(self._devices) == 0:
-            raise AssertionError(
-                'Must have at least one device to collect from.')
+            raise AssertionError('Must have at least one device to collect from.')
+
         for device in self._devices:
             producer = HandledThread(
                 name=f'Producer: {device.getId()}', target=device.startDataCollection, args=(self._errorQueue,))
@@ -127,10 +128,10 @@ class DataCollectionWorker:
 
         # split producers as equally as possible among consumers
         if numConsumers > 1:
-            for i in range(0, numConsumers, avgProducersPerConsumer):
+            for i in range(0, totalDevices, avgProducersPerConsumer):
                 startIdx: int = i
                 # index error past the end of the array is handled in self._consumeDataFromDevices
-                numDevices: int = avgProducersPerConsumer 
+                numDevices: int = avgProducersPerConsumer
                 consumer: HandledThread = HandledThread(name=f'Consumer-{startIdx}',
                     target=self._consumeDataFromDevices, args=(self._errorQueue, startIdx, numDevices,))
                 self._consumerThreads.append(consumer)
@@ -138,16 +139,23 @@ class DataCollectionWorker:
             self._consumerThreads.append(HandledThread(name=f'Consumer-0',
                 target=self._consumeDataFromDevices, args=(self._errorQueue, 0, 1,)))
         self._running = True
-        for producer in self._producerThreads.values():
-            producer.start()
         for consumer in self._consumerThreads:
             consumer.start()
+        for producer in self._producerThreads.values():
+            producer.start()
+        self._outputThread = HandledThread(name='Output-Handler', target=self._outputData, args=(self._errorQueue,))
         self._outputThread.start()
+        self._stopThread = HandledThread(name='Stop-Sentinel', target=self._waitForStopEvent, args=(self._errorQueue, stopEvent,))
+        self._stopThread.start()
 
-    def stop(self) -> None:
+    def _waitForStopEvent(self, event: Event) -> None:
+        event.wait()
+        self.stop()
+
+    def stop(self, *args) -> None:
         if not self._running:
             return
-        for device in self.devices:
+        for device in self._devices:
             device.stopDataCollection()
 
         self._running = False
@@ -156,11 +164,11 @@ class DataCollectionWorker:
             anyThreadsAlive = False
             for producer in self._producerThreads.values():
                 producer.join(self.THREAD_JOIN_TIMEOUT)
-                anyThreadsAlive |= producer.isAlive()
+                anyThreadsAlive |= producer.is_alive()
             for consumer in self._consumerThreads:
                 consumer.join(self.THREAD_JOIN_TIMEOUT)
-                anyThreadsAlive |= consumer.isAlive()
-            self.outputThread.join(self.THREAD_JOIN_TIMEOUT)
-            anyThreadsAlive |= self._outputThread.isAlive()
+                anyThreadsAlive |= consumer.is_alive()
+            self._outputThread.join(self.THREAD_JOIN_TIMEOUT)
+            anyThreadsAlive |= self._outputThread.is_alive()
         self._consumerThreads.clear()
         self._producerThreads.clear()

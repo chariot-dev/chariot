@@ -25,7 +25,7 @@ class Network(Manager):
 
     def addDevice(self, device: DeviceAdapter):
         self._addToCollection(device)
-        
+
     def deleteDevice(self, deviceId: str):
         self._deleteFromCollection(deviceId)
 

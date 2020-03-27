@@ -3,7 +3,7 @@ from json import load
 from os import path
 from chariot.utility import AbstractFactory
 from chariot.utility.JSONTypes import JSONDict
-from chariot.device.adapter import DeviceAdapter, ImpinjR420Adapter, ImpinjXArrayAdapter, TestAdapter
+from chariot.device.adapter import DeviceAdapter, ImpinjR420Adapter, ImpinjXArrayAdapter
 from chariot.device.configuration import DeviceConfiguration
 from chariot.utility.exceptions import ItemNotSupported, ErrorStrings
 
@@ -13,12 +13,11 @@ class _DeviceAdapterFactory(AbstractFactory):
         self.instanceMap: Dict[str, Type[DeviceAdapter]] = {
             'ImpinjXArray': ImpinjXArrayAdapter,
             'ImpinjSpeedwayR420': ImpinjR420Adapter,
-            'TestDevice': TestAdapter,
         }
         self.instanceName: str = 'device'
         self.typeField: str = 'deviceType'
 
-        currentPath = path.dirname(path.abspath(__file__))
+        currentPath: str = path.dirname(path.abspath(__file__))
         with open(f'{currentPath}/driver/supportedDevices.json') as deviceList:
             self._supportedDevices: JSONDict = load(deviceList)
 
