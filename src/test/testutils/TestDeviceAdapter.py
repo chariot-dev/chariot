@@ -12,6 +12,7 @@ class TestDeviceAdapter(DeviceAdapter):
         super().__init__(config)
 
     def _startDataCollection(self) -> None:
+        pollDelay = self._config.pollDelay / 1000
         while self.inCollectionEpisode:
             if not self.connected:
                 raise AssertionError
@@ -19,7 +20,7 @@ class TestDeviceAdapter(DeviceAdapter):
             response: requests.Response = requests.get('http://localhost:5000/data')
             data: JSONObject = response.json()
             self._reportData(data)
-            sleep(self._config.pollDelay / 1000)
+            sleep(pollDelay)
 
     def _connect(self) -> None:
         pass

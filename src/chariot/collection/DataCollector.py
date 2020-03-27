@@ -4,7 +4,8 @@ from multiprocessing import SimpleQueue as Queue
 from queue import Empty as QueueEmptyException
 import signal
 from threading import Timer
-from typing import Callable, List, Optional
+from time import sleep
+from typing import Callable, Iterable, List, Optional
 from chariot.collection.configuration import DataCollectionConfiguration
 from chariot.collection import DataCollectionWorker
 from chariot.database.writer import DatabaseWriter
@@ -16,7 +17,8 @@ from chariot.utility.JSONTypes import JSONObject
 
 class DataCollector:
     MAX_DEVICES_PER_WORKER: int = 8
-    THREAD_JOIN_TIMEOUT: float = 0.1
+    JOIN_TIMEOUT: float = 1.0
+    PROCESS_CREATION_DELAY = 0.01
 
     def __init__(self, configuration: DataCollectionConfiguration, onEnd: Optional[Callable] = None, onError: Optional[Callable] = None):
         self._config: DataCollectionConfiguration = configuration
@@ -30,6 +32,7 @@ class DataCollector:
         self._stopTimer: Optional[Timer] = None
         self._workers: List[DataCollectionWorker] = []
         self._workerProcesses: List[HandledProcess] = []
+        self._minPollDelay: float = 0.01
 
     def __del__(self) -> None:
         self.stopCollection()
@@ -77,6 +80,11 @@ class DataCollector:
         self._devices = [device for device in network.getDevices().values()]
         if len(self._devices) == 0:
             raise AssertionError('Can\'t collect data from a network with no devices')
+        
+        # set the minimum poll delay for any action to the max between the default and 90% of the min from the devices in a network
+        devicePolls: Iterable[DeviceAdapter] = (0.9 * device.getConfiguration().pollDelay / 1000 for device in self._devices)
+        minDevicePoll: float = min(devicePolls)
+        self._minPollDelay = max(self._minPollDelay, minDevicePoll)
 
         self._config.database.connect()
 
@@ -88,7 +96,7 @@ class DataCollector:
         for i in range(0, numDevices, avgDevicesPerWorker):
             startIdx: int = i
             endIdx: int = min(startIdx + avgDevicesPerWorker, numDevices)
-            worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx])
+            worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx], self._minPollDelay)
             # output hooks are called when data is received and chunked - this is where we would add the socket.send
             # for the DataOutputAdapter
             worker.addOutputHook(self._config.database.insertMany)
@@ -101,6 +109,7 @@ class DataCollector:
         self._errorHandler.start()
         for workerProcess in self._workerProcesses:
             workerProcess.start()
+            sleep(self.PROCESS_CREATION_DELAY)
         if hasattr(self._config, 'runTime'):
             self._stopTimer = Timer(float(self._config.runTime / 1000), self._stopCollection, args=(True,))
             self._stopTimer.start()
@@ -116,9 +125,9 @@ class DataCollector:
         while alive:
             alive = False
             for workerProcess in self._workerProcesses:
-                workerProcess.join(self.THREAD_JOIN_TIMEOUT)
+                workerProcess.join(self.JOIN_TIMEOUT)
                 alive |= workerProcess.is_alive()
-            self._errorHandler.join(self.THREAD_JOIN_TIMEOUT)
+            self._errorHandler.join(self.JOIN_TIMEOUT)
             alive |= self._errorHandler.is_alive()
         self._config.database.disconnect()
         self._workerProcesses.clear()

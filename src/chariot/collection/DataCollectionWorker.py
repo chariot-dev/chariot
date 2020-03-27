@@ -1,7 +1,7 @@
 from math import ceil
 from multiprocessing import Event
 import signal
-from time import time
+from time import sleep, time
 from threading import current_thread, main_thread, Thread
 from typing import Callable, Dict, List, Optional, Set
 from queue import SimpleQueue as Queue, Empty as QueueEmptyException
@@ -17,11 +17,12 @@ class DataCollectionWorker:
     PRODUCERS_PER_CONSUMER: int = 2
     THREAD_JOIN_TIMEOUT: float = 1.0
 
-    def __init__(self, devices: List[DeviceAdapter]):
+    def __init__(self, devices: List[DeviceAdapter], minPollDelay: float = 0.01):
         self._devices = devices
         self._dataQueue: Queue = Queue()
         self._errorQueue: Queue = Queue()
         self._consumerThreads: List[HandledThread] = []
+        self._minPollDelay: float = minPollDelay
         self._running: bool = False
         self._producerThreads: Dict[str, HandledThread] = {}
         self._outputHooks: Set[Callable] = set()
@@ -50,6 +51,7 @@ class DataCollectionWorker:
                     break
             if len(output) > 0:
                 self._dataQueue.put(output, block=True)
+            sleep(self._minPollDelay)
 
     def _consumeDataFromDevices(self, startIdx: int, numDevices: int) -> None:
         if numDevices == 1:
@@ -67,8 +69,11 @@ class DataCollectionWorker:
                         continue
                 if len(output) > 0:
                     self._dataQueue.put(output, block=True)
-
+                sleep(self._minPollDelay / numDevices)
+                
     def _outputData(self) -> None:
+        numDevices: int = len(self._devices)
+        pollDelay = self._minPollDelay / numDevices
         while self._running:
             output: List[List[JSONObject]] = []
             try:
@@ -87,6 +92,7 @@ class DataCollectionWorker:
 
             for chunk in output:
                 self._callOutputHooks(chunk)
+            sleep(self._minPollDelay)
 
     def addOutputHook(self, hook: Callable) -> None:
         self._outputHooks.add(hook)
