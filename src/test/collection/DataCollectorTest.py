@@ -14,8 +14,8 @@ from test.testutils import MockDeviceTester, MockServer, TestDeviceAdapter, Test
 
 class DataCollectorTest(MockDeviceTester):
     instance: Optional[DataCollector] = None
-    NUM_DEVICES: int = 10
-    EPISODE_LEN: float = 5.0
+    NUM_DEVICES: int = 64
+    EPISODE_LEN: float = 15.0
 
     def _buildNetwork(self) -> Network:
         networkConfig: NetworkConfiguration = NetworkConfiguration({

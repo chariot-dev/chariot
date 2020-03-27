@@ -19,7 +19,7 @@ class TestDatabaseWriter(DatabaseWriter):
         self.cleanup()
 
     def cleanup(self):
-        if self.client:
+        if self.client is not None:
             self.client.close()
             self.cursor = None
             self.client = None
@@ -41,7 +41,7 @@ class TestDatabaseWriter(DatabaseWriter):
         return self.cursor
 
     def _initializeTable(self) -> None:
-        self.client.cursor().execute(
+        self.cursor.execute(
             f'CREATE TABLE IF NOT EXISTS {self.config.tableName}(id INTEGER PRIMARY KEY AUTOINCREMENT, device_name VARCHAR(255), insertion_time INTEGER, production_time INTEGER, freeform BLOB)'
         )
 
@@ -51,7 +51,7 @@ class TestDatabaseWriter(DatabaseWriter):
     def _insertMany(self, records: List[Dict[str, JSONObject]]) -> None:
         self.cursor.executemany(
             f'INSERT INTO {self.config.tableName} (device_name, insertion_time, production_time, freeform) VALUES (?,?,?,?)',
-            ((record['device_name'], record['production_time'], record['insertion_time'], self._pickleFreeform(record['freeform'])) for record in records)
+            ((record['device_name'], record['insertion_time'], record['production_time'], self._pickleFreeform(record['freeform'])) for record in records)
         )
         self.client.commit()
 
