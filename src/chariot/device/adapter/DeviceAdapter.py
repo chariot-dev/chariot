@@ -72,7 +72,7 @@ class DeviceAdapter(metaclass=ABCMeta):
 
     def stopDataCollection(self) -> None:
         if not self.inCollectionEpisode:
-            raise AssertionError
+            return
         self._stopDataCollection()
         self.inCollectionEpisode = False
 
