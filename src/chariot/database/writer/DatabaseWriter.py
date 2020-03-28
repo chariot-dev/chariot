@@ -1,4 +1,5 @@
 import abc
+from multiprocessing import Lock as ProcessLock
 from threading import Lock
 from typing import Dict, List, Optional, Type
 from time import time
@@ -18,7 +19,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         self.connected: bool = False
         self._modLock: Optional[Lock] = None
         self._lockReason: Optional[str] = None
-        self.writeLock: Lock = Lock()
+        self.writeLock: ProcessLock = ProcessLock()
 
     def __del__(self):
         self.disconnect()

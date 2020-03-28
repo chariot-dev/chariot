@@ -14,6 +14,7 @@ from chariot.utility.JSONTypes import JSONObject
 class DataCollectionWorker:
     DEFAULT_TIMEOUT: float = 1.0
     ERROR_CHECK_TIMEOUT: float = 0.5
+    OUTPUT_WRITE_SLEEP: float = 2.0
     PRODUCERS_PER_CONSUMER: int = 2
     THREAD_JOIN_TIMEOUT: float = 1.0
 
@@ -35,6 +36,7 @@ class DataCollectionWorker:
     def _consumeDataFromDevice(self, deviceIdx: int) -> None:
         device: DeviceAdapter = self._devices[deviceIdx]
         while self._running:
+            sleep(self._minPollDelay)
             output: List[JSONObject] = []
             try:
                 data: JSONObject = device.getDataQueue().get(
@@ -51,7 +53,6 @@ class DataCollectionWorker:
                     break
             if len(output) > 0:
                 self._dataQueue.put(output, block=True)
-            sleep(self._minPollDelay)
 
     def _consumeDataFromDevices(self, startIdx: int, numDevices: int) -> None:
         if numDevices == 1:
@@ -59,6 +60,7 @@ class DataCollectionWorker:
         else:
             endIdx: int =  min(startIdx + numDevices, len(self._devices))
             while self._running:
+                sleep(self._minPollDelay / numDevices)
                 output: List[JSONObject] = []
                 for i in range(startIdx, endIdx):
                     try:
@@ -69,12 +71,12 @@ class DataCollectionWorker:
                         continue
                 if len(output) > 0:
                     self._dataQueue.put(output, block=True)
-                sleep(self._minPollDelay / numDevices)
                 
     def _outputData(self) -> None:
         numDevices: int = len(self._devices)
         pollDelay = self._minPollDelay / numDevices
         while self._running:
+            sleep(self.OUTPUT_WRITE_SLEEP)
             output: List[List[JSONObject]] = []
             try:
                 data: List[JSONObject] = self._dataQueue.get(
@@ -92,7 +94,6 @@ class DataCollectionWorker:
 
             for chunk in output:
                 self._callOutputHooks(chunk)
-            sleep(self._minPollDelay)
 
     def addOutputHook(self, hook: Callable) -> None:
         self._outputHooks.add(hook)
