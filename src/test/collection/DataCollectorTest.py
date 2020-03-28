@@ -57,15 +57,34 @@ class DataCollectorTest(MockDeviceTester):
         })
         self.instance = DataCollector(collectorConfig)
         self.instance.startCollection()
+        assert self.instance.isRunning() == True
+     
+        # these objects should be locked from modificaiton while episode is running
+        # as for devices, changes won't be reflected anyway since they are cloned into a separate process
+        # basically means a snapshot of what they were is taken upon starting a collection episode
+        # this doesn't prevent them from being modified elsewhere, we have no control over the device's native API
+        with pytest.raises(AssertionError):
+            network.updateConfig({})
+
+        with pytest.raises(AssertionError):
+            database.updateConfig({})
+
+        with pytest.raises(AssertionError):
+            self.instance.updateConfig({})
+
         sleep(self.EPISODE_LEN)
         self.instance.stopCollection()
+
         assert self.instance.isRunning() == False
+
         # Test Database doesn't actually disconnect though, just says it is
         assert database.isConnected() == False
 
         # check that all devices were able to report data
         db: Cursor = database.getCursor()
         dataDict: Dict[str, List[JSONObject]] = {}
+
+        # there are random failures with this query, not sure why
         for record in db.execute('SELECT * from data'):
             if record[1] not in dataDict:
                 dataDict[record[1]] = [record]
@@ -74,3 +93,8 @@ class DataCollectorTest(MockDeviceTester):
 
         database.cleanup()
         assert len(dataDict.keys()) == self.NUM_DEVICES
+
+        # these should no longer fail as the lock has been released
+        network.updateConfig({})
+        database.updateConfig({})
+        self.instance.updateConfig({})

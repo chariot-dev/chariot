@@ -13,7 +13,7 @@ class TestDeviceAdapter(DeviceAdapter):
 
     def _startDataCollection(self) -> None:
         pollDelay = self._config.pollDelay / 1000
-        while self.inCollectionEpisode:
+        while self._inCollectionEpisode:
             if not self.connected:
                 raise AssertionError
 

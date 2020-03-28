@@ -3,7 +3,7 @@ from multiprocessing import cpu_count, Event, Process
 from multiprocessing import SimpleQueue as Queue
 from queue import Empty as QueueEmptyException
 import signal
-from threading import Timer
+from threading import Lock, Timer
 from time import sleep
 from typing import Callable, Iterable, List, Optional
 from chariot.collection.configuration import DataCollectionConfiguration
@@ -18,13 +18,14 @@ from chariot.utility.JSONTypes import JSONObject
 class DataCollector:
     MAX_DEVICES_PER_WORKER: int = 8
     JOIN_TIMEOUT: float = 1.0
-    PROCESS_CREATION_DELAY = 0.01
+    PROCESS_CREATION_DELAY = 0.1
 
     def __init__(self, configuration: DataCollectionConfiguration, onEnd: Optional[Callable] = None, onError: Optional[Callable] = None):
         self._config: DataCollectionConfiguration = configuration
         self._devices: List[DeviceAdapter] = []
         self._errorHandler: HandledThread = HandledThread(name='Error-Handler', target=self._handleErrors)
         self._errorQueue: Queue = Queue()
+        self._runLock = Lock()
         self._onEnd: Optional[Callable] = onEnd
         self._onError: Optional[Callable[Exception], None] = onError
         self._running: bool = False
@@ -106,10 +107,13 @@ class DataCollector:
             self._workerProcesses.append(workerProcess)
 
         self._running = True
+        self._runLock.acquire()
+        network.lock(self._runLock, 'a data collection episode')
+        self._config.database.lock(self._runLock, 'a data collection episode')
         self._errorHandler.start()
         for workerProcess in self._workerProcesses:
             workerProcess.start()
-            sleep(self.PROCESS_CREATION_DELAY)
+            sleep(self.PROCESS_CREATION_DELAY) # seems to be necessary to avoid random bad forks
         if hasattr(self._config, 'runTime'):
             self._stopTimer = Timer(float(self._config.runTime / 1000), self._stopCollection, args=(True,))
             self._stopTimer.start()
@@ -133,6 +137,7 @@ class DataCollector:
         self._workerProcesses.clear()
         self._workers.clear()
         self._devices.clear()
+        self._runLock.release()
 
         if not calledFromTimer and self._stopTimer:
             if self._stopTimer.is_alive():
@@ -149,5 +154,5 @@ class DataCollector:
 
     def updateConfig(self, config: JSONObject) -> None:
         if self._running:
-            raise AssertionError
+            raise AssertionError('Cannot modify a data collection configuration during a data collection episode')
         self._config.updateConfig(config)

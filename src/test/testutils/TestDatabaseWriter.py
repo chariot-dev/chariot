@@ -30,7 +30,7 @@ class TestDatabaseWriter(DatabaseWriter):
         currentPath: str = os.path.dirname(os.path.abspath(__file__))
         dbPath: str = f'{currentPath}/temp'
         os.makedirs(dbPath, 0o777, exist_ok=True)
-        self.clientPath = f'{dbPath}/{self.config.databaseName}.db'
+        self.clientPath = f'{dbPath}/{self._config.databaseName}.db'
         self.client = sqlite3.connect(self.clientPath, check_same_thread=False)
         self.cursor = self.client.cursor()
 
@@ -42,7 +42,7 @@ class TestDatabaseWriter(DatabaseWriter):
 
     def _initializeTable(self) -> None:
         self.cursor.execute(
-            f'CREATE TABLE IF NOT EXISTS {self.config.tableName}(id INTEGER PRIMARY KEY AUTOINCREMENT, device_name VARCHAR(255), insertion_time INTEGER, production_time INTEGER, freeform BLOB)'
+            f'CREATE TABLE IF NOT EXISTS {self._config.tableName}(id INTEGER PRIMARY KEY AUTOINCREMENT, device_name VARCHAR(255), insertion_time INTEGER, production_time INTEGER, freeform BLOB)'
         )
 
     def _insertOne(self, record: Dict[str, JSONObject]) -> None:
@@ -50,7 +50,7 @@ class TestDatabaseWriter(DatabaseWriter):
 
     def _insertMany(self, records: List[Dict[str, JSONObject]]) -> None:
         self.cursor.executemany(
-            f'INSERT INTO {self.config.tableName} (device_name, insertion_time, production_time, freeform) VALUES (?,?,?,?)',
+            f'INSERT INTO {self._config.tableName} (device_name, insertion_time, production_time, freeform) VALUES (?,?,?,?)',
             ((record['device_name'], record['insertion_time'], record['production_time'], self._pickleFreeform(record['freeform'])) for record in records)
         )
         self.client.commit()

@@ -50,7 +50,7 @@ class Manager(ABC):
             )
 
         # modify configuration to reflect new name
-        t.getConfiguration().updateConfig({t.getConfiguration().getIdField(): newName})
+        t.updateConfig({t.getConfiguration().getIdField(): newName})
 
         # update collection, make new key and delete the old one
         self.collection[newName] = self.collection[toFind]

@@ -11,16 +11,16 @@ class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):
         self._config: Type[DeviceConfiguration] = config
         self.connected: bool = False
-        self.dataQueue: Queue = Queue()
-        self.inCollectionEpisode = False
+        self._dataQueue: Queue = Queue()
+        self._inCollectionEpisode: bool = False
 
     # this method should only be run as the target of a ProducerThread
     def startDataCollection(self) -> None:
-        if self.inCollectionEpisode:
+        if self._inCollectionEpisode:
             return
         if not self.connected:
             self.connect()
-        self.inCollectionEpisode = True
+        self._inCollectionEpisode = True
         self._startDataCollection()
 
     @abstractmethod
@@ -40,7 +40,7 @@ class DeviceAdapter(metaclass=ABCMeta):
     # gracefully close the connection to the device
     def disconnect(self) -> None:
         if not self.connected:
-            raise DeviceNotConnectedError()
+            return
         self._disconnect()
         self.connected = False
 
@@ -52,7 +52,7 @@ class DeviceAdapter(metaclass=ABCMeta):
         return self._config
 
     def getDataQueue(self) -> Queue:
-        return self.dataQueue
+        return self._dataQueue
 
     def getDeviceType(self) -> str:
         return self._config.deviceType
@@ -64,24 +64,29 @@ class DeviceAdapter(metaclass=ABCMeta):
         self._config.deviceId = newId
 
     def _reportData(self, data: Dict[str, JSONObject]):
-        self.dataQueue.put({
+        self._dataQueue.put({
             'device_name': self._config.deviceId,
             'production_time': int(round(time() * 1000)),
             'freeform': data,
             })
 
     def stopDataCollection(self) -> None:
-        if not self.inCollectionEpisode:
+        if not self._inCollectionEpisode:
             return
         self._stopDataCollection()
-        self.inCollectionEpisode = False
+        self._inCollectionEpisode = False
 
     @abstractmethod
     def _stopDataCollection(self) -> None:
         pass
 
-    def getDeviceConfiguration(self) -> Type[DeviceConfiguration]:
-        return self._config
+    def toDict(self) -> None:
+        return self._config.toDict()
+
+    def updateConfig(self, config: JSONObject) -> None:
+        if self._inCollectionEpisode:
+            raise AssertionError('Cannot modify device configuration during a collection episode')
+        self._config.updateConfig(config)
 
 
 __all__ = ['DeviceAdapter']

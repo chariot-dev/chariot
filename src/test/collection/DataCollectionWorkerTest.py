@@ -11,8 +11,8 @@ from test.testutils import MockDeviceTester, MockServer, TestDeviceAdapter, Test
 
 class DataCollectionWorkerTest(MockDeviceTester):
     instance: Optional[DataCollectionWorker] = None
-    NUM_DEVICES: int = 4
-    EPISODE_LEN: float = 5.0
+    NUM_DEVICES: int = 8
+    EPISODE_LEN: float = 10.0
     dataStore: Queue = Queue()
 
     def _loadDevices(self):

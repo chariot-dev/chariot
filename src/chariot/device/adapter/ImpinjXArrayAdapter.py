@@ -107,7 +107,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
         return
 
     def _startDataCollection(self) -> None:
-        while self.inCollectionEpisode:
+        while self._inCollectionEpisode:
             if not self.connected:
                 # raise DeviceNotConnectedError()
                 raise AssertionError

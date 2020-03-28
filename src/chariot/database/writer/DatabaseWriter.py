@@ -1,6 +1,6 @@
 import abc
-from multiprocessing import Lock
-from typing import Dict, List, Type
+from threading import Lock
+from typing import Dict, List, Optional, Type
 from time import time
 from chariot.database.configuration import DatabaseConfiguration
 from chariot.utility.JSONTypes import JSONObject
@@ -14,8 +14,10 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     }
 
     def __init__(self, config: Type[DatabaseConfiguration]):
-        self.config: Type[DatabaseConfiguration] = config
+        self._config: Type[DatabaseConfiguration] = config
         self.connected: bool = False
+        self._modLock: Optional[Lock] = None
+        self._lockReason: Optional[str] = None
         self.writeLock: Lock = Lock()
 
     def __del__(self):
@@ -47,7 +49,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         pass
 
     def getConfiguration(self):
-        return self.config
+        return self._config
 
     @abc.abstractmethod
     def _initializeTable(self):
@@ -86,6 +88,25 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
 
     def isConnected(self) -> bool:
         return self.connected
+
+    # this method locks the dbwriter from modification e.g during a collection episode for as long as the lock 
+    # passed in is active
+    def lock(self, lock: Lock, reason: Optional[str] = None):
+        if self._modLock is not None:
+            raise AssertionError('The database writer was already locked')
+        self._modLock = lock
+        self._lockReason = reason
+
+    def updateConfig(self, config: JSONObject) -> None:
+        # if there is a modification lock in place and it is locked,
+        if self._modLock and self._modLock.locked():
+                message: str = 'This database writer is currently locked from modification'
+                if self._lockReason is not None:
+                    message += f'. It is being used by {self._lockReason}'
+                raise AssertionError(message)
+        elif self._modLock:
+            self._modLock = None
+        self._config.updateConfig(config)
 
     def validateRecord(self, record: Dict[str, JSONObject]):
         for key in self.validDataFields:

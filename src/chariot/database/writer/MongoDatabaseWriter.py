@@ -16,11 +16,11 @@ class MongoDatabaseWriter(DatabaseWriter):
     def _connect(self):
         connectStr: str = 'mongodb://'
         if hasattr(self.config, 'username'):
-            connectStr += f'{self.config.username}:{self.config.password}@'
-        connectStr += f'{self.config.host}:{self.config.port}/{self.config.databaseName}'
+            connectStr += f'{self._config.username}:{self._config.password}@'
+        connectStr += f'{self._config.host}:{self._config.port}/{self._config.databaseName}'
         self.client = MongoClient(
             connectStr,
-            serverSelectionTimeoutMS=self.config.timeoutMS)
+            serverSelectionTimeoutMS=self._config.timeoutMS)
         self.client.server_info()  # This will raise error if connection invalid
 
     def _disconnect(self):
@@ -28,8 +28,8 @@ class MongoDatabaseWriter(DatabaseWriter):
         self.client = None
 
     def _initializeTable(self):
-        database: Database = self.client[self.config.databaseName]
-        self.table = database[self.config.tableName]
+        database: Database = self.client[self._config.databaseName]
+        self.table = database[self._config.tableName]
 
     def _insertOne(self, record: Dict[str, JSONObject]):
         self.table.insert_one(record)
