@@ -81,7 +81,7 @@ class DataCollectorTest(MockDeviceTester):
         assert database.isConnected() == False
 
         # check that all devices were able to report data
-        db: Cursor = database.getCursor()
+        db: Cursor = database.getClient()
         dataDict: Dict[str, List[JSONObject]] = {}
 
         # there are random failures with this query, not sure why

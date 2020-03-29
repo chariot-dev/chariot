@@ -8,7 +8,7 @@ from chariot.utility.JSONTypes import JSONObject
 class MockServer:
     RANDOM_STR_LEN = 10
 
-    def __init__(self, port: int = 5000):
+    def __init__(self, port: int = 6000):
         self.port = port
         self.app: Flask = self._buildApp()
         self.appProcess = Process(name='Mock-Server-Process', target=self.run,
