@@ -2,7 +2,6 @@ from math import ceil
 from multiprocessing import cpu_count, Event, Process
 from multiprocessing import SimpleQueue as Queue
 from queue import Empty as QueueEmptyException
-import signal
 from threading import Lock, Timer
 from time import sleep
 from typing import Callable, Iterable, List, Optional
@@ -67,6 +66,7 @@ class DataCollector:
             raise AssertionError
         self._onError = handler
 
+    # if it was a timed collection episode, execute this once it's done
     def setEndHandler(self, handler: Callable) -> None:
         if not callable(handler):
             raise AssertionError
