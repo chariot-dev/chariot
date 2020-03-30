@@ -50,5 +50,3 @@ class DataCollectionWorkerTest(MockDeviceTester):
 
         # assert every device was able to report data
         assert len(dataDict.keys()) == self.NUM_DEVICES
-        for device, data in dataDict.items():
-            assert len(data) != 0

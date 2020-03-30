@@ -24,7 +24,6 @@ class TestDatabaseWriter(DatabaseWriter):
             os.remove('testdb')
 
     def _connect(self) -> None:
-        currentPath: str = os.path.dirname(os.path.abspath(__file__))
         self.client = sqlite3.connect('testdb', check_same_thread=False)
 
     def _disconnect(self) -> None:

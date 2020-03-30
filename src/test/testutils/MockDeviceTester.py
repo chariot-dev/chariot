@@ -14,7 +14,7 @@ class MockDeviceTester:
         cls.server: MockServer = MockServer()
         cls.server.start()
         serverRunning: bool = False
-        
+
         # ensure the server starts accepting requests before running tests
         while not serverRunning:
             try:
