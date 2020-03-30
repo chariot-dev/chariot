@@ -17,5 +17,8 @@ chariot.egg-info
 *.py[cod]
 __pycache__/
 
+#pytest
+.coverage
+
 # Test folder
 /src/testing
