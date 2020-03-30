@@ -1,5 +1,5 @@
 from flask import Flask, request
-# from flask_cors import CORS
+from flask_cors import CORS
 from multiprocessing import Process
 import random
 import string
@@ -17,6 +17,7 @@ class MockServer:
     def _buildApp(self) -> Flask:
         # Flask server in a package: https://flask.palletsprojects.com/en/1.1.x/api/
         app = self._buildEndpoints(Flask(__name__.split('.')[0]))
+        CORS(app)
         return app
 
     def _buildEndpoints(self, app: Flask) -> Flask:

@@ -17,7 +17,7 @@ class TestDeviceAdapter(DeviceAdapter):
             if not self.connected:
                 raise AssertionError
 
-            response: requests.Response = requests.get('http://localhost:6000/data')
+            response: requests.Response = requests.get(f'http://localhost:{self._config.port}/data')
             data: JSONObject = response.json()
             self._reportData(data)
             sleep(pollDelay)
