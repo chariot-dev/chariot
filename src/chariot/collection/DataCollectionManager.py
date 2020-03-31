@@ -31,5 +31,5 @@ class DataCollectionManager(Manager):
             return self._getCollectorsJson()
         return [collector for collector in self.collection.values()]
 
-    def replaceCollector(self, newName: str, collectorName: str) -> None:
-        self._modifyNameInCollection(newName, collectorName)
+    def replaceCollector(self, collectorName: str, newName: str) -> None:
+        self._modifyNameInCollection(collectorName, newName)
