@@ -54,7 +54,7 @@ class _DeviceAdapterFactory(AbstractFactory):
                 # now combine the specified device template with that of the generic template
                 specificDevice = load(deviceTemplate)
                 return self.combineConfigWithGeneric(specificDevice, deviceName)
-        except:
+        except FileNotFoundError:
             raise ItemNotSupported(ErrorStrings.ERR_Item_Not_Supported.value.format(self.instanceName, deviceName))
 
     # use this method to combine settings from a specific configuration instance with the generic required fields

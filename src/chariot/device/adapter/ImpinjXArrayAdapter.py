@@ -79,7 +79,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
 
     def _getToken(self, connectUrl: str, authUsername: str) -> str:
         tokenUrl: str = f'{connectUrl}/authentication/v1/token/{authUsername}'
-        response: requests.Response = requests.put(tokenUrl, { 'Authorization': tokenUrl })
+        response: requests.Response = requests.put(tokenUrl, {'Authorization': tokenUrl})
         token: str = response.json()['token']
         return token
 
@@ -98,7 +98,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
             revokeUrl,
             data=dumps(tokenData),
             headers=self.session.basicAuthHeaders
-            )
+        )
         return
 
     def _stopItemsenseJob(self) -> None:
@@ -118,7 +118,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
                     self.session.dataRequestUrl,
                     data=dumps(self.session.dataRequestBody),
                     headers=self.session.tokenAuthHeaders
-                    )
+                )
                 jsonData: JSONDict = response.json()
                 self._reportData(jsonData)
                 if 'nextPageMarker' in jsonData:

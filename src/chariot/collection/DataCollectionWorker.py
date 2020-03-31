@@ -5,7 +5,6 @@ from typing import Callable, Dict, List, Optional, Set
 from queue import SimpleQueue as Queue, Empty as QueueEmptyException
 from chariot.device.adapter import DeviceAdapter
 from chariot.utility.concurrency import HandledThread
-from chariot.utility.exceptions.ChariotExceptions import *
 from chariot.utility.JSONTypes import JSONObject
 
 
@@ -57,7 +56,7 @@ class DataCollectionWorker:
         if numDevices == 1:
             self._consumeDataFromDevice(startIdx)
         else:
-            endIdx: int =  min(startIdx + numDevices, len(self._devices))
+            endIdx: int = min(startIdx + numDevices, len(self._devices))
             while self._running:
                 sleep(self._minPollDelay / numDevices)
                 output: List[JSONObject] = []
@@ -72,8 +71,6 @@ class DataCollectionWorker:
                     self._dataQueue.put(output, block=True)
 
     def _outputData(self) -> None:
-        numDevices: int = len(self._devices)
-        pollDelay = self._minPollDelay / numDevices
         while self._running:
             sleep(self._outputDelay)
             output: List[List[JSONObject]] = []
@@ -138,12 +135,12 @@ class DataCollectionWorker:
                 startIdx: int = i
                 # index error past the end of the array is handled in self._consumeDataFromDevices
                 numDevices: int = avgProducersPerConsumer
-                consumer: HandledThread = HandledThread(name=f'Consumer-{startIdx}',
-                    target=self._consumeDataFromDevices, args=(self._errorQueue, startIdx, numDevices,))
+                consumer: HandledThread = HandledThread(name=f'Consumer-{startIdx}', target=self._consumeDataFromDevices,
+                                                        args=(self._errorQueue, startIdx, numDevices,))
                 self._consumerThreads.append(consumer)
         else:
-            self._consumerThreads.append(HandledThread(name=f'Consumer-0',
-                target=self._consumeDataFromDevices, args=(self._errorQueue, 0, 1,)))
+            self._consumerThreads.append(HandledThread(name=f'Consumer-0', target=self._consumeDataFromDevices,
+                                                       args=(self._errorQueue, 0, 1,)))
         self._running = True
         for consumer in self._consumerThreads:
             consumer.start()

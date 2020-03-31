@@ -3,7 +3,6 @@ from time import time
 from typing import Dict, Type
 from queue import SimpleQueue as Queue
 from chariot.device.configuration import DeviceConfiguration
-from chariot.utility.exceptions.ChariotExceptions import *
 from chariot.utility.JSONTypes import JSONObject
 
 
@@ -68,7 +67,7 @@ class DeviceAdapter(metaclass=ABCMeta):
             'device_name': self._config.deviceId,
             'production_time': int(round(time() * 1000)),
             'freeform': data,
-            })
+        })
 
     def stopDataCollection(self) -> None:
         if not self._inCollectionEpisode:

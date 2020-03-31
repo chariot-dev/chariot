@@ -1,6 +1,6 @@
 from sllurp.llrp import LLRPClientFactory
 from twisted.internet import reactor
-from typing import Dict, Optional
+from typing import Optional
 from chariot.device.adapter import DeviceAdapter
 from chariot.device.configuration import ImpinjR420Configuration
 
