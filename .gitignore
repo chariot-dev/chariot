@@ -1,8 +1,12 @@
+# vscode
+.vscode/
+
 # python3 venv
 bin/
 include/
 lib/
 lib64
+Scripts/
 pyvenv.cfg
 share/
 .mypy_cache/
@@ -12,3 +16,9 @@ chariot.egg-info
 # python
 *.py[cod]
 __pycache__/
+
+#pytest
+.coverage
+
+# Test folder
+/src/testing

@@ -325,5 +325,29 @@
                 ]
             }
         ]
+    },
+    "Test Device": {
+        "imgSrc": "some_imgur_link",
+        "description": "A false device for unit testing of internal components.",
+        "settings": [
+            {
+                "title": "Buffer Size",
+                "alias": "buffSize",
+                "description": "Determines the size of the buffer used for creating fake data.",
+                "type": "Number",
+                "inputType": "number",
+                "required": true,
+                "validationRegex": "TODO"
+            },
+            {
+                "title": "Seed Value",
+                "alias": "seedVal",
+                "description": "Value to use with the seed, useful for getting consistent values",
+                "type": "Number",
+                "inputType": "number",
+                "required": false,
+                "validationRegex": "TODO"
+            }
+        ]
     }
 }

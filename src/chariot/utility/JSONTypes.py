@@ -11,5 +11,5 @@ class JSONDict(Dict[str, JSONObject]):
 
 class JSONList(List[JSONObject]):
     pass
-    
+
 __all__ = ['JSONDict', 'JSONList', 'JSONObject', 'JSONValue']

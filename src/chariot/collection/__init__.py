@@ -1,1 +1,3 @@
+from chariot.collection.DataCollectionWorker import DataCollectionWorker
+from chariot.collection.DataCollector import DataCollector
 from chariot.collection.DataCollectionManager import DataCollectionManager

@@ -12,12 +12,12 @@ class _DeviceAdapterFactory(AbstractFactory):
     def __init__(self):
         self.instanceMap: Dict[str, Type[DeviceAdapter]] = {
             'ImpinjXArray': ImpinjXArrayAdapter,
-            'ImpinjSpeedwayR420': ImpinjR420Adapter
+            'ImpinjSpeedwayR420': ImpinjR420Adapter,
         }
         self.instanceName: str = 'device'
         self.typeField: str = 'deviceType'
 
-        currentPath = path.dirname(path.abspath(__file__))
+        currentPath: str = path.dirname(path.abspath(__file__))
         with open(f'{currentPath}/driver/supportedDevices.json') as deviceList:
             self._supportedDevices: JSONDict = load(deviceList)
 

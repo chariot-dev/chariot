@@ -72,13 +72,13 @@ def modifyNetwork():
         del requestContent[parser.getNewNetworkNameStr()]
 
     # at this point, 'newNetworkName' is not a key, so validate configuration and update
-    NetworkManager.getNetwork(networkName).getConfiguration().updateConfig(requestContent)
+    NetworkManager.getNetwork(networkName).updateConfig(requestContent)
 
     # if applicable, modify collection so the new network name is in collection and old one is deleted
     if hasNewName:
         # notice that requestContent[TypeStrings.Network_Identifier.value] is used, this will return the new name since
         # keys were updated. So 'networkName' would be the old name of the network
-        NetworkManager.replaceNetwork(requestContent[TypeStrings.Network_Identifier.value], networkName)
+        NetworkManager.replaceNetwork(networkName, requestContent[TypeStrings.Network_Identifier.value])
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -173,7 +173,7 @@ def modifyDevice():
     # remove networkName key so that updating configuration does not raise an error
     del requestContent[TypeStrings.Network_Identifier.value]
 
-    NetworkManager.getNetwork(networkName).getDevice(deviceName).getConfiguration().updateConfig(requestContent)
+    NetworkManager.getNetwork(networkName).getDevice(deviceName).updateConfig(requestContent)
 
     # if applicable, modify collection so the new device name is in collection and old one is deleted
     if hasNewName:
@@ -248,7 +248,7 @@ def modifyDatabaseConfiguration():
         del requestContent[parser.getNewDbIdStr()]
 
     # at this point, 'newDbId' is not a key, so validate configuration and update
-    DatabaseManager.getDbWriter(dbId).getConfiguration().updateConfig(requestContent)
+    DatabaseManager.getDbWriter(dbId).updateConfig(requestContent)
 
     # if applicable, modify collection so the new dbId is in collection and old one is deleted
     if hasNewName:

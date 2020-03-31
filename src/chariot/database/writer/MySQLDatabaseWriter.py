@@ -3,7 +3,7 @@ from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
 from chariot.utility.JSONTypes import JSONObject
 from chariot.database.writer import DatabaseWriter
-from chariot.database.configuration import DatabaseConfiguration, MySQLDatabaseConfiguration
+from chariot.database.configuration import MySQLDatabaseConfiguration
 from typing import Dict, List, Optional
 
 
@@ -15,12 +15,12 @@ class MySQLDatabaseWriter(DatabaseWriter):
 
     def _connect(self):
         self.connection = connector.connect(
-            user=self.config.username,
-            password=self.config.password,
-            host=self.config.host,
-            port=self.config.port,
-            database=self.config.databaseName,
-            connection_timeout=round(self.config.timeoutMS / 1000)
+            user=self._config.username,
+            password=self._config.password,
+            host=self._config.host,
+            port=self._config.port,
+            database=self._config.databaseName,
+            connection_timeout=round(self._config.timeoutMS / 1000)
         )
         if self.connection.is_connected():
             self.cursor = self.connection.cursor()
@@ -32,19 +32,19 @@ class MySQLDatabaseWriter(DatabaseWriter):
 
     def _initializeTable(self):
         self.cursor.execute(
-            f'CREATE TABLE IF NOT EXISTS {self.config.tableName}(id INTEGER PRIMARY KEY AUTO_INCREMENT, insertion_time BIGINT, relative_time BIGINT, freeform VARBINARY(64535))'
+            f'CREATE TABLE IF NOT EXISTS {self._config.tableName}(id INTEGER PRIMARY KEY AUTO_INCREMENT, device_name VARCHAR(255), insertion_time BIGINT, production_time BIGINT, freeform VARBINARY(64535))'
         )
 
-    def _insertOne(self, dataPoint: Dict[str, JSONObject]):
+    def _insertOne(self, record: Dict[str, JSONObject]):
         self.cursor.execute(
-            f'INSERT INTO {self.config.tableName} (relative_time, insertion_time, freeform) VALUES (%s, %s, %s)',
-            (dataPoint['relative_time'], dataPoint['insertion_time'], dataPoint['freeform'])
+            f'INSERT INTO {self._config.tableName} (device_name, insertion_time, production_time, freeform) VALUES (%s, %s, %s, %s)',
+            (record['device_name'], record['insertion_time'], record['production_time'], record['freeform'])
         )
         self.connection.commit()
 
-    def _insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
+    def _insertMany(self, records: List[Dict[str, JSONObject]]):
         self.cursor.executemany(
-            f'INSERT INTO {self.config.tableName} (relative_time, insertion_time, freeform) VALUES (%s, %s, %s)',
-            [(dataPoint['relative_time'], dataPoint['insertion_time'], dataPoint['freeform']) for dataPoint in dataPoints]
+            f'INSERT INTO {self._config.tableName} (device_name, insertion_time, production_time, freeform) VALUES (%s, %s, %s, %s)',
+            ((record['device_name'], record['insertion_time'], record['production_time'], record['freeform']) for record in records)
         )
         self.connection.commit()
