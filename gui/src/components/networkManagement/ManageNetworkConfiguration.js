@@ -11,7 +11,6 @@ import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
 const getNetworkDetailsBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
-const xhr = new XMLHttpRequest();
 
 class ManageNetworkConfiguration extends React.Component {
   constructor(props) {
@@ -50,56 +49,36 @@ class ManageNetworkConfiguration extends React.Component {
 
   // Gets run upon initial component render to load the default values of the text fields
   componentDidMount() {
-    xhr.open('GET', getNetworkDetailsBaseUrl + '?networkName=' + this.state.originalNetworkName);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    fetch(getNetworkDetailsBaseUrl + '?networkName=' + this.state.originalNetworkName)
+    .then(res => res.json())
+    .then(
+      // On success
+      (result) => {
+        var responseJsonArray = result; // Response is a dictionary 
 
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+        var properties = {};
+        properties["Network Name"] = responseJsonArray["networkName"];
+        properties["Network Description"] = responseJsonArray["description"];
 
-          console.log(responseJsonArray);
+        this.setState({originalNetworkProperties: properties});    
+        
+        // Initialize all to-be-saved properties to be the original, in the event not all properties are modified so can still be saved
+        this.setState({newNetworkProperties: properties});
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
 
-          var properties = {};
-          properties["Network Name"] = responseJsonArray["networkName"];
-          properties["Network Description"] = responseJsonArray["description"];
-
-          this.setState({originalNetworkProperties: properties});
-
-          // Initialize all to-be-saved properties to be the original, in the event not all properties are modified so can still be saved
-          this.setState({newNetworkProperties: properties});
-        }
-      }
-    }
     
-    xhr.send();
+        /*
+          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
+        */ 
+      }
+    )
   }
 
 
   updateNetworkConfiguration = () => {
-    xhr.open('PUT', getNetworkDetailsBaseUrl);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          this.setState({ confirmIsOpen: false });
-          this.setState({ successIsOpen: !this.state.successIsOpen });
-        }
-        else if (xhr.status === 400){
-          this.setState({ errorIsOpen: !this.state.errorIsOpen }, function () {
-            var returnedErrorMessage = JSON.parse(xhr.response).message;
-            this.setState({ errorMessage: returnedErrorMessage }, function () {
-              console.log(this.state.errorMessage);
-            });
-          });
-          
-        }
-      }
-    }
-
     var data = {};
 
     if (this.state.originalNetworkName === this.state.newNetworkProperties["Network Name"]) {
@@ -116,9 +95,36 @@ class ManageNetworkConfiguration extends React.Component {
       }     
     }
 
-    console.log(data);
-    
-    xhr.send(JSON.stringify(data));
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    };
+
+    fetch(getNetworkDetailsBaseUrl, requestOptions)
+    .then(
+      () => {
+        this.setState({ confirmIsOpen: false });
+        this.setState({ successIsOpen: !this.state.successIsOpen }); 
+      },
+      // If put was unsuccessful, update state and display error modal
+      (error) => {
+        this.setState({ errorIsOpen: !this.state.errorIsOpen }, function () {
+          var returnedErrorMessage = error.message;
+
+          this.setState({ errorMessage: returnedErrorMessage }, function () {
+            console.log(this.state.errorMessage);
+
+            /*
+              Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
+            */ 
+          });
+        });      
+        /*
+          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
+        */ 
+      }
+    )
   }
 
   toggleErrorModal = () => {
@@ -140,7 +146,7 @@ class ManageNetworkConfiguration extends React.Component {
             <div className="form-group">
               Network Description: <textarea className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" defaultValue={this.state.originalNetworkProperties["Network Description"]} onChange={this.handleChange}></textarea>
             </div>
-            <Link to="/networkManager">
+            <Link to="/manageExistingNetworks">
               <Button variant="primary" className="float-left footer-button">Back</Button>
             </Link>
             <Button variant="primary" className="float-right footer-button" type="submit">Save</Button>

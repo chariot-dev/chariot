@@ -13,7 +13,6 @@ import { Link } from 'react-router-dom';
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 
 const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
-const xhr = new XMLHttpRequest();
 
 class ChooseNetwork extends Component {
   constructor(props) {
@@ -24,27 +23,31 @@ class ChooseNetwork extends Component {
   }
 
   componentDidMount () {
-    xhr.open('GET', getAllNetworksBaseUrl);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    fetch(getAllNetworksBaseUrl)
+    .then(res => res.json())
+    .then(
+      // On success
+      (result) => {
+        var responseJsonArray = result; // Response is a dictionary  
 
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+        var updatedNetworksJsonArray = this.state.existingNetworks;
 
-          var updatedNetworksJsonArray = this.state.existingNetworks; 
-
-          for (var i = 0; i < responseJsonArray.length; i++) {
-            updatedNetworksJsonArray.push(responseJsonArray[i]);
-          }
-
-          this.setState({ existingNetworks: updatedNetworksJsonArray });
+        for (var i = 0; i < responseJsonArray.length; i++) {
+          updatedNetworksJsonArray.push(responseJsonArray[i]);
         }
+
+        this.setState({ existingNetworks: updatedNetworksJsonArray });
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+
+   
+       /*
+         Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
+       */ 
       }
-    }
-    
-    xhr.send();
+    )
   }
 
   render() {

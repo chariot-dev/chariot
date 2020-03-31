@@ -13,7 +13,6 @@ import Button from 'react-bootstrap/Button';
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 
 const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
-const xhr = new XMLHttpRequest();
 
 class ManageExistingNetworks extends Component {
   constructor(props) {
@@ -25,28 +24,30 @@ class ManageExistingNetworks extends Component {
 
 
   componentDidMount() {
-    xhr.open('GET', getAllNetworksBaseUrl);
-    xhr.setRequestHeader("Content-Type", "application/json");
-
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
-
-          var updatedNetworksJsonArray = this.state.existingNetworks; 
-
-          for (var i = 0; i < responseJsonArray.length; i++) {
-            updatedNetworksJsonArray.push(responseJsonArray[i]);
-          }
-
-          this.setState({ existingNetworks: updatedNetworksJsonArray });
-          console.log(updatedNetworksJsonArray);
+    // Execute the get request to 'getAllNetworksBaseUrl' using fetch
+    fetch(getAllNetworksBaseUrl)
+    .then(res => res.json())
+    .then(
+      // If get was successful, update state with recieved network information
+      (result) => {
+        console.log(result);
+        var responseJsonArray = result;
+        
+        var updatedNetworksJsonArray = this.state.existingNetworks; 
+        for (var i = 0; i < responseJsonArray.length; i++) {
+          updatedNetworksJsonArray.push(responseJsonArray[i]);
         }
+
+        this.setState({ existingNetworks: updatedNetworksJsonArray });
+      },  
+      
+      /*
+        If get was unsuccessful, update state and display error modal
+      */
+      (error) => {
+        console.log(error.message);
       }
-    }
-    
-    xhr.send();
+    )
   }
   
 

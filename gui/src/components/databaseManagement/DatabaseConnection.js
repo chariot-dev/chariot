@@ -7,8 +7,6 @@ import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
-const xhr = new XMLHttpRequest();
-
 const databaseGetBaseUrl = "http://localhost:5000/chariot/api/v1.0/database"
 
 class DatabaseConnection extends Component {
@@ -42,7 +40,7 @@ class DatabaseConnection extends Component {
         this.setState({supportedDatabaseTypes: tempSupportedDatabaseTypes});
       },
       (error) => {
-        console.log(error);
+        console.log(error.message);
       }
     )
   }

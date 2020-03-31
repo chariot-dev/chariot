@@ -18,7 +18,6 @@ import SuccessModalBody from '../shared/SuccessModalBody';
 
 const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
 const deleteNetworkBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
-const xhr = new XMLHttpRequest();
 
 class DeleteNetwork extends Component {
   constructor(props) {
@@ -34,27 +33,31 @@ class DeleteNetwork extends Component {
   } 
 
   componentDidMount() {
-    xhr.open('GET', getAllNetworksBaseUrl);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    fetch(getAllNetworksBaseUrl)
+    .then(res => res.json())
+    .then(
+      // On success
+      (result) => {
+        var responseJsonArray = result; // Response is a dictionary  
 
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+        var updatedNetworksJsonArray = this.state.existingNetworks;
 
-          var updatedNetworksJsonArray = this.state.existingNetworks; 
-
-          for (var i = 0; i < responseJsonArray.length; i++) {
-            updatedNetworksJsonArray.push(responseJsonArray[i]);
-          }
-
-          this.setState({ existingNetworks: updatedNetworksJsonArray });
+        for (var i = 0; i < responseJsonArray.length; i++) {
+          updatedNetworksJsonArray.push(responseJsonArray[i]);
         }
+
+        this.setState({ existingNetworks: updatedNetworksJsonArray });
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+
+  
+        /*
+          Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
+        */ 
       }
-    }
-    
-    xhr.send();
+    )
   }
 
 
@@ -74,26 +77,33 @@ class DeleteNetwork extends Component {
 
 
   toggleSuccessModal = () => {
-    xhr.open('DELETE', deleteNetworkBaseUrl + "?networkName=" + this.state.selectedNetworkToDelete);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    // Delete request options
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    };
 
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          this.setState({
-            confirmIsOpen: false
-          });
-          this.setState({
-            successIsOpen: !this.state.successIsOpen
-          });      
-        }
-        else {
-          console.log("ERROR");
-        }
+    fetch(deleteNetworkBaseUrl + "?networkName=" + this.state.selectedNetworkToDelete, requestOptions)
+    // On success
+    .then(
+      () => {
+        this.setState({
+          confirmIsOpen: false
+        });
+        this.setState({
+          successIsOpen: !this.state.successIsOpen
+        });
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+
+    
+        /*
+          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
+        */ 
       }
-    }
-
-    xhr.send();
+    )
   }
 
 
