@@ -15,7 +15,7 @@ from test.testutils import MockDeviceTester, MockServer, TestDeviceAdapter, Test
 class DataCollectorTest(MockDeviceTester):
     instance: Optional[DataCollector] = None
     NUM_DEVICES: int = 64
-    EPISODE_LEN: float = 15.0
+    EPISODE_LEN: float = 600
 
     def _buildNetwork(self) -> Network:
         networkConfig: NetworkConfiguration = NetworkConfiguration({
@@ -49,7 +49,7 @@ class DataCollectorTest(MockDeviceTester):
         network: Network = self._buildNetwork()
         database: TestDatabaseWriter = self._buildDatabase()
         for i in range(self.NUM_DEVICES):
-            network.addDevice(self._buildDevice(f'Test Device {i}'))
+            network.addDevice(self._buildDevice(f'Test Device {i + 1}'))
         collectorConfig: DataCollectionConfiguration = DataCollectionConfiguration({
             'configId': 'Test Collector',
             'network': network,

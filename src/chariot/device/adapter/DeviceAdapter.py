@@ -1,11 +1,11 @@
 from abc import ABCMeta, abstractmethod
-from sys import exc_info
 from time import time
 from typing import Dict, Type
 from queue import SimpleQueue as Queue
 from chariot.device.configuration import DeviceConfiguration
 from chariot.utility.exceptions.ChariotExceptions import *
 from chariot.utility.JSONTypes import JSONObject
+
 
 class DeviceAdapter(metaclass=ABCMeta):
     def __init__(self, config: Type[DeviceConfiguration]):

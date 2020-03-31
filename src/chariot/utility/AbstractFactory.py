@@ -1,6 +1,6 @@
 from abc import ABC
-from typing import Any, Dict, Type, Union
-from chariot.utility.JSONTypes import JSONObject
+from typing import Any, Dict, Type
+
 
 class AbstractFactory(ABC):
     def __init__(self):

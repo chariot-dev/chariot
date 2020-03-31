@@ -1,0 +1,9 @@
+include *.md
+include LICENSE
+include *.py
+include *.txt
+include tox.ini
+include 
+recursive-include test *.py
+graft chariot
+recursive-include docs *.yml

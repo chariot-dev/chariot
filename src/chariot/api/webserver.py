@@ -301,6 +301,7 @@ def retrieveAllDbConfigs():
 
 # ---  This section deals with errorHandlers  --- #
 @app.errorhandler(NameNotFoundError)
+@app.errorhandler(NoIdentifierError)
 def handleInvalidUsage(error):
     res = jsonify(toDict(error.message))
     res.status_code = error.status_code
@@ -323,13 +324,6 @@ def handleItemNotSupported(error):
 
 @app.errorhandler(DatabaseConnectionError)
 def handleDatabaseNotConnected(error):
-    res = jsonify(toDict(error.message))
-    res.status_code = error.status_code
-    return res
-
-
-@app.errorhandler(NoIdentifierError)
-def handleInvalidUsage(error):
     res = jsonify(toDict(error.message))
     res.status_code = error.status_code
     return res

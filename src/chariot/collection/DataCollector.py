@@ -1,5 +1,5 @@
 from math import ceil
-from multiprocessing import cpu_count, Event, Process
+from multiprocessing import Event
 from multiprocessing import SimpleQueue as Queue
 from queue import Empty as QueueEmptyException
 from threading import Lock, Timer
@@ -48,7 +48,7 @@ class DataCollector:
 
     def getNetwork(self) -> Network:
         return self._config.network
-    
+
     # implement error handling using self._errorQueue here, this runs in a separate thread
     def _handleErrors(self) -> None:
         # use self._onError to report errors that cannot be handled here and should be passed to the user
@@ -81,7 +81,7 @@ class DataCollector:
         self._devices = [device for device in network.getDevices().values()]
         if len(self._devices) == 0:
             raise AssertionError('Can\'t collect data from a network with no devices')
-        
+
         # set the minimum poll delay for any action to the max between the default and 90% of the min from the devices in a network
         devicePolls: Iterable[DeviceAdapter] = (0.9 * device.getConfiguration().pollDelay / 1000 for device in self._devices)
         minDevicePoll: float = min(devicePolls)
@@ -113,7 +113,7 @@ class DataCollector:
         self._errorHandler.start()
         for workerProcess in self._workerProcesses:
             workerProcess.start()
-            sleep(self.PROCESS_CREATION_DELAY) # seems to be necessary to avoid random bad forks
+            sleep(self.PROCESS_CREATION_DELAY)  # seems to be necessary to avoid random bad forks
         if hasattr(self._config, 'runTime'):
             self._stopTimer = Timer(float(self._config.runTime / 1000), self._stopCollection, args=(True,))
             self._stopTimer.start()
