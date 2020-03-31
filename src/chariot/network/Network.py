@@ -1,5 +1,5 @@
 from threading import Lock
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional
 from chariot.device.adapter import DeviceAdapter
 from chariot.network.configuration.NetworkConfiguration import NetworkConfiguration
 from chariot.utility.JSONTypes import JSONObject

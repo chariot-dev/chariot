@@ -1,17 +1,7 @@
-from threading import Thread
-# unused right now, but will be useful for scaling past a couple of devices
-from multiprocessing.queues import Queue as ProcessQueue
 from typing import Dict
-from sys import exc_info
-from time import time
-from queue import Empty as QueueEmptyException, Queue as ThreadQueue
 from chariot.collection import DataCollector
-from chariot.device.adapter import DeviceAdapter
 from chariot.utility import Manager
 from chariot.utility.JSONTypes import JSONObject
-from chariot.network import Network
-from chariot.database.writer import DatabaseWriter
-from chariot.utility.exceptions.ChariotExceptions import *
 
 
 class DataCollectionManager(Manager):

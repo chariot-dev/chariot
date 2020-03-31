@@ -1,8 +1,6 @@
 from math import ceil
 from multiprocessing import Event
-import signal
-from time import sleep, time
-from threading import current_thread, main_thread, Thread
+from time import sleep
 from typing import Callable, Dict, List, Optional, Set
 from queue import SimpleQueue as Queue, Empty as QueueEmptyException
 from chariot.device.adapter import DeviceAdapter

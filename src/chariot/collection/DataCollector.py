@@ -1,7 +1,6 @@
 from math import ceil
-from multiprocessing import cpu_count, Event, Process
+from multiprocessing import cpu_count, Event
 from multiprocessing import SimpleQueue as Queue
-from queue import Empty as QueueEmptyException
 from threading import Lock, Timer
 from time import sleep
 from typing import Callable, Iterable, List, Optional

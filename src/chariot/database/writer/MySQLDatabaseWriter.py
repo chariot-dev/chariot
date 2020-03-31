@@ -3,7 +3,7 @@ from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
 from chariot.utility.JSONTypes import JSONObject
 from chariot.database.writer import DatabaseWriter
-from chariot.database.configuration import DatabaseConfiguration, MySQLDatabaseConfiguration
+from chariot.database.configuration import MySQLDatabaseConfiguration
 from typing import Dict, List, Optional
 
 

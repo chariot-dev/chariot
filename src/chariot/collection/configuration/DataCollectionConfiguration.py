@@ -1,7 +1,7 @@
 from chariot.configuration import Configuration
 from chariot.network import Network
 from chariot.database.writer import DatabaseWriter
-from chariot.utility.JSONTypes import JSONDict, JSONObject
+from chariot.utility.JSONTypes import JSONObject
 from typing import Dict, Type
 
 

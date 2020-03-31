@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from sys import exc_info
 from time import time
 from typing import Dict, Type
 from queue import SimpleQueue as Queue
