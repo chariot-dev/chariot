@@ -50,7 +50,7 @@ class ManageNetworkConfiguration extends React.Component {
 
   // Gets run upon initial component render to load the default values of the text fields
   componentDidMount() {
-    xhr.open('GET', getNetworkDetailsBaseUrl + '?NetworkName=' + this.state.originalNetworkName);
+    xhr.open('GET', getNetworkDetailsBaseUrl + '?networkName=' + this.state.originalNetworkName);
     xhr.setRequestHeader("Content-Type", "application/json");
 
     // Once a response is received
@@ -59,9 +59,11 @@ class ManageNetworkConfiguration extends React.Component {
         if (xhr.status === 200) {
           var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
 
+          console.log(responseJsonArray);
+
           var properties = {};
-          properties["Network Name"] = responseJsonArray["NetworkName"];
-          properties["Network Description"] = responseJsonArray["Description"];
+          properties["Network Name"] = responseJsonArray["networkName"];
+          properties["Network Description"] = responseJsonArray["description"];
 
           this.setState({originalNetworkProperties: properties});
 
@@ -96,15 +98,25 @@ class ManageNetworkConfiguration extends React.Component {
           
         }
       }
-
-
     }
 
-    var data = {
-      "NetworkName": this.state.originalNetworkName,
-      "NewName": this.state.newNetworkProperties["Network Name"],
-      "Description": this.state.newNetworkProperties["Network Description"]
+    var data = {};
+
+    if (this.state.originalNetworkName == this.state.newNetworkProperties["Network Name"]) {
+      data = {
+        "networkName": this.state.originalNetworkName,
+        "description": this.state.newNetworkProperties["Network Description"]
+      }
     }
+    else {
+      data = {
+        "networkName": this.state.originalNetworkName,
+        "newNetworkName": this.state.newNetworkProperties["Network Name"],
+        "description": this.state.newNetworkProperties["Network Description"]
+      }     
+    }
+
+    console.log(data);
     
     xhr.send(JSON.stringify(data));
   }
