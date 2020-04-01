@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List, Union
 from chariot.collection import DataCollector
 from chariot.utility import Manager
 from chariot.utility.JSONTypes import JSONObject
