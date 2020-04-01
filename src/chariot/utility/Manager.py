@@ -10,47 +10,47 @@ class Manager(ABC):
     def __init__(self):
         self.collection: Dict[str, Any] = {}
 
-    def _addToCollection(self, t: T) -> None:
-        id: str = t.getConfiguration().getId()
-        idField: str = t.getConfiguration().getIdField()
-        if id is None:
+    def _addToCollection(self, item: T) -> None:
+        itemId: str = item.getConfiguration().getId()
+        idField: str = item.getConfiguration().getIdField()
+        if itemId is None:
             raise NoIdentifierError(ErrorStrings.ERR_Specify_Identifier.value.format(idField))
 
         # When adding a key, if the same key is in the dict, the values are overridden. Avoid this.
-        if id not in self.collection:
-            self.collection[id] = t
+        if itemId not in self.collection:
+            self.collection[itemId] = item
         else:
-            raise DuplicateNameError(ErrorStrings.ERR_Not_Unique_Name.value.format(id, idField))
+            raise DuplicateNameError(ErrorStrings.ERR_Not_Unique_Name.value.format(itemId, idField))
 
-    def _deleteFromCollection(self, id: str):
-        if id is None:
+    def _deleteFromCollection(self, itemId: str):
+        if itemId is None:
             raise NoIdentifierError(ErrorStrings.ERR_Specify_Identifier.value.format(ErrorStrings.Err_General_Id))
 
-        if id in self.collection:
-            del self.collection[id]
+        if itemId in self.collection:
+            del self.collection[itemId]
         else:
-            raise NameNotFoundError(ErrorStrings.Err_Id_Not_In_Collection.value.format(id))
+            raise NameNotFoundError(ErrorStrings.Err_Id_Not_In_Collection.value.format(itemId))
 
     # Convenience method used to return a generic object via a given network name
-    def _retrieveFromCollection(self, id: str) -> T:
+    def _retrieveFromCollection(self, itemId: str) -> T:
         try:
-            t: T = self.collection[id]
+            item: T = self.collection[itemId]
         except KeyError:
-            raise NameNotFoundError(ErrorStrings.Err_Id_Not_In_Collection.value.format(id))
-        return t
+            raise NameNotFoundError(ErrorStrings.Err_Id_Not_In_Collection.value.format(itemId))
+        return item
 
     # This method gives a new key name to an already defined item.
     def _modifyNameInCollection(self, toFind: str, newName: str):
-        t: T = self._retrieveFromCollection(toFind)
+        item: T = self._retrieveFromCollection(toFind)
 
         # check that newName is unique to avoid data overwrites
         if newName in self.collection:
             raise DuplicateNameError(
-                ErrorStrings.ERR_Not_Unique_Name.value.format(newName, t.getConfiguration().getIdField())
+                ErrorStrings.ERR_Not_Unique_Name.value.format(newName, item.getConfiguration().getIdField())
             )
 
         # modify configuration to reflect new name
-        t.updateConfig({t.getConfiguration().getIdField(): newName})
+        item.updateConfig({item.getConfiguration().getIdField(): newName})
 
         # update collection, make new key and delete the old one
         self.collection[newName] = self.collection[toFind]

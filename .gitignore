@@ -16,6 +16,7 @@ chariot.egg-info
 # python
 *.py[cod]
 __pycache__/
+.eggs
 
 #pytest
 .coverage

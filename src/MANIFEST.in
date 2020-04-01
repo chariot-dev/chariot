@@ -3,7 +3,10 @@ include LICENSE
 include *.py
 include *.txt
 include tox.ini
-include 
+include .pylintrc
+include .flake8
+include mypy.ini
+include pytest.ini
 recursive-include test *.py
 graft chariot
-recursive-include docs *.yml
+# recursive-include docs *.yml

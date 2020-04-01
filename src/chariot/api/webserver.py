@@ -304,28 +304,28 @@ def retrieveAllDbConfigs():
 @app.errorhandler(NoIdentifierError)
 def handleInvalidUsage(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.status_code
+    res.status_code = error.statusCode
     return res
 
 
 @app.errorhandler(DuplicateNameError)
 def handleDuplicateName(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.status_code
+    res.status_code = error.statusCode
     return res
 
 
 @app.errorhandler(ItemNotSupported)
 def handleItemNotSupported(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.status_code
+    res.status_code = error.statusCode
     return res
 
 
 @app.errorhandler(DatabaseConnectionError)
 def handleDatabaseNotConnected(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.status_code
+    res.status_code = error.statusCode
     return res
 
 
