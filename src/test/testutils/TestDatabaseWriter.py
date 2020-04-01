@@ -21,7 +21,7 @@ class TestDatabaseWriter(DatabaseWriter):
         if self.client is not None:
             self.client.close()
             self.client = None
-            # os.remove('testdb')
+            os.remove('testdb')
 
     def _connect(self) -> None:
         self.client = sqlite3.connect('testdb', check_same_thread=False)
