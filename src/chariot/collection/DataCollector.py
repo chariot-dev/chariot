@@ -48,7 +48,6 @@ class DataCollector:
 
     def getNetwork(self) -> Network:
         return self._config.network
-
     # implement error handling using self._errorQueue here, this runs in a separate thread
     def _handleErrors(self) -> None:
         # use self._onError to report errors that cannot be handled here and should be passed to the user

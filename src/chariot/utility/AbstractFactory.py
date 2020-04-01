@@ -1,7 +1,6 @@
 from abc import ABC
 from typing import Any, Dict, Type
 
-
 class AbstractFactory(ABC):
     def __init__(self):
         self.instanceMap: Dict[str, Type] = {}

@@ -22,6 +22,7 @@ class DataCollectionWorker:
         self._consumerThreads: List[HandledThread] = []
         self._minPollDelay: float = minPollDelay
         self._outputDelay: float = max(self._minPollDelay, self.OUTPUT_WRITE_SLEEP)
+        self._consumeTimeout: float = max(self._minPollDelay, self.DEFAULT_TIMEOUT)
         self._running: bool = False
         self._producerThreads: Dict[str, HandledThread] = {}
         self._outputHooks: Set[Callable] = set()
@@ -38,7 +39,7 @@ class DataCollectionWorker:
             output: List[JSONObject] = []
             try:
                 data: JSONObject = device.getDataQueue().get(
-                    block=True, timeout=self.DEFAULT_TIMEOUT)
+                    block=True, timeout=self._consumeTimeout)
                 output.append(data)
             except QueueEmptyException:
                 pass
@@ -76,7 +77,7 @@ class DataCollectionWorker:
             output: List[List[JSONObject]] = []
             try:
                 data: List[JSONObject] = self._dataQueue.get(
-                    block=True, timeout=self.DEFAULT_TIMEOUT)
+                    block=True, timeout=self._consumeTimeout)
                 output.append(data)
             except QueueEmptyException:
                 pass

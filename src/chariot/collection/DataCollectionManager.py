@@ -1,5 +1,4 @@
-# unused right now, but will be useful for scaling past a couple of devices
-from typing import Dict, List, Union
+from typing import Dict
 from chariot.collection import DataCollector
 from chariot.utility import Manager
 from chariot.utility.JSONTypes import JSONObject
@@ -32,5 +31,5 @@ class DataCollectionManager(Manager):
             return self._getCollectorsJson()
         return [collector for collector in self.collection.values()]
 
-    def replaceCollector(self, newName: str, collectorName: str) -> None:
-        self._modifyNameInCollection(newName, collectorName)
+    def replaceCollector(self, collectorName: str, newName: str) -> None:
+        self._modifyNameInCollection(collectorName, newName)
