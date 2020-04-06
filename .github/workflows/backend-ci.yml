@@ -41,4 +41,5 @@ jobs:
         bandit -r chariot
     - name: Test with pytest
       run: |
+        cd src
         pytest -v test
