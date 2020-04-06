@@ -1,5 +1,6 @@
 # Chariot Exceptions Library
 
+
 # TODO: pass in arguments to the error signifying the violating network/device
 class DeviceNotConnectedError(AssertionError):
     def __init__(self):

@@ -52,7 +52,7 @@ class _DatabaseWriterFactory(AbstractFactory):
                 # now combine the specified device template with that of the generic template
                 specificDb = load(dbTemplate)
                 return self.combineConfigWithGeneric(specificDb, dbName)
-        except:
+        except FileNotFoundError:
             raise ItemNotSupported(ErrorStrings.ERR_Item_Not_Supported.value.format(self.instanceName, dbName))
 
     # use this method to combine settings from a specific configuration instance with the generic required fields

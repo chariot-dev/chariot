@@ -90,7 +90,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def isConnected(self) -> bool:
         return self.connected
 
-    # this method locks the dbwriter from modification e.g during a collection episode for as long as the lock 
+    # this method locks the dbwriter from modification e.g during a collection episode for as long as the lock
     # passed in is active
     def lock(self, lock: Lock, reason: Optional[str] = None):
         if self._modLock is not None:
@@ -101,10 +101,10 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def updateConfig(self, config: JSONObject) -> None:
         # if there is a modification lock in place and it is locked,
         if self._modLock and self._modLock.locked():
-                message: str = 'This database writer is currently locked from modification'
-                if self._lockReason is not None:
-                    message += f'. It is being used by {self._lockReason}'
-                raise AssertionError(message)
+            message: str = 'This database writer is currently locked from modification'
+            if self._lockReason is not None:
+                message += f'. It is being used by {self._lockReason}'
+            raise AssertionError(message)
         elif self._modLock:
             self._modLock = None
         self._config.updateConfig(config)

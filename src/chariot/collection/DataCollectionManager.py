@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List, Union
 from chariot.collection import DataCollector
 from chariot.utility import Manager
 from chariot.utility.JSONTypes import JSONObject
@@ -26,7 +26,7 @@ class DataCollectionManager(Manager):
         # will implement when Network and DatabaseWriter issue is resolved
         return {}
 
-    def getCollectors(self, json=False) -> Dict[str, str]:
+    def getCollectors(self, json=False) -> [Union[List[DataCollector], Dict[str, JSONObject]]]:
         if json:
             return self._getCollectorsJson()
         return [collector for collector in self.collection.values()]

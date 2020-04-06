@@ -1,5 +1,5 @@
 from math import ceil
-from multiprocessing import cpu_count, Event
+from multiprocessing import Event
 from multiprocessing import SimpleQueue as Queue
 from threading import Lock, Timer
 from time import sleep
@@ -18,7 +18,8 @@ class DataCollector:
     JOIN_TIMEOUT: float = 1.0
     PROCESS_CREATION_DELAY = 0.1
 
-    def __init__(self, configuration: DataCollectionConfiguration, onEnd: Optional[Callable] = None, onError: Optional[Callable] = None):
+    def __init__(self, configuration: DataCollectionConfiguration, onEnd: Optional[Callable] = None,
+                 onError: Optional[Callable] = None):
         self._config: DataCollectionConfiguration = configuration
         self._devices: List[DeviceAdapter] = []
         self._errorHandler: HandledThread = HandledThread(name='Error-Handler', target=self._handleErrors)
@@ -47,7 +48,7 @@ class DataCollector:
 
     def getNetwork(self) -> Network:
         return self._config.network
-    
+
     # implement error handling using self._errorQueue here, this runs in a separate thread
     def _handleErrors(self) -> None:
         # use self._onError to report errors that cannot be handled here and should be passed to the user
@@ -80,8 +81,9 @@ class DataCollector:
         self._devices = [device for device in network.getDevices().values()]
         if len(self._devices) == 0:
             raise AssertionError('Can\'t collect data from a network with no devices')
-        
-        # set the minimum poll delay for any action to the max between the default and 90% of the min from the devices in a network
+
+        # set the minimum poll delay for any action to the max between
+        # the default and 90% of the min from the devices in a network
         devicePolls: Iterable[DeviceAdapter] = (0.9 * device.getConfiguration().pollDelay / 1000 for device in self._devices)
         minDevicePoll: float = min(devicePolls)
         self._minPollDelay = max(self._minPollDelay, minDevicePoll)
@@ -112,7 +114,7 @@ class DataCollector:
         self._errorHandler.start()
         for workerProcess in self._workerProcesses:
             workerProcess.start()
-            sleep(self.PROCESS_CREATION_DELAY) # seems to be necessary to avoid random bad forks
+            sleep(self.PROCESS_CREATION_DELAY)  # seems to be necessary to avoid random bad forks
         if hasattr(self._config, 'runTime'):
             self._stopTimer = Timer(float(self._config.runTime / 1000), self._stopCollection, args=(True,))
             self._stopTimer.start()
@@ -141,8 +143,8 @@ class DataCollector:
         if not calledFromTimer and self._stopTimer:
             if self._stopTimer.is_alive():
                 self._stopTimer.cancel()
-                # not sure if cancel calls join, i.e. if it's necessary to join on a Timer
-                # Timer source: https://github.com/python/cpython/blob/dab8423d220243efabbbcafafc12d90145539b50/Lib/threading.py#L1249
+                # not sure if cancel calls join, i.e. if it's necessary to join on a Timer. Timer Source:
+                # https://github.com/python/cpython/blob/dab8423d220243efabbbcafafc12d90145539b50/Lib/threading.py#L1249
                 self._stopTimer.join()
                 self._stopTimer = None
         if self._onEnd:

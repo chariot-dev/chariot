@@ -1,15 +1,14 @@
 import pytest
 from sqlite3 import Cursor
 from time import sleep
-from threading import Thread
 from typing import Dict, List, Optional
-from chariot.collection import DataCollector, DataCollectionWorker
+from chariot.collection import DataCollector
 from chariot.collection.configuration import DataCollectionConfiguration
 from chariot.database.configuration import DatabaseConfiguration
 from chariot.network import Network
 from chariot.network.configuration import NetworkConfiguration
 from chariot.utility.JSONTypes import JSONObject
-from test.testutils import MockDeviceTester, MockServer, TestDeviceAdapter, TestDatabaseWriter, TestDeviceConfiguration
+from test.testutils import MockDeviceTester, TestDatabaseWriter
 
 
 class DataCollectorTest(MockDeviceTester):
@@ -49,7 +48,7 @@ class DataCollectorTest(MockDeviceTester):
         network: Network = self._buildNetwork()
         database: TestDatabaseWriter = self._buildDatabase()
         for i in range(self.NUM_DEVICES):
-            network.addDevice(self._buildDevice(f'Test Device {i}'))
+            network.addDevice(self._buildDevice(f'Test Device {i + 1}'))
         collectorConfig: DataCollectionConfiguration = DataCollectionConfiguration({
             'configId': 'Test Collector',
             'network': network,

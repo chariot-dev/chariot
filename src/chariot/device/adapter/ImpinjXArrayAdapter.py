@@ -79,7 +79,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
 
     def _getToken(self, connectUrl: str, authUsername: str) -> str:
         tokenUrl: str = f'{connectUrl}/authentication/v1/token/{authUsername}'
-        response: requests.Response = requests.put(tokenUrl, { 'Authorization': tokenUrl })
+        response: requests.Response = requests.put(tokenUrl, {'Authorization': tokenUrl})
         token: str = response.json()['token']
         return token
 
@@ -94,16 +94,16 @@ class ImpinjXArrayAdapter(DeviceAdapter):
     def _revokeAuthToken(self) -> None:
         revokeUrl = f'{self.session.connectUrl}/authentication/v1/revokeToken'
         tokenData: Dict[str, str] = {'token': self.sesion.token}
-        response: requests.Response = requests.put(
+        requests.put(
             revokeUrl,
             data=dumps(tokenData),
             headers=self.session.basicAuthHeaders
-            )
+        )
         return
 
     def _stopItemsenseJob(self) -> None:
         stopUrl = f'{self.session.connectUrl}/control/v1/jobs/stop/{self.session.jobId}'
-        response: requests.Response = requests.post(stopUrl, headers=self.session.tokenAuthHeaders)
+        requests.post(stopUrl, headers=self.session.tokenAuthHeaders)
         return
 
     def _startDataCollection(self) -> None:
@@ -116,9 +116,9 @@ class ImpinjXArrayAdapter(DeviceAdapter):
             while not collectedAllPages:
                 response: requests.Response = requests.get(
                     self.session.dataRequestUrl,
-                    data = dumps(self.session.dataRequestBody),
-                    headers = self.session.tokenAuthHeaders
-                    )
+                    data=dumps(self.session.dataRequestBody),
+                    headers=self.session.tokenAuthHeaders
+                )
                 jsonData: JSONDict = response.json()
                 self._reportData(jsonData)
                 if 'nextPageMarker' in jsonData:
@@ -139,4 +139,4 @@ class ImpinjXArrayAdapter(DeviceAdapter):
         self.session = None
 
 
-__all__=['ImpinjXArrayAdapter']
+__all__ = ['ImpinjXArrayAdapter']

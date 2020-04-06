@@ -2,6 +2,7 @@ from sys import exc_info
 from traceback import format_exception
 from multiprocessing import Process
 
+
 class HandledProcess(Process):
     def run(self):
         try:
@@ -12,4 +13,3 @@ class HandledProcess(Process):
             # args[0]: the errorQueue passed in
             # print(err)
             self._args[0].put((self.name, err, format_exception(*exc_info())))
-

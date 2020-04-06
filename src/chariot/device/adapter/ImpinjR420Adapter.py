@@ -1,11 +1,9 @@
-from time import time
-from typing import Dict
 from sllurp.llrp import LLRPClientFactory
 from twisted.internet import reactor
-from typing import Dict, Optional
-from chariot.utility.JSONTypes import JSONObject
+from typing import Optional
 from chariot.device.adapter import DeviceAdapter
 from chariot.device.configuration import ImpinjR420Configuration
+
 
 class ImpinjR420Adapter(DeviceAdapter):
     def __init__(self, config: ImpinjR420Configuration):
@@ -17,7 +15,7 @@ class ImpinjR420Adapter(DeviceAdapter):
         reactor.run()
 
     def _connect(self) -> None:
-        #TODO: condition for the abscence of optional configs
+        # TODO: condition for the abscence of optional configs
         self.llrpFactory = LLRPClientFactory(
             report_every_n_tags=self._config.report_every_n_tags,
             tx_power=self._config.tx_power,

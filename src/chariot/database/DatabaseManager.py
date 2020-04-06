@@ -4,7 +4,6 @@ from chariot.utility import Manager
 
 
 class _DatabaseManager(Manager):
-
     def __init__(self):
         # TODO: load all database configs for a user upon instantiation
         self.collection: Dict[str, DatabaseWriter] = {}
@@ -28,7 +27,6 @@ class _DatabaseManager(Manager):
             allConfigs[key] = self._retrieveFromCollection(key).getConfiguration().toDict()
 
         return allConfigs
-
 
 
 # return a singleton instance

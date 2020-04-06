@@ -6,10 +6,13 @@ from typing import Dict, List, Union
 JSONValue = Union[str, int, float, bool, None]
 JSONObject = Union[JSONValue, 'JSONDict', 'JSONList']
 
+
 class JSONDict(Dict[str, JSONObject]):
     pass
 
+
 class JSONList(List[JSONObject]):
     pass
+
 
 __all__ = ['JSONDict', 'JSONList', 'JSONObject', 'JSONValue']
