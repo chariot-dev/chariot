@@ -40,7 +40,7 @@ class Manager(ABC):
         return t
 
     # This method gives a new key name to an already defined item.
-    def _modifyNameInCollection(self, newName: str, toFind: str):
+    def _modifyNameInCollection(self, toFind: str, newName: str):
         t: T = self._retrieveFromCollection(toFind)
 
         # check that newName is unique to avoid data overwrites
@@ -50,7 +50,7 @@ class Manager(ABC):
             )
 
         # modify configuration to reflect new name
-        t.getConfiguration().updateConfig({t.getConfiguration().getIdField(): newName})
+        t.updateConfig({t.getConfiguration().getIdField(): newName})
 
         # update collection, make new key and delete the old one
         self.collection[newName] = self.collection[toFind]

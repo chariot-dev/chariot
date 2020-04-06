@@ -8,16 +8,16 @@ class _DeviceConfigurationFactory(AbstractFactory):
     def __init__(self):
         self.instanceMap: Dict[str, Type[DeviceConfiguration]] = {
             'ImpinjXArray': ImpinjXArrayConfiguration,
-            'ImpinjSpeedwayR420': ImpinjR420Configuration
+            'ImpinjSpeedwayR420': ImpinjR420Configuration,
         }
         self.typeField = 'deviceType'
         self.instanceName: str = 'device configuration'
-    
+
     def getInstance(self, config: JSONObject) -> DeviceConfiguration:
         return super().getInstance(config)
 
 
-# Return singleton 
+# Return singleton
 DeviceConfigurationFactory = _DeviceConfigurationFactory()
 
 __all__ = ['DeviceConfigurationFactory']
