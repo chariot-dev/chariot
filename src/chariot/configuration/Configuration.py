@@ -68,6 +68,3 @@ class Configuration(ABC):
     @abstractmethod
     def getIdField(self) -> str:
         pass
-
-
-__all__ = ['Configuration']

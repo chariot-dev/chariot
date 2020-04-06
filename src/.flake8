@@ -1,2 +1,6 @@
-max_line_length = 100
-exclude = .tox,*.egg,build,data,include,lib,lib64,bin,share,.*
+[flake8]
+max_line_length = 130
+exclude = .tox,*.egg,build,data,include,lib,lib64,bin,share,.*, *__init__*
+ignore = F403 ; temporary
+statistics = True
+show_source = True

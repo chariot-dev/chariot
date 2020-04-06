@@ -1,4 +1,3 @@
 from chariot.database.DatabaseConfigurationFactory import DatabaseConfigurationFactory
 from chariot.database.DatabaseWriterFactory import DatabaseWriterFactory
 from chariot.database.DatabaseManager import DatabaseManager
-

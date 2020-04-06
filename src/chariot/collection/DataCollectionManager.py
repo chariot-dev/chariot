@@ -1,48 +1,35 @@
-from chariot.network import NetworkManager, Network
+from typing import Dict, List, Union
+from chariot.collection import DataCollector
+from chariot.utility import Manager
+from chariot.utility.JSONTypes import JSONObject
 
 
-class DataCollectionManager:
+class DataCollectionManager(Manager):
     # This class is intended to work with an instance of NetworkManager. The NetworkManager
     # is responsible for housing multiple user-defined networks. Once a network has been selected
     # for data collection, this class interacts with the NetworkManager to start and stop data collection
     # of all devices from the selected network
 
-    def __init__(self, networkManager: NetworkManager):
-        self.networkManager = networkManager
-        self.activeNetwork: Network = self.networkManager.getNetworkByIndex(0)  # default network to use
+    def __init__(self):
+        self.collection: Dict[str, DataCollector] = {}
 
-    def setActiveNetwork(self, networkToUse: str):
-        self.activeNetwork = self.networkManager.findNetworkByNetworkName(networkToUse)
+    def addCollector(self, collector: DataCollector) -> None:
+        self._addToCollection(collector)
 
-    def getActiveNetwork(self) -> Network:
-        return self.activeNetwork
+    def deleteCollector(self, collectorName: str) -> None:
+        self._deleteFromCollection(collectorName)
 
-    # This method starts the data collection process for all devices on the selected network.
-    # Simply iterate through the Network to get to the device and sends a start signal
-    def collectData(self, networkToUse: str):
-        # find the Network by unique network name
-        chosenNetwork: Network = self.networkManager.findNetworkByNetworkName(networkToUse)
+    def getCollector(self, collectorName: str) -> DataCollector:
+        return self._retrieveFromCollection(collectorName)
 
-        if chosenNetwork is not None:
-            self.activeNetwork = chosenNetwork  # update active network
-            # iterate the network collection and start device interaction
-            for device in chosenNetwork.getAllDevices():
-                device.startDataCollection()
+    def _getCollectorsJson(self) -> Dict[str, JSONObject]:
+        # will implement when Network and DatabaseWriter issue is resolved
+        return {}
 
-    # This method stops the data collection process for all devices on the selected network.
-    # Simply iterate through the Network to get to the device and sends a stop signal
-    def terminateDataCollection(self):
-        for device in self.activeNetwork.getAllDevices():
-            device.stopDataCollection()
+    def getCollectors(self, json=False) -> [Union[List[DataCollector], Dict[str, JSONObject]]]:
+        if json:
+            return self._getCollectorsJson()
+        return [collector for collector in self.collection.values()]
 
-    # This method is to handle ctrl-c in a graceful manner.
-    # NOTE: Python signal handlers are always executed in the main Python thread
-    #def handler(signum, frame):
-        # Handle cleanup which is gracefully terminating data collection
-        #print("SIGINT detected. Closing application.")
-        #self.terminateDataCollection()
-
-
-# Set the signal handler
-#signal.signal(signal.CTRL_C_EVENT, handler)
-
+    def replaceCollector(self, collectorName: str, newName: str) -> None:
+        self._modifyNameInCollection(collectorName, newName)

@@ -12,12 +12,12 @@ class _DeviceAdapterFactory(AbstractFactory):
     def __init__(self):
         self.instanceMap: Dict[str, Type[DeviceAdapter]] = {
             'ImpinjXArray': ImpinjXArrayAdapter,
-            'ImpinjSpeedwayR420': ImpinjR420Adapter
+            'ImpinjSpeedwayR420': ImpinjR420Adapter,
         }
         self.instanceName: str = 'device'
         self.typeField: str = 'deviceType'
 
-        currentPath = path.dirname(path.abspath(__file__))
+        currentPath: str = path.dirname(path.abspath(__file__))
         with open(f'{currentPath}/driver/supportedDevices.json') as deviceList:
             self._supportedDevices: JSONDict = load(deviceList)
 
@@ -54,7 +54,7 @@ class _DeviceAdapterFactory(AbstractFactory):
                 # now combine the specified device template with that of the generic template
                 specificDevice = load(deviceTemplate)
                 return self.combineConfigWithGeneric(specificDevice, deviceName)
-        except:
+        except FileNotFoundError:
             raise ItemNotSupported(ErrorStrings.ERR_Item_Not_Supported.value.format(self.instanceName, deviceName))
 
     # use this method to combine settings from a specific configuration instance with the generic required fields
