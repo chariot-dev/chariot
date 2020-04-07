@@ -11,12 +11,15 @@ class ConfirmationModalBody extends Component {
   }
 
   formatConfirmationData () {
+    console.log(this.state.confirmationData);
     var confirmationData = this.state.confirmationData;
+    console.log(confirmationData);
 
     var confirmationDataElement = [];
 
     Object.keys(confirmationData).forEach(function(key) {
       var value = confirmationData[key];
+      console.log(key + "  " + value);
       
       confirmationDataElement.push(<div key={key}><b>{key}</b>: {value}<br></br></div>);
     });

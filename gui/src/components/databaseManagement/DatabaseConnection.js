@@ -11,9 +11,10 @@ class DatabaseConnection extends Component {
   constructor(props) {
     super(props);
 
-    console.log(this.props.location.networkProps['Network Name'])
+    console.log(this.props.location.networkProps);
     this.state = {
       chosenNetwork: this.props.location.networkProps['Network Name'],
+      networkDevices: this.props.location.networkProps['Devices'],
       formControls: {
           "IP Address": '',
           "Name": '',
@@ -27,6 +28,7 @@ class DatabaseConnection extends Component {
 
     this.testConnection = this.testConnection.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
     this.handleCancelConfirmation = this.handleCancelConfirmation.bind(this);
   }
 
@@ -41,10 +43,11 @@ class DatabaseConnection extends Component {
     this.setState({ formControls: updatedFormControls }); // Update the state
   }
 
-  toggleConfirmationModal = () => {
+  toggleConfirmationModal(event) {
     this.setState({
       confirmIsOpen: !this.state.confirmIsOpen
     });
+    event.preventDefault();
   }
 
 
@@ -80,21 +83,21 @@ class DatabaseConnection extends Component {
 
         <form onSubmit={this.toggleConfirmationModal}>
           <div className="form-group">
-            <input required type="text" className="form-control" id="ipAddress" name="ipAddress" placeholder="IP Address" onChange={this.handleChange}/>
+            <input required type="text" className="form-control" id="IP Address" name="IP Address" placeholder="IP Address" onChange={this.handleChange}/>
           </div>
           <div className="form-group">
-            <input required type="text" className="form-control" id="name" name="name" placeholder="Name" onChange={this.handleChange}/>
+            <input required type="text" className="form-control" id="Name" name="Name" placeholder="Name" onChange={this.handleChange}/>
           </div>
           <div className="form-group">
-            <input required type="password" className="form-control" id="password" name="password" placeholder="Password" onChange={this.handleChange}/>
+            <input required type="password" className="form-control" id="Password" name="Password" placeholder="Password" onChange={this.handleChange}/>
           </div>         
           <Link to="/chooseNetwork">
             <Button variant="primary" className="float-left footer-button">Back</Button>
-        </Link>
+          </Link>
 
-        <Button variant="success" className="footer-button button-mid-bottom">Test Connection</Button>
+          <Button variant="success" className="footer-button button-mid-bottom">Test Connection</Button>
 
-        <Button variant="primary" className="float-right footer-button" type="submit">Connect</Button>
+          <Button variant="primary" className="float-right footer-button" type="submit">Connect</Button>
 
         </form>
 
@@ -121,7 +124,7 @@ class DatabaseConnection extends Component {
       </SuccessModalBody>
 
       <Modal.Footer>
-        <Link to='/dataCollectionEpisodeStatus'>
+        <Link to={{pathname:'/dataCollectionEpisodeStatus', networkProps:{'Network Name': this.state.chosenNetwork, 'Devices': this.state.networkDevices}}}>
           <Button variant="primary" className="float-right">Continue</Button>
         </Link>
       </Modal.Footer>
@@ -130,8 +133,6 @@ class DatabaseConnection extends Component {
 
     ]
   }
-
-
 
 
 }
