@@ -57,6 +57,8 @@ class NetworkDeviceCellScreenTemplate extends Component {
             </Link>
           )
           break;
+        default:
+          buttonElement.push(undefined);
       }
       
       if (this.state.withLinks) {

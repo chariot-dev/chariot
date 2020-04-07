@@ -102,7 +102,7 @@ class ManageNetworkConfiguration extends React.Component {
 
     var data = {};
 
-    if (this.state.originalNetworkName == this.state.newNetworkProperties["Network Name"]) {
+    if (this.state.originalNetworkName === this.state.newNetworkProperties["Network Name"]) {
       data = {
         "networkName": this.state.originalNetworkName,
         "description": this.state.newNetworkProperties["Network Description"]

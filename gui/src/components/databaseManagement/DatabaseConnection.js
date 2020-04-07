@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
-import ErrorModalBody from '../shared/ErrorModalBody';
+//import ErrorModalBody from '../shared/ErrorModalBody';
 
 class DatabaseConnection extends Component {
   constructor(props) {

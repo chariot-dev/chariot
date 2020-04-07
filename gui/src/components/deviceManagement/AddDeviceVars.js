@@ -119,24 +119,14 @@ class AddDeviceVars extends Component {
       var curFieldAlias = deviceSettings[key].alias;
       var curFieldIsRequired = deviceSettings[key].required;
       var valueType = deviceSettings[key].inputType;
-
-      if (valueType == "checkbox") {
-        deviceSpecificForm.push(
-          <div className="form-group" key={curFieldAlias}>
-            <input type={valueType}  required={curFieldIsRequired} className="deviceCreationFormCheckbox" id={curFieldAlias} name={key} onChange={this.handleChange}/>
-            <label> {key}</label>
-          </div>
-        );
-      }
-      else {
-        deviceSpecificForm.push(
-          <div className="form-group" key={curFieldAlias}>
-            <label>{key}:</label>
-            <input type={valueType}  required={curFieldIsRequired} className="form-control" id={curFieldAlias} name={key} onChange={this.handleChange}/>
-          </div>
-        );
-      }
-
+      
+      deviceSpecificForm.push(
+        <div className="form-group" key={key}>
+          {valueType === "checkbox" ? '' : <label>{key}:</label>}
+          <input type={valueType}  required={curFieldIsRequired} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : "form-control"} id={curFieldAlias} name={key} onChange={this.handleChange}/>
+          {valueType === "checkbox" ? <label>{key}</label> : ''}
+        </div>
+      )
     }
 
     return (deviceSpecificForm);

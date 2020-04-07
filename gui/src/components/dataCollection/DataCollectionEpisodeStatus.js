@@ -12,6 +12,9 @@ class DataCollectionEpisodeStatus extends Component {
       <div className="container">
         <h1>Data Collection Episode</h1>
 
+        <div id="deviceCollectionStatuses">
+        
+        </div>
 
       </div>
     ]

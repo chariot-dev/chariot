@@ -130,47 +130,27 @@ class ManageDeviceConfiguration extends React.Component {
     var temp = [this.state.newDeviceProperties['Tag Population']];
 
     // ======= When creating fields, no reference to field type, so some fields are would be sent as strings when they need to be ints. Also antenna beeds array. Need to fix ========
-
-    if (this.state.originalDeviceName == this.state.newDeviceProperties["Device Name"]) {
-      data = {
-        "networkName": this.state.originalNetworkName,
-        "deviceId": this.state.newDeviceProperties['Device Name'],
-        //"newDeviceId": this.state.newDeviceProperties['IP Address'], // Not needed because not changing name
-        "ipAddress": this.state.newDeviceProperties['IP Address'],
-        "pollDelay": this.state.newDeviceProperties['Poll Delay'],
-        "antennas": temp,
-        "tag_population": this.state.newDeviceProperties['Tag Population'],
-        "report_every_n_tags": this.state.newDeviceProperties['Report Every n Tags'],
-        "tx_power": this.state.newDeviceProperties['Tx Power'],
-        "session": this.state.newDeviceProperties['Session'],
-        "start_inventory": this.state.newDeviceProperties['Start Inventory'],
-        "mode_identifier": this.state.newDeviceProperties['Mode Identifier'],
-        "EnableROSpecID": this.state.newDeviceProperties['Enable ROS Spec ID'],
-        "EnableSpecIndex": this.state.newDeviceProperties['Enable Spec Index'],
-        "EnableInventoryParameterSpecID": this.state.newDeviceProperties['Enable Inventory Parameter Spec ID'],
-        "EnableRFPhaseAngle": this.state.newDeviceProperties['Enable RF Phase Angle']
-      }
+    data = {
+      "networkName": this.state.originalNetworkName,
+      "deviceId": this.state.newDeviceProperties['Device Name'],
+      //"newDeviceId": this.state.newDeviceProperties['IP Address'], // Not needed because not changing name
+      "ipAddress": this.state.newDeviceProperties['IP Address'],
+      "pollDelay": this.state.newDeviceProperties['Poll Delay'],
+      "antennas": temp,
+      "tag_population": this.state.newDeviceProperties['Tag Population'],
+      "report_every_n_tags": this.state.newDeviceProperties['Report Every n Tags'],
+      "tx_power": this.state.newDeviceProperties['Tx Power'],
+      "session": this.state.newDeviceProperties['Session'],
+      "start_inventory": this.state.newDeviceProperties['Start Inventory'],
+      "mode_identifier": this.state.newDeviceProperties['Mode Identifier'],
+      "EnableROSpecID": this.state.newDeviceProperties['Enable ROS Spec ID'],
+      "EnableSpecIndex": this.state.newDeviceProperties['Enable Spec Index'],
+      "EnableInventoryParameterSpecID": this.state.newDeviceProperties['Enable Inventory Parameter Spec ID'],
+      "EnableRFPhaseAngle": this.state.newDeviceProperties['Enable RF Phase Angle']
     }
-    else {
-      data = {
-        "networkName": this.state.originalNetworkName,
-        "deviceId": this.state.originalDeviceName,
-        "newDeviceId": this.state.newDeviceProperties['Device Name'], // Needed because changing name
-        "ipAddress": this.state.newDeviceProperties['IP Address'],
-        "pollDelay": this.state.newDeviceProperties['Poll Delay'],
-        "antennas": temp,
-        "tag_population": this.state.newDeviceProperties['Tag Population'],
-        "report_every_n_tags": this.state.newDeviceProperties['Report Every n Tags'],
-        "tx_power": this.state.newDeviceProperties['Tx Power'],
-        "session": this.state.newDeviceProperties['Session'],
-        "start_inventory": this.state.newDeviceProperties['Start Inventory'],
-        "mode_identifier": this.state.newDeviceProperties['Mode Identifier'],
-        "EnableROSpecID": this.state.newDeviceProperties['Enable ROS Spec ID'],
-        "EnableSpecIndex": this.state.newDeviceProperties['Enable Spec Index'],
-        "EnableInventoryParameterSpecID": this.state.newDeviceProperties['Enable Inventory Parameter Spec ID'],
-        "EnableRFPhaseAngle": this.state.newDeviceProperties['Enable RF Phase Angle']
-      }
-    }    
+    if (this.state.originalDeviceName !== this.state.newDeviceProperties["Device Name"]){
+      data["newDeviceId"] = this.state.newDeviceProperties['Device Name']; // Needed because changing name
+    }
 
     console.log(data);
     xhr.send(JSON.stringify(data));
