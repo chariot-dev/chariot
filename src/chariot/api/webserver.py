@@ -28,7 +28,8 @@ defaultSuccessCode: int = 200
 # --- This section of api endpoints deals with netowrks  --- #
 
 @app.route(nManagerBaseUrl + '/networks/names', methods=['GET'])
-# This method will return all network names known to the networkManager and their descriptions
+# This method will return all network names known to the networkManager
+# and their descriptions
 def retrieveAllNetworkNames():
     allNetworks: Dict[str, str] = NetworkManager.getAllNetworks()
     return buildSuccessfulRequest(allNetworks, defaultSuccessCode)
@@ -48,7 +49,8 @@ def createNetwork():
     # build a NetworkConfiguration from payload and verify it
     networkConfig: NetworkConfiguration = NetworkConfiguration(requestContent)
 
-    # if configuration is successful, then create a Network and add it to the NetworkManager
+    # if configuration is successful, then create a Network and add it to the
+    # NetworkManager
     network: Network = Network(networkConfig)
     NetworkManager.addNetwork(network)
 
@@ -58,27 +60,34 @@ def createNetwork():
 @app.route(nManagerBaseUrl + '/network', methods=['PUT'])
 def modifyNetwork():
     # through this endpoint, a network can have its name and/or description changed
-    # it must be that the old name('networkName') is specified and a new name('newNetworkName') is given in the payload
+    # it must be that the old name('networkName') is specified and a new
+    # name('newNetworkName') is given in the payload
 
     requestContent = request.get_json()
     hasNewName = False
     networkName: str = parser.getNameInPayload(requestContent)
 
-    # check if a new network name is specified in the payload, if so capture old name so its deleted from collection
+    # check if a new network name is specified in the payload, if so capture
+    # old name so its deleted from collection
     if parser.getNewNetworkNameStr() in requestContent:
         hasNewName = True
-        # for configuration validation, alter keys from 'newNetworkName' to 'networkName'
+        # for configuration validation, alter keys from 'newNetworkName' to
+        # 'networkName'
         requestContent[TypeStrings.Network_Identifier.value] = requestContent[parser.getNewNetworkNameStr()]
         del requestContent[parser.getNewNetworkNameStr()]
 
-    # at this point, 'newNetworkName' is not a key, so validate configuration and update
+    # at this point, 'newNetworkName' is not a key, so validate configuration
+    # and update
     NetworkManager.getNetwork(networkName).updateConfig(requestContent)
 
-    # if applicable, modify collection so the new network name is in collection and old one is deleted
+    # if applicable, modify collection so the new network name is in
+    # collection and old one is deleted
     if hasNewName:
         # notice that requestContent[TypeStrings.Network_Identifier.value] is used, this will return the new name since
-        # keys were updated. So 'networkName' would be the old name of the network
-        NetworkManager.replaceNetwork(networkName, requestContent[TypeStrings.Network_Identifier.value])
+        # keys were updated. So 'networkName' would be the old name of the
+        # network
+        NetworkManager.replaceNetwork(
+            networkName, requestContent[TypeStrings.Network_Identifier.value])
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -102,10 +111,15 @@ def getNetworkDetails():
 
 # ---  This section of endpoints deals with devices  --- #
 
-@app.route(nManagerBaseUrl + '/network/device/supportedDevices', methods=['GET'])
+@app.route(
+    nManagerBaseUrl +
+    '/network/device/supportedDevices',
+    methods=['GET'])
 def getSupportedDevices():
-    # returns a dictionary of supported devices, with key as deviceType and value as the configuration
-    return buildSuccessfulRequest(DeviceAdapterFactory.getsupportedDevices(), None)
+    # returns a dictionary of supported devices, with key as deviceType and
+    # value as the configuration
+    return buildSuccessfulRequest(
+        DeviceAdapterFactory.getsupportedDevices(), None)
 
 
 @app.route(nManagerBaseUrl + '/network/device/config', methods=['GET'])
@@ -113,7 +127,8 @@ def getSupportedDeviceConfig():
     deviceTemplateName = parser.getDeviceNameInURL(request)
 
     # get specified device template
-    deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(deviceTemplateName)
+    deviceTemplate = DeviceAdapterFactory.getSpecifiedDeviceTemplate(
+        deviceTemplateName)
 
     return buildSuccessfulRequest(deviceTemplate, defaultSuccessCode)
 
@@ -146,7 +161,8 @@ def createDevice():
     # build configuration for device
     deviceConfig: Configuration = DeviceConfigurationFactory.getInstance(payloadConfig)
 
-    # with configuration validated, now use the factory to create a deviceAdapter instance
+    # with configuration validated, now use the factory to create a
+    # deviceAdapter instance
     device: DeviceAdapter = DeviceAdapterFactory.getInstance(deviceConfig)
 
     # add device to specified network
@@ -158,27 +174,32 @@ def createDevice():
 @app.route(nManagerBaseUrl + '/network/device', methods=['PUT'])
 def modifyDevice():
     # through this endpoint, a device can have its configuration changed
-    # it must be that the old name('deviceId') is specified and a new name('newDeviceId') is given in the payload
+    # it must be that the old name('deviceId') is specified and a new
+    # name('newDeviceId') is given in the payload
     requestContent = request.get_json()
     hasNewName = False
     networkName = parser.getNameInPayload(requestContent)
     deviceName: str = parser.getDeviceNameInPayload(requestContent)
 
-    # check if a new device name is specified in the payload, if so capture old name so its deleted from collection
+    # check if a new device name is specified in the payload, if so capture
+    # old name so its deleted from collection
     if parser.getNewDeviceIdStr() in requestContent:
         hasNewName = True
         requestContent[TypeStrings.Device_Identifier.value] = requestContent[parser.getNewDeviceIdStr()]
         del requestContent[parser.getNewDeviceIdStr()]
 
-    # remove networkName key so that updating configuration does not raise an error
+    # remove networkName key so that updating configuration does not raise an
+    # error
     del requestContent[TypeStrings.Network_Identifier.value]
 
-    NetworkManager.getNetwork(networkName).getDevice(deviceName).updateConfig(requestContent)
+    NetworkManager.getNetwork(networkName).getDevice(
+        deviceName).updateConfig(requestContent)
 
-    # if applicable, modify collection so the new device name is in collection and old one is deleted
+    # if applicable, modify collection so the new device name is in collection
+    # and old one is deleted
     if hasNewName:
-        NetworkManager.getNetwork(networkName).replaceDevice(requestContent[TypeStrings.Device_Identifier.value],
-                                                             deviceName)
+        NetworkManager.getNetwork(networkName).replaceDevice(
+            requestContent[TypeStrings.Device_Identifier.value], deviceName)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -203,7 +224,8 @@ def testDBConfiguration():
 
     dbConfig: DatabaseConfiguration = DatabaseConfigurationFactory.getInstance(payloadConfig)
 
-    # with configuration validated, now use the factory to create a dbWriter instance
+    # with configuration validated, now use the factory to create a dbWriter
+    # instance
     dbWriter: DatabaseWriter = DatabaseWriterFactory.getInstance(dbConfig)
 
     try:
@@ -222,7 +244,8 @@ def createDBConfiguration():
 
     dbConfig: DatabaseConfiguration = DatabaseConfigurationFactory.getInstance(payloadConfig)
 
-    # with configuration validated, now use the factory to create a dbWriter instance
+    # with configuration validated, now use the factory to create a dbWriter
+    # instance
     dbWriter: DatabaseWriter = DatabaseWriterFactory.getInstance(dbConfig)
 
     # add to dbManager
@@ -234,27 +257,32 @@ def createDBConfiguration():
 @app.route(nManagerBaseUrl + '/database', methods=['PUT'])
 def modifyDatabaseConfiguration():
     # through this endpoint, a database can have its id and/or attributes changed
-    # it must be that the old name('dbId') is specified and a new name('newDbId') is given in the payload
+    # it must be that the old name('dbId') is specified and a new
+    # name('newDbId') is given in the payload
 
     requestContent = request.get_json()
     hasNewName = False
     dbId: str = parser.getDbNameInPayload(requestContent)
 
-    # check if a new dbId is specified in the payload, if so capture old name so its deleted from collection
+    # check if a new dbId is specified in the payload, if so capture old name
+    # so its deleted from collection
     if parser.getNewDbIdStr() in requestContent:
         hasNewName = True
         # for configuration validation, alter keys from 'dbId' to 'newDbId'
         requestContent[TypeStrings.Database_Identifier.value] = requestContent[parser.getNewDbIdStr()]
         del requestContent[parser.getNewDbIdStr()]
 
-    # at this point, 'newDbId' is not a key, so validate configuration and update
+    # at this point, 'newDbId' is not a key, so validate configuration and
+    # update
     DatabaseManager.getDbWriter(dbId).updateConfig(requestContent)
 
-    # if applicable, modify collection so the new dbId is in collection and old one is deleted
+    # if applicable, modify collection so the new dbId is in collection and
+    # old one is deleted
     if hasNewName:
         # notice that requestContent['dbId'] is used, this will return the new name since keys were
         # updated. So variable dbId would be the old name of the network
-        DatabaseManager.replaceDbWriter(requestContent[TypeStrings.Database_Identifier.value], dbId)
+        DatabaseManager.replaceDbWriter(
+            requestContent[TypeStrings.Database_Identifier.value], dbId)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -278,8 +306,10 @@ def getDatabaseConfiguration():
 
 @app.route(nManagerBaseUrl + '/database/supportedDatabases', methods=['GET'])
 def getSupportedDatabases():
-    # returns a dictionary of supported devices, with key as deviceType and value as the configuration
-    return buildSuccessfulRequest(DatabaseWriterFactory.getsupportedDatabases(), None)
+    # returns a dictionary of supported devices, with key as deviceType and
+    # value as the configuration
+    return buildSuccessfulRequest(
+        DatabaseWriterFactory.getsupportedDatabases(), None)
 
 
 @app.route(nManagerBaseUrl + '/database/config', methods=['GET'])
@@ -287,7 +317,8 @@ def getSupportedDatabaseConfig():
     deviceTemplateName = parser.getDbNameInURL(request)
 
     # get specified device template
-    deviceTemplate = DatabaseWriterFactory.getSpecifiedDbTemplate(deviceTemplateName)
+    deviceTemplate = DatabaseWriterFactory.getSpecifiedDbTemplate(
+        deviceTemplateName)
 
     return buildSuccessfulRequest(deviceTemplate, defaultSuccessCode)
 
@@ -301,31 +332,37 @@ def retrieveAllDbConfigs():
 
 # ---  This section deals with errorHandlers  --- #
 @app.errorhandler(NameNotFoundError)
-@app.errorhandler(NoIdentifierError)
 def handleInvalidUsage(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(DuplicateNameError)
 def handleDuplicateName(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(ItemNotSupported)
 def handleItemNotSupported(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(DatabaseConnectionError)
 def handleDatabaseNotConnected(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
+    return res
+
+
+@app.errorhandler(NoIdentifierError)
+def handleInvalidUsage(error):
+    res = jsonify(toDict(error.message))
+    res.status_code = error.status_code
     return res
 
 
@@ -349,4 +386,4 @@ def buildSuccessfulRequest(data, code):
     return response, code
 
 
-app.run()
+app.run(host='0.0.0.0')

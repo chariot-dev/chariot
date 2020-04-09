@@ -60,6 +60,24 @@ To install the Chariot GUI, run the `install-gui.sh` script.
 
 `$ bash install-gui.sh`
 
+### Installation via Docker
+
+Use a \*nix shell to install. If on Windows, you may use the Docker Quickstart Terminal. Start by cloning this repository.
+
+`$ git clone https://github.com/chariot-dev/chariot.git`
+
+Navigate to the `src` directory.
+
+`$ cd path/to/chariot/src`
+
+Run the following command to build the core Docker image.
+
+`$ docker build -t chariot-core:latest .`
+
+Run the following command to run the chariot-core container.
+
+`docker run -p 5000:5000 chariot-core`
+
 ### Usage
 
 #### Starting Chariot
