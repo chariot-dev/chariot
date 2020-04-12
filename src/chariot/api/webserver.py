@@ -199,7 +199,7 @@ def deleteDevice():
 # ---  This section of endpoints deals with databases  --- #
 @app.route(nManagerBaseUrl + '/database/test', methods=['POST'])
 def testDBConfiguration():
-    dbId = parser.getNameInURL(request)
+    dbId = parser.getDbNameInPayload(request)
     dbWriter: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
 
     try:
