@@ -199,12 +199,8 @@ def deleteDevice():
 # ---  This section of endpoints deals with databases  --- #
 @app.route(nManagerBaseUrl + '/database/test', methods=['POST'])
 def testDBConfiguration():
-    payloadConfig = request.get_json()
-
-    dbConfig: DatabaseConfiguration = DatabaseConfigurationFactory.getInstance(payloadConfig)
-
-    # with configuration validated, now use the factory to create a dbWriter instance
-    dbWriter: DatabaseWriter = DatabaseWriterFactory.getInstance(dbConfig)
+    dbId = parser.getNameInURL(request)
+    dbWriter: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
 
     try:
         dbWriter.connect()
