@@ -1,6 +1,9 @@
 from math import ceil
+from queue import Empty
 from multiprocessing import cpu_count, Event
 from multiprocessing import SimpleQueue as Queue
+from sys import exc_info
+from re import match
 from threading import Lock, Timer
 from time import sleep
 from typing import Callable, Iterable, List, Optional
@@ -11,6 +14,7 @@ from chariot.device.adapter import DeviceAdapter
 from chariot.network import Network
 from chariot.utility.concurrency import HandledProcess, HandledThread
 from chariot.utility.JSONTypes import JSONObject
+from chariot.utility.exceptions import DeviceNotConnectedError, InCollectionEpisodeError, NotInCollectionEpisodeError, FailedToBeginCollectionError
 
 
 class DataCollector:
@@ -53,7 +57,59 @@ class DataCollector:
         # use self._onError to report errors that cannot be handled here and should be passed to the user
         # the API should pass in an errorhandler method as onError
         # go through each worker and do worker.getErrorQueue().get_nowait()
-        # while self._running:
+        while self._running:
+            for worker in self._workers:
+                try:
+                # Process: (Process Name, Error, Error output as a list of strings)
+                # Thread: (Thread Name, Stack Trace)
+                    error = worker.getErrorQueue().get_nowait()
+                    name = error[0]
+
+                    if len(error) is 2:             # Thread Error
+                        err, val, tb = error[1]
+                    else:                           # Process Error
+                        err,tb = error[1],error[2]
+
+                    # Error Handling depends on what kind of Thread/Process we are dealing with
+                    if name == 'Stop-Sentinel':
+                        if err is Exception:
+                            pass
+                        else:
+                            self._onError(err)
+                    else if name == 'Output-Handler':
+                        if err is Exception:
+                            pass
+                        else:
+                            self._onError(err)
+                    else if match(r"Consumer-*",name):
+                        if err is Exception:
+                            pass
+                        else:
+                            self._onError(err)
+                    else if match(r"Producer:*",name):
+                        devID = name[10:]         # Extract deviceID for later use 
+
+                        if err is DeviceNotConnectedError:        # Disconnected Device
+                            pass
+                        else if err is InCollectionEpisodeError:    # Tried to do something during DCE, may need extra info on the kind of operation
+                            pass
+                        else if err is NotInCollectionEpisodeError: # Tried to do something outside a DCE
+                            pass
+                        else if err is FailedToBeginCollectionError:
+                            pass
+                        else:
+                            self._onError(err)      # assuming this is how _onError works
+                        pass
+                    else if match(r"DataCollectionWorker-*",name):
+                        err = error[1]
+
+                        if err is Exception:
+                            pass
+                        else:
+                            self._onError(err)
+                except Empty:
+                    continue
+                
         #   pass
         pass
 
