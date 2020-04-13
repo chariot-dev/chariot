@@ -6,9 +6,9 @@ import Modal from 'react-bootstrap/Modal';
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 
-const getDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
-const modifyDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
-const deleteDeviceBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
+const getDeviceConfigurationBaseUrl = 'http://192.168.99.100:5000/chariot/api/v1.0/network/device';
+const modifyDeviceConfigurationBaseUrl = 'http://192.168.99.100:5000/chariot/api/v1.0/network/device';
+const deleteDeviceBaseUrl = 'http://192.168.99.100:5000/chariot/api/v1.0/network/device';
 const xhr = new XMLHttpRequest();
 
 

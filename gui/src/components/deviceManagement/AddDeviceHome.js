@@ -20,8 +20,8 @@ import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
-const getDeviceConfigBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
-const postDeviceCreationBaseUrl = "http://localhost:5000/chariot/api/v1.0/network/device";
+const getDeviceConfigBaseUrl = 'http://192.168.99.100:5000/chariot/api/v1.0/network/device/config';
+const postDeviceCreationBaseUrl = "http://192.168.99.100:5000/chariot/api/v1.0/network/device";
 const xhr = new XMLHttpRequest();
 
 class AddDeviceHome extends Component {

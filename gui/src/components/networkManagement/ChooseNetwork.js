@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 
-const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
+const getAllNetworksBaseUrl = 'http://192.168.99.100:5000/chariot/api/v1.0/networks/all';
 const xhr = new XMLHttpRequest();
 
 class ChooseNetwork extends Component {

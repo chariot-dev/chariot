@@ -10,7 +10,7 @@ import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
-const getNetworkDetailsBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
+const getNetworkDetailsBaseUrl = 'http://192.168.99.100:5000/chariot/api/v1.0/network';
 const xhr = new XMLHttpRequest();
 
 class ManageNetworkConfiguration extends React.Component {
