@@ -52,8 +52,12 @@ class ChooseDatabaseConfig extends Component {
 
         {this.state.existingConfigs ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} withLinks={false} type="chooseDatabase"></NetworkDeviceCellScreenTemplate> : null}
 
-        <Link to="/welcome">
+        <Link to="/chooseNetwork">
           <Button variant="primary" className="float-left footer-button">Back</Button>
+        </Link>
+
+        <Link to="/databaseConnection">
+          <Button variant="primary" className="float-right footer-button">Create</Button>
         </Link>
       </div>
     );

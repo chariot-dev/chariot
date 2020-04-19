@@ -18,6 +18,7 @@ import DataCollectionEpisodeStatus from "./components/dataCollection/DataCollect
 import ManageNetworkConfiguration from "./components/networkManagement/ManageNetworkConfiguration";
 import ManageDevices from "./components/deviceManagement/ManageDevices";
 import ManageDeviceConfiguration from "./components/deviceManagement/ManageDeviceConfiguration";
+import RunConfirmationComponent from "./components/runConfirmation/RunConfirmationComponent";
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
@@ -45,6 +46,7 @@ function App() {
           <Route path="/manageExistingNetwork/:networkName" exact component={ManageNetworkConfiguration} />
           <Route path="/manageExistingDevices/devices/:networkName" exact component={ManageDevices} />
           <Route path="/manageExistingDevices/devices/:networkName/:deviceName" exact component={ManageDeviceConfiguration} />
+          <Route path="/runConfirmationComponent" exact component={RunConfirmationComponent} />
         </Switch>
       </div>
     </Router>

@@ -81,7 +81,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
           curDatabaseName = this.state.dataJson[i]["databaseName"];
           curDatabaseType =  this.state.dataJson[i]["type"];
           buttonElement.push(
-            <Link key={"chooseDatabaseButton" + i} to={{pathname:'/databaseConnection', networkProps:{}}}>
+            <Link key={"chooseDatabaseButton" + i} to={{pathname:'/runConfirmationComponent', networkProps:{}}}>
               <Button className="float-right" variant="success" size="sm">
                 Choose Database
               </Button>

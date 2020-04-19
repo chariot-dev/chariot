@@ -7,14 +7,13 @@ import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
-const databaseGetBaseUrl = "http://localhost:5000/chariot/api/v1.0/database"
+const databaseBaseUrl = "http://localhost:5000/chariot/api/v1.0/database"
 
 class DatabaseConnection extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      chosenNetwork: this.props.location.networkProps['Network Name'], // Network user chose on previous screen
       supportedDatabaseTypes: [],
       'Database Type' : '',
       databaseConfig : {},
@@ -29,7 +28,7 @@ class DatabaseConnection extends Component {
 
   // Gets supported database types when page initially loads in order to dynamically fill in select-menu
   componentDidMount() {
-    fetch(databaseGetBaseUrl + "/supportedDatabases")
+    fetch(databaseBaseUrl + "/supportedDatabases")
     .then(res => res.json())
     .then(
       (result) => {
@@ -72,7 +71,7 @@ class DatabaseConnection extends Component {
 
     if (lastDatabaseType !== event.target.value) { // If database type was changed
       this.setState({'Database Type': event.target.value }, function () { // Update state, then get config for the db type
-        fetch(databaseGetBaseUrl + "/config?dbId=" + this.state['Database Type'])
+        fetch(databaseBaseUrl + "/config?dbId=" + this.state['Database Type'])
         .then(res => res.json())
         .then(
           (result) => {
@@ -99,18 +98,22 @@ class DatabaseConnection extends Component {
     
     for (var i = 0; i < config.length; i++) {
       var curFieldAlias = config[i].alias;
-      var curFieldDescription = config[i].description;
-      var curFieldType = config[i].inputType;
-      var curFieldTitle = config[i].title;
-      var curFieldIsRequired = config[i].required;
+      // don't want the user to fill out the 'Type' on GUI, so removing it from here
+      if (curFieldAlias !== 'type') {
+        var curFieldDescription = config[i].description;
+        var curFieldType = config[i].inputType;
+        var curFieldTitle = config[i].title;
+        var curFieldIsRequired = config[i].required;
 
-      databaseSpecificForm.push(
-        <div className="form-group" key={curFieldAlias}>
-          {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
-          {curFieldTitle}
-          <input type={curFieldType}  required={curFieldIsRequired} className={curFieldType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={curFieldTitle} onChange={this.handleChange}/>
-        </div>
-      );
+        databaseSpecificForm.push(
+          <div className="form-group" key={curFieldAlias}>
+            {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
+            {curFieldTitle}
+            <input type={curFieldType}  required={curFieldIsRequired} className={curFieldType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={curFieldTitle} onChange={this.handleChange}/>
+          </div>
+        );
+      }
+
     }
 
     return databaseSpecificForm;
@@ -119,6 +122,94 @@ class DatabaseConnection extends Component {
   toggleErrorModal = () => {
     this.setState({ errorIsOpen: !this.state.errorIsOpen });
   }
+
+  testConfigurationConnection = () => {
+    var formData = this.parseFromTextFields();
+    // Post request options
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    };
+
+    fetch(databaseBaseUrl + "/test", requestOptions)
+    .then(res => res.json())
+    .then(
+      // If post was successful, update state and display success modal
+      () => {
+        this.setState({
+          confirmIsOpen: false
+        });
+        this.setState({
+          successIsOpen: !this.state.successIsOpen
+        });
+      },
+      // If post was unsuccessful, update state and display error modal
+      (error) => {
+        // Once error message is set, then launch the error modal
+        this.setState({
+          errorMessage: error.message
+        }, () => {
+          this.setState({ errorIsOpen: !this.state.errorIsOpen });
+        });
+      }
+    )
+  };
+
+  //When the create button is clicked, take the values from the text fields and create a database configuration
+  createDatabaseConfiguration = () => {
+    var formData = this.parseFromTextFields();
+    // Post request options
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    };
+
+    fetch(databaseBaseUrl, requestOptions)
+    .then(res => res.json())
+    .then(
+      // If post was successful, update state and display success modal
+      () => {
+        this.setState({
+          confirmIsOpen: false
+        });
+        this.setState({
+          successIsOpen: !this.state.successIsOpen
+        });
+      },
+      // If post was unsuccessful, update state and display error modal
+      (error) => {
+        // Once error message is set, then launch the error modal
+        this.setState({
+          errorMessage: error.message
+        }, () => {
+          this.setState({ errorIsOpen: !this.state.errorIsOpen });
+        });
+      }
+    )
+  };
+
+  //Utility method meant to return values from each text field that is filled by user
+  parseFromTextFields = () => {
+    var dbType = this.state["Database Type"];
+
+    var formData = {};
+
+    for (var i = 0; i < this.state.databaseConfig["MongoDB"].settings.length; i++) {
+      //need to match the databaseProperties keys (which align to title in databaseConfig)
+      var textFieldTitle = this.state.databaseConfig[dbType].settings[i].title;
+      if (textFieldTitle in this.state.databaseProperties) {
+        //user has entered a value for this field, add it to payload as the alias
+        formData[this.state.databaseConfig[dbType].settings[i].alias] = this.state.databaseProperties[textFieldTitle]
+      }
+    }
+
+    //database type can't be parsed from text fields, so add that in separately
+    formData["type"] = dbType;
+
+    return formData;
+  };
 
 
   render() {
@@ -138,7 +229,10 @@ class DatabaseConnection extends Component {
 
         <form>
           {this.state.showDatabaseSpecificSettings ? this.createDatabaseFields() : null}
-          <Button variant="primary" className="float-right footer-button" type="submit">Connect</Button>
+          <Link to="/chooseDatabaseConfig">
+            <Button variant="primary" className="float-right footer-button" type="submit"
+                    onClick={this.createDatabaseConfiguration}>Create</Button>
+          </Link>
         </form>
 
 
@@ -146,7 +240,8 @@ class DatabaseConnection extends Component {
             <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
 
-        <Button variant="success" className="footer-button button-mid-bottom">Test Connection</Button>
+        <Button variant="success" className="footer-button button-mid-bottom"
+                onClick={this.testConfigurationConnection}>Test Connection</Button>
 
       </div>,
 
