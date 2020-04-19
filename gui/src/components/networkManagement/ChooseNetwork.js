@@ -28,10 +28,10 @@ class ChooseNetwork extends Component {
     .then(
       // On success
       (result) => {
-        var responseJsonArray = result; // Response is a dictionary  
+        var responseJsonArray = result;  
 
         var updatedNetworksJsonArray = this.state.existingNetworks;
-
+        
         for (var i = 0; i < responseJsonArray.length; i++) {
           updatedNetworksJsonArray.push(responseJsonArray[i]);
         }
@@ -58,7 +58,7 @@ class ChooseNetwork extends Component {
           Select a network to begin data collection process.
         </p>
 
-        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="choose"></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="chooseNetwork"></NetworkDeviceCellScreenTemplate> : null}
 
         <Link to="/welcome">
           <Button variant="primary" className="float-left footer-button">Back</Button>

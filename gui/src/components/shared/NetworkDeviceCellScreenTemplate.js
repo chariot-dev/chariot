@@ -22,15 +22,25 @@ class NetworkDeviceCellScreenTemplate extends Component {
     var networkLinks = [];
 
     for (var i = 0; i < this.state.dataJson.length; i++) {
-      var deviceTags = []; // Reset list of devices for network-to-be-displayed
-      var curNetworkName = this.state.dataJson[i]["NetworkName"];
-      var curNetworkDescription = this.state.dataJson[i]["Description"];
+      // For network/device page use
+      let deviceTags;
+      let curNetworkName;
+      let curNetworkDescription;
+
+      // For database page use 
+      let curDatabaseId;
+      let curDatabaseName;
+      let curDatabaseType;
 
       var buttonElement = [];
 
       switch (this.state.type) {
         // For DeleteNetwork
         case "delete":
+          deviceTags = []; // Reset list of devices for network-to-be-displayed
+          curNetworkName = this.state.dataJson[i]["NetworkName"];
+          curNetworkDescription = this.state.dataJson[i]["Description"];
+    
           buttonElement.push(
             <Button key={"deleteNetworkButton" + i} className="float-right" variant="danger" size="sm" onClick={this.props.deleteNetwork.bind(this, curNetworkName)}>
               Delete Network
@@ -39,6 +49,10 @@ class NetworkDeviceCellScreenTemplate extends Component {
           break;
         // For ManageExistingNetworks
         case "manage":
+          deviceTags = []; // Reset list of devices for network-to-be-displayed
+          curNetworkName = this.state.dataJson[i]["NetworkName"];
+          curNetworkDescription = this.state.dataJson[i]["Description"];
+    
           buttonElement.push(
             <Link key={"manageNetworkButton" + i} to={{pathname:'/addDeviceHome', networkProps:{'Network Name': curNetworkName}}}> 
               <Button className="float-right" variant="light" size="sm">
@@ -48,7 +62,11 @@ class NetworkDeviceCellScreenTemplate extends Component {
           )
           break;
         // For ChooseNetwork
-        case "choose":
+        case "chooseNetwork":
+          deviceTags = []; // Reset list of devices for network-to-be-displayed
+          curNetworkName = this.state.dataJson[i]["NetworkName"];
+          curNetworkDescription = this.state.dataJson[i]["Description"];
+    
           buttonElement.push(
             <Link key={"chooseNetworkButton" + i} to={{pathname:'/chooseDatabaseConfig', networkProps:{'Network Name': curNetworkName}}}>
               <Button className="float-right" variant="success" size="sm">
@@ -56,6 +74,19 @@ class NetworkDeviceCellScreenTemplate extends Component {
               </Button>
             </Link>
           )
+          break;
+        // For ChooseDatabaseConfig
+        case "chooseDatabase":
+          curDatabaseId = this.state.dataJson[i]["dbId"];
+          curDatabaseName = this.state.dataJson[i]["databaseName"];
+          curDatabaseType =  this.state.dataJson[i]["type"];
+          buttonElement.push(
+            <Link key={"chooseDatabaseButton" + i} to={{pathname:'/databaseConnection', networkProps:{}}}>
+              <Button className="float-right" variant="success" size="sm">
+                Choose Database
+              </Button>
+            </Link>
+          )         
           break;
       }
       
@@ -107,41 +138,61 @@ class NetworkDeviceCellScreenTemplate extends Component {
         );
       }
       else { // without links
-        if (this.state.dataJson[i]["Devices"].length > 0) {
-          for (var j = 0; j < this.state.dataJson[i]["Devices"].length; j++) {
-            curDeviceKey = curNetworkName + "Device" + j;
-            curDeviceName = this.state.dataJson[i]["Devices"][j];       
+        if (this.state.type !== "chooseDatabase") {
+          if (this.state.dataJson[i]["Devices"].length > 0) {
+            for (var j = 0; j < this.state.dataJson[i]["Devices"].length; j++) {
+              curDeviceKey = curNetworkName + "Device" + j;
+              curDeviceName = this.state.dataJson[i]["Devices"][j];       
+              deviceTags.push(
+                <div key={curDeviceKey} className="networksDeviceLink">
+                  <b>Device {j + 1}: </b>{curDeviceName}<br></br>
+                </div>
+              );
+            }
+          }
+          // If no devices, say so
+          else {
             deviceTags.push(
               <div key={curDeviceKey} className="networksDeviceLink">
-                <b>Device {j + 1}: </b>{curDeviceName}<br></br>
+                No devices exist for this network.
               </div>
             );
           }
         }
-        // If now devices, say so
-        else {
-          deviceTags.push(
-            <div key={curDeviceKey} className="networksDeviceLink">
-              No devices exist for this network.
+
+        // Create links for network, then create the jsx for networks/devices
+        if (this.state.type !== "chooseDatabase") {
+          networkLinks.push(
+            <div className="existingNetworkBox" key={i}>
+              <div className="existingNetworkCell">
+
+                {buttonElement}
+                
+                <div>
+                  <b>Network Name: </b> {curNetworkName}<br></br>
+                  <b>Description: </b> {curNetworkDescription}<br></br>
+                </div>
+                {deviceTags}
+              </div>
             </div>
           );
         }
-        // Create links for network, then create the jsx for networks/devices
-        networkLinks.push(
-          <div className="existingNetworkBox" key={i}>
-            <div className="existingNetworkCell">
+        else {
+          networkLinks.push(
+            <div className="existingNetworkBox" key={i}>
+              <div className="existingNetworkCell">
 
-              {buttonElement}
-              
-              <div>
-                <b>Network Name: </b> {curNetworkName}<br></br>
-                <b>Description: </b> {curNetworkDescription}<br></br>
+                {buttonElement}
+                
+                <div>
+                  <b>Database ID: </b> {curDatabaseId}<br></br>
+                  <b>Database Name: </b> {curDatabaseName}<br></br>
+                  <b>Database Type: </b> {curDatabaseType}<br></br>
+                </div>
               </div>
-              {deviceTags}
-            </div>
-          </div>
-        );
-
+            </div>          
+          );
+        }
       }
 
     }

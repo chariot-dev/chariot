@@ -20,12 +20,12 @@ class ChooseDatabaseConfig extends Component {
     .then(
       // On success
       (result) => {
-        var responseJsonArray = result; // Response is a dictionary
+        var responseJson = result; // Response is a dictionary
 
         var updatedDbJsonArray = this.state.existingConfigs;
 
-        for (var i = 0; i < responseJsonArray.length; i++) {
-          updatedDbJsonArray.push(responseJsonArray[i]);
+        for (var key of Object.keys(responseJson)) {
+          updatedDbJsonArray.push(responseJson[key]);
         }
 
         this.setState({ existingConfigs: updatedDbJsonArray });
@@ -33,7 +33,6 @@ class ChooseDatabaseConfig extends Component {
       // On error
       (error) => {
         console.log(error.message);
-
 
        /*
          Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
@@ -43,6 +42,7 @@ class ChooseDatabaseConfig extends Component {
   }
 
   render() {
+
     return (
       <div className="container">
         <h1>Choose a Database</h1>
@@ -50,7 +50,7 @@ class ChooseDatabaseConfig extends Component {
           Select a database to begin data collection process.
         </p>
 
-        {this.state.existingConfigs ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} withLinks={false} type="choose"></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingConfigs ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} withLinks={false} type="chooseDatabase"></NetworkDeviceCellScreenTemplate> : null}
 
         <Link to="/welcome">
           <Button variant="primary" className="float-left footer-button">Back</Button>
