@@ -8,6 +8,7 @@ import ManageExistingNetworks from "./components/networkManagement/ManageExistin
 import DeleteNetwork from "./components/networkManagement/DeleteNetwork";
 import ChooseNetwork from "./components/networkManagement/ChooseNetwork";
 import DatabaseConnection from './components/databaseManagement/DatabaseConnection';
+import ChooseDatabaseConfig from './components/databaseManagement/ChooseDatabaseConfig';
 import DataAnalysisMain from "./components/dataAnalysis/DataAnalysisMain";
 import NetworkConfigsMain from "./components/networkConfigs/NetworkConfigsMain";
 import DeviceConfigsMain from "./components/deviceConfigs/DeviceConfigsMain";
@@ -34,6 +35,7 @@ function App() {
           <Route path="/deleteNetwork" component={DeleteNetwork} />
           <Route path="/chooseNetwork" component={ChooseNetwork} />
           <Route path="/databaseConnection" component={DatabaseConnection} />
+          <Route path="/chooseDatabaseConfig" component={ChooseDatabaseConfig} />
           <Route path="/dataAnalysisMain" component={DataAnalysisMain} />
           <Route path="/networkConfigsMain" component={NetworkConfigsMain} />
           <Route path="/deviceConfigsMain" component={DeviceConfigsMain} />

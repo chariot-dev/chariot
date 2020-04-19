@@ -50,7 +50,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
         // For ChooseNetwork
         case "choose":
           buttonElement.push(
-            <Link key={"chooseNetworkButton" + i} to={{pathname:'/databaseConnection', networkProps:{'Network Name': curNetworkName}}}> 
+            <Link key={"chooseNetworkButton" + i} to={{pathname:'/chooseDatabaseConfig', networkProps:{'Network Name': curNetworkName}}}>
               <Button className="float-right" variant="success" size="sm">
                 Choose Network
               </Button>

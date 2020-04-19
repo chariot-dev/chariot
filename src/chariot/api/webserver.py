@@ -199,7 +199,8 @@ def deleteDevice():
 # ---  This section of endpoints deals with databases  --- #
 @app.route(nManagerBaseUrl + '/database/test', methods=['POST'])
 def testDBConfiguration():
-    dbId = parser.getDbNameInPayload(request)
+    requestContent = request.get_json()
+    dbId = parser.getDbNameInPayload(requestContent)
     dbWriter: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
 
     try:
@@ -297,31 +298,37 @@ def retrieveAllDbConfigs():
 
 # ---  This section deals with errorHandlers  --- #
 @app.errorhandler(NameNotFoundError)
+def handleNameNotFound(error):
+    res = jsonify(toDict(error.message))
+    res.status_code = error.status_code
+    return res
+
+
 @app.errorhandler(NoIdentifierError)
 def handleInvalidUsage(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(DuplicateNameError)
 def handleDuplicateName(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(ItemNotSupported)
 def handleItemNotSupported(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(DatabaseConnectionError)
 def handleDatabaseNotConnected(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
