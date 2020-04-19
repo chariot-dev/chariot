@@ -24,3 +24,5 @@ __pycache__/
 
 # Test folder
 /src/testing
+
+node_modules/
