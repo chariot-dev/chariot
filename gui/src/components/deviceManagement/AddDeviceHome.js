@@ -280,5 +280,10 @@ class AddDeviceHome extends Component {
     ]
   }
 }
+<<<<<<< HEAD
 
 export default AddDeviceHome;
+=======
+
+export default AddDeviceHome;
+>>>>>>> 1c9b5b910e838bcd4c7a99fe4832fd6011e07b82

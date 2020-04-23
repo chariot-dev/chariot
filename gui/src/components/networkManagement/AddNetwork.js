@@ -16,7 +16,11 @@ import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 import BaseURL from "../utility/BaseURL";
 
+<<<<<<< HEAD
 const postCreateNetworkBaseUrl = BaseURL + 'network';
+=======
+const postCreateNetworkBaseUrl = 'http://192.168.99.100:5000/chariot/api/v1.0/network';
+>>>>>>> 1c9b5b910e838bcd4c7a99fe4832fd6011e07b82
 const xhr = new XMLHttpRequest();
 
 class AddNetwork extends Component {
@@ -149,4 +153,8 @@ class AddNetwork extends Component {
 
 }
 
+<<<<<<< HEAD
 export default AddNetwork;
+=======
+export default AddNetwork; 
+>>>>>>> 1c9b5b910e838bcd4c7a99fe4832fd6011e07b82

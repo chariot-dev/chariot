@@ -1,9 +1,7 @@
-FROM ubuntu:latest
-RUN apt-get update -y
-RUN apt-get install -y python3.8-dev python3-pip
+FROM python:latest
 COPY . /chariot/src
 WORKDIR /chariot/src
-RUN python3.8 -m pip install -r requirements.txt
+RUN python3 -m pip install -r requirements.txt
 EXPOSE 5000
-ENTRYPOINT ["python3.8"]
+ENTRYPOINT ["python3"]
 CMD ["-m", "chariot.api.webserver"]
