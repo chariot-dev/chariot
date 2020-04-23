@@ -1,8 +1,8 @@
 /*
   This component handles the user having to choose a network to run the data collection episode on.
-  The body of the screen (network/device info) is generated through the NetworkDeviceCellScreenTemplate 
-  child component. Since the buttons in this component links the user to other components, a callback 
-  to update this component's state isn't necessary. 
+  The body of the screen (network/device info) is generated through the NetworkDeviceCellScreenTemplate
+  child component. Since the buttons in this component links the user to other components, a callback
+  to update this component's state isn't necessary.
 
 */
 
@@ -12,7 +12,9 @@ import { Link } from 'react-router-dom';
 
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 
-const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
+import BaseURL from "../utility/BaseURL";
+
+const getAllNetworksBaseUrl = BaseURL + 'networks/all';
 const xhr = new XMLHttpRequest();
 
 class ChooseNetwork extends Component {
@@ -31,9 +33,9 @@ class ChooseNetwork extends Component {
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
         if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary
 
-          var updatedNetworksJsonArray = this.state.existingNetworks; 
+          var updatedNetworksJsonArray = this.state.existingNetworks;
 
           for (var i = 0; i < responseJsonArray.length; i++) {
             updatedNetworksJsonArray.push(responseJsonArray[i]);
@@ -43,13 +45,13 @@ class ChooseNetwork extends Component {
         }
       }
     }
-    
+
     xhr.send();
   }
 
   render() {
     console.log(this.state.existingNetworks);
-    
+
     return (
       <div className="container">
         <h1>Choose a Network</h1>
@@ -68,4 +70,4 @@ class ChooseNetwork extends Component {
 
 }
 
-export default ChooseNetwork; 
+export default ChooseNetwork;

@@ -1,9 +1,9 @@
 /*
   The component that handles the functinality for deleting a network. The body of the screen (network/device info)
-  is generated through NetworkDeviceCellScreenTemplate as the child component, and uses a callback to update this 
-  component's state. deleteNetwork={this.deleteConfirmation.bind(this)} is passed as a callback to 
-  NetworkDeviceCellScreenTemplate. When the 'Delete Network' is pressed in the child (NetworkDeviceCellScreenTemplate), 
-  it calls this.props.deleteNetwork.bind(this, curNetworkName), which in turn, calls deleteConfirmation(selectedNetwork) 
+  is generated through NetworkDeviceCellScreenTemplate as the child component, and uses a callback to update this
+  component's state. deleteNetwork={this.deleteConfirmation.bind(this)} is passed as a callback to
+  NetworkDeviceCellScreenTemplate. When the 'Delete Network' is pressed in the child (NetworkDeviceCellScreenTemplate),
+  it calls this.props.deleteNetwork.bind(this, curNetworkName), which in turn, calls deleteConfirmation(selectedNetwork)
   in the parent (this component).
 */
 
@@ -15,9 +15,10 @@ import Modal from 'react-bootstrap/Modal';
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 
 import SuccessModalBody from '../shared/SuccessModalBody';
+import BaseURL from "../utility/BaseURL";
 
-const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
-const deleteNetworkBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
+const getAllNetworksBaseUrl = BaseURL + 'networks/all';
+const deleteNetworkBaseUrl = BaseURL + 'network';
 const xhr = new XMLHttpRequest();
 
 class DeleteNetwork extends Component {
@@ -31,7 +32,7 @@ class DeleteNetwork extends Component {
     }
 
     this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
-  } 
+  }
 
   componentDidMount() {
     xhr.open('GET', getAllNetworksBaseUrl);
@@ -41,9 +42,9 @@ class DeleteNetwork extends Component {
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
         if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary
 
-          var updatedNetworksJsonArray = this.state.existingNetworks; 
+          var updatedNetworksJsonArray = this.state.existingNetworks;
 
           for (var i = 0; i < responseJsonArray.length; i++) {
             updatedNetworksJsonArray.push(responseJsonArray[i]);
@@ -53,7 +54,7 @@ class DeleteNetwork extends Component {
         }
       }
     }
-    
+
     xhr.send();
   }
 
@@ -68,7 +69,7 @@ class DeleteNetwork extends Component {
   hideConfirmationModal(event) {
     this.setState({
       confirmIsOpen: !this.state.confirmIsOpen
-    });    
+    });
     event.preventDefault();
   }
 
@@ -85,7 +86,7 @@ class DeleteNetwork extends Component {
           });
           this.setState({
             successIsOpen: !this.state.successIsOpen
-          });      
+          });
         }
         else {
           console.log("ERROR");
@@ -108,7 +109,7 @@ class DeleteNetwork extends Component {
         {/* {this.state.existingNetworkNames ? this.createNetworkLinks() : null} */}
 
         {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="delete" deleteNetwork={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : null}
-        
+
         <Link to="/networkManager">
           <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
@@ -140,4 +141,4 @@ class DeleteNetwork extends Component {
 
 }
 
-export default DeleteNetwork; 
+export default DeleteNetwork;

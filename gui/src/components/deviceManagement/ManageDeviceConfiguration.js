@@ -5,10 +5,11 @@ import Modal from 'react-bootstrap/Modal';
 
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
+import BaseURL from "../utility/BaseURL";
 
-const getDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
-const modifyDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
-const deleteDeviceBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
+const getDeviceConfigurationBaseUrl = BaseURL + 'network/device';
+const modifyDeviceConfigurationBaseUrl = BaseURL + 'network/device';
+const deleteDeviceBaseUrl = BaseURL + 'network/device';
 const xhr = new XMLHttpRequest();
 
 
@@ -33,12 +34,12 @@ class ManageDeviceConfiguration extends React.Component {
   handleChange(event) {
     var updatedDeviceProperties = this.state.newDeviceProperties; // Store from current state
     updatedDeviceProperties[event.target.name] = event.target.value; // Update the json
-    
+
     this.setState({ newDeviceProperties: updatedDeviceProperties }); // Update the state
   }
 
 
-  // Gets run upon initial component render to load the default values of the text fields  
+  // Gets run upon initial component render to load the default values of the text fields
   componentDidMount() {
     xhr.open('GET', getDeviceConfigurationBaseUrl + '?networkName=' + this.state.originalNetworkName + '&deviceId=' + this.state.originalDeviceName);
     xhr.setRequestHeader("Content-Type", "application/json");
@@ -48,7 +49,7 @@ class ManageDeviceConfiguration extends React.Component {
       if (xhr.readyState === XMLHttpRequest.DONE) {
         if (xhr.status === 200) {
           console.log(xhr.response);
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary
 
           var properties = {};
           properties["Device Name"] = this.state.originalDeviceName;
@@ -57,12 +58,12 @@ class ManageDeviceConfiguration extends React.Component {
           properties["Session"] = responseJsonArray["session"];
           properties["Start Inventory"] = responseJsonArray["start_inventory"];
           properties["Mode Identifier"] = responseJsonArray["mode_identifier"];
-          properties["Tag Population"] = responseJsonArray["tag_population"]; 
+          properties["Tag Population"] = responseJsonArray["tag_population"];
           properties["Poll Delay"] = responseJsonArray["pollDelay"];
           properties["Tx Power"] = responseJsonArray["tx_power"];
           properties["Enable Inventory Parameter Spec ID"] = responseJsonArray["EnableInventoryParameterSpecID"];
           properties["Enable ROS Spec ID"] = responseJsonArray["EnableROSpecID"];
-          properties["Enable Spec Index"] = responseJsonArray["EnableSpecIndex"]; 
+          properties["Enable Spec Index"] = responseJsonArray["EnableSpecIndex"];
 
           this.setState({originalDeviceProperties: properties});
 
@@ -73,7 +74,7 @@ class ManageDeviceConfiguration extends React.Component {
         }
       }
     }
-    
+
     xhr.send();
   }
 
@@ -89,7 +90,7 @@ class ManageDeviceConfiguration extends React.Component {
           {key}: <input className="form-control" id={key} name={key} defaultValue={this.state.originalDeviceProperties[key]} onChange={this.handleChange}/>
         </div>
       );
-      
+
     }
 
     return configurationFields;
@@ -103,7 +104,7 @@ class ManageDeviceConfiguration extends React.Component {
   toggleModifyConfirmationModal = () => {
     this.setState({saveConfirmIsOpen: !this.state.saveConfirmIsOpen});
   }
-  
+
   modifyDevice = () => {
     xhr.open('PUT', modifyDeviceConfigurationBaseUrl + "?networkName=" + this.state.originalNetworkName + "&deviceId=" + this.state.originalDeviceName);
     xhr.setRequestHeader("Content-Type", "application/json");
@@ -116,14 +117,14 @@ class ManageDeviceConfiguration extends React.Component {
           });
           this.setState({
             saveSuccessIsOpen: !this.state.successIsOpen
-          });      
+          });
         }
         else {
           console.log(xhr);
           console.log(xhr.response);
         }
       }
-    }    
+    }
 
 
     var data = {};
@@ -170,7 +171,7 @@ class ManageDeviceConfiguration extends React.Component {
         "EnableInventoryParameterSpecID": this.state.newDeviceProperties['Enable Inventory Parameter Spec ID'],
         "EnableRFPhaseAngle": this.state.newDeviceProperties['Enable RF Phase Angle']
       }
-    }    
+    }
 
     console.log(data);
     xhr.send(JSON.stringify(data));
@@ -189,18 +190,18 @@ class ManageDeviceConfiguration extends React.Component {
           });
           this.setState({
             deleteSuccessIsOpen: !this.state.saveSuccessIsOpen
-          });    
+          });
         }
         else {
           console.log("ERROR");
-        }  
+        }
       }
     }
 
     xhr.send();
   }
-  
-  
+
+
   hideSaveConfirmModal = () => {
     this.setState({saveConfirmIsOpen: false});
   }

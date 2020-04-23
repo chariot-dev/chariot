@@ -14,8 +14,9 @@ import Button from 'react-bootstrap/Button';
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
+import BaseURL from "../utility/BaseURL";
 
-const postCreateNetworkBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
+const postCreateNetworkBaseUrl = BaseURL + 'network';
 const xhr = new XMLHttpRequest();
 
 class AddNetwork extends Component {
@@ -35,11 +36,11 @@ class AddNetwork extends Component {
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
-  
+
   handleChange(event) {
     var updatedNetworkProperties = this.state.networkProperties; // Store from current state
     updatedNetworkProperties[event.target.name] = event.target.value; // Update the json
-    
+
     this.setState({ networkProperties: updatedNetworkProperties }); // Update the state
   }
 
@@ -92,7 +93,7 @@ class AddNetwork extends Component {
       <div className="container" key="addNetworkForm">
         <h1>Add a New Network</h1>
           <p className="screenInfo">Please fill in the fields below to create a network. Then, click "Next".</p>
-          
+
           <form id="createNetworkForm" onSubmit={this.toggleConfirmationModal}>
             <div className="form-group">
               Network Name: <input required className="form-control" id="networkNameInput" name="Network Name" onChange={this.handleChange}/>
@@ -113,7 +114,7 @@ class AddNetwork extends Component {
             confirmationData = {this.state.networkProperties}
             >
           </ConfirmationModalBody>
-          
+
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.toggleConfirmationModal}>No</Button>
           <Button variant="primary" className="float-right" onClick={this.createNetworkAndToggleSuccessModal}>Yes</Button>
@@ -148,4 +149,4 @@ class AddNetwork extends Component {
 
 }
 
-export default AddNetwork; 
+export default AddNetwork;

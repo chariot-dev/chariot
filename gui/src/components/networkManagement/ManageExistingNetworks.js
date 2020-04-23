@@ -1,8 +1,8 @@
 /*
-  The component handles the functionality on the screen "Manage Existing Networks". The body of the screen 
+  The component handles the functionality on the screen "Manage Existing Networks". The body of the screen
   (network/device info) is generated through the NetworkDeviceCellScreenTemplate child component. Since the
   links and buttons in this component links the user to other components, a callback to update this component's
-  state isn't necessary. 
+  state isn't necessary.
 */
 
 
@@ -11,8 +11,9 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
+import BaseURL from "../utility/BaseURL";
 
-const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
+const getAllNetworksBaseUrl = BaseURL + 'networks/all';
 const xhr = new XMLHttpRequest();
 
 class ManageExistingNetworks extends Component {
@@ -21,7 +22,7 @@ class ManageExistingNetworks extends Component {
     this.state = {
       existingNetworks: []
     }
-  } 
+  }
 
 
   componentDidMount() {
@@ -32,9 +33,9 @@ class ManageExistingNetworks extends Component {
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
         if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary
 
-          var updatedNetworksJsonArray = this.state.existingNetworks; 
+          var updatedNetworksJsonArray = this.state.existingNetworks;
 
           for (var i = 0; i < responseJsonArray.length; i++) {
             updatedNetworksJsonArray.push(responseJsonArray[i]);
@@ -45,10 +46,10 @@ class ManageExistingNetworks extends Component {
         }
       }
     }
-    
+
     xhr.send();
   }
-  
+
 
   render() {
     console.log(this.state.existingNetworks);
@@ -59,12 +60,12 @@ class ManageExistingNetworks extends Component {
         <p className="screenInfo">
           Select a network to modify its existing configuration settings. Select a device under a network to modify the device's existing configuration settings.
         </p>
-        
+
         {/* {this.state.existingNetworks ? this.createNetworkLinks() : null} */}
         {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={true} type="manage"></NetworkDeviceCellScreenTemplate> : null}
 
         <Link to="/networkManager">
-          <Button variant="primary" className="float-left footer-button">Back</Button> 
+          <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
       </div>
     );
@@ -73,4 +74,4 @@ class ManageExistingNetworks extends Component {
 
 }
 
-export default ManageExistingNetworks; 
+export default ManageExistingNetworks;

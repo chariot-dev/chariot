@@ -9,8 +9,9 @@ import Modal from 'react-bootstrap/Modal';
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
+import BaseURL from "../utility/BaseURL";
 
-const getNetworkDetailsBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
+const getNetworkDetailsBaseUrl = BaseURL + 'network';
 const xhr = new XMLHttpRequest();
 
 class ManageNetworkConfiguration extends React.Component {
@@ -27,7 +28,7 @@ class ManageNetworkConfiguration extends React.Component {
       successIsOpen: false,
       errorIsOpen: false,
       errorMessage: ""
-    }    
+    }
 
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -37,7 +38,7 @@ class ManageNetworkConfiguration extends React.Component {
   handleChange(event) {
     var updatedNetworkProperties = this.state.newNetworkProperties; // Store from current state
     updatedNetworkProperties[event.target.name] = event.target.value; // Update the json
-    
+
     this.setState({ newNetworkProperties: updatedNetworkProperties }); // Update the state
   }
 
@@ -57,7 +58,7 @@ class ManageNetworkConfiguration extends React.Component {
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
         if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary
 
           console.log(responseJsonArray);
 
@@ -72,7 +73,7 @@ class ManageNetworkConfiguration extends React.Component {
         }
       }
     }
-    
+
     xhr.send();
   }
 
@@ -80,7 +81,7 @@ class ManageNetworkConfiguration extends React.Component {
   updateNetworkConfiguration = () => {
     xhr.open('PUT', getNetworkDetailsBaseUrl);
     xhr.setRequestHeader("Content-Type", "application/json");
-    
+
     // Once a response is received
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
@@ -95,7 +96,7 @@ class ManageNetworkConfiguration extends React.Component {
               console.log(this.state.errorMessage);
             });
           });
-          
+
         }
       }
     }
@@ -113,11 +114,11 @@ class ManageNetworkConfiguration extends React.Component {
         "networkName": this.state.originalNetworkName,
         "newNetworkName": this.state.newNetworkProperties["Network Name"],
         "description": this.state.newNetworkProperties["Network Description"]
-      }     
+      }
     }
 
     console.log(data);
-    
+
     xhr.send(JSON.stringify(data));
   }
 
@@ -154,7 +155,7 @@ class ManageNetworkConfiguration extends React.Component {
           confirmationData = {this.state.newNetworkProperties}
           >
         </ConfirmationModalBody>
-        
+
       <Modal.Footer>
         <Button variant="primary" className="float-left" onClick={this.toggleConfirmationModal}>No</Button>
         <Button variant="primary" className="float-right" onClick={this.updateNetworkConfiguration}>Yes</Button>
