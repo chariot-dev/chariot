@@ -16,8 +16,7 @@ class DataCollectionWorker:
     PRODUCERS_PER_CONSUMER: int = 2
     THREAD_JOIN_TIMEOUT: float = 1.0
 
-    def __init__(self, devices: List[DeviceAdapter], index: int, minPollDelay: float = 0.01):
-        self._id = index
+    def __init__(self, devices: List[DeviceAdapter], minPollDelay: float = 0.01):
         self._devices = devices
         self._dataQueue: Queue = Queue()
         self._errorQueue: Queue = Queue()
@@ -126,7 +125,7 @@ class DataCollectionWorker:
 
         for device in self._devices:
             producer = HandledThread(
-                name=f'Producer: {self._id}-{device.getId()}', target=device.startDataCollection, args=(self._errorQueue,))
+                name=f'Producer: {device.getId()}', target=device.startDataCollection, args=(self._errorQueue,))
             self._producerThreads[device.getId()] = producer
         totalDevices: int = len(self._devices)
         numConsumers: int = ceil(totalDevices / self.PRODUCERS_PER_CONSUMER)
@@ -159,7 +158,7 @@ class DataCollectionWorker:
 
     def addDeviceDuringDCE(self, device: DeviceAdapter, reconnect=False) -> None:
         producer: HandledThread = HandledThread(
-            name=f'Producer: {self._id}-{device.getID()}', target=device.startDataCollection, args=(self._errorQueue,))
+            name=f'Producer: {device.getID()}', target=device.startDataCollection, args=(self._errorQueue,))
         self._producerThreads[device.getId()] = producer
         
         if not reconnect:

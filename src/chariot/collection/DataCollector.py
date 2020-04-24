@@ -57,27 +57,26 @@ class DataCollector:
         # use self._onError to report errors that cannot be handled here and should be passed to the user
         # the API should pass in an errorhandler method as onError
         # go through each worker and do worker.getErrorQueue().get_nowait()
+
+        MAX_ATTEMPTS: int = 3
+        reconnects: Dict[DataCollectionWorker, Dict[DeviceAdapter, int]] = {}
+
+        # Create dictionaries at start
+        for worker in self._workers:
+            reconnects[worker] = {}
+            for device in worker._devices:
+                reconnects[worker][device] = 0
+
         while self._running:
             for worker in self._workers:
                 try:
                 # Process: (Process Name, Error, Error output as a list of strings)
                 # Thread: (Thread Name, Stack Trace)
-                    error = worker.getErrorQueue().get_nowait()
-                    name = error[0]
-
-                    if len(error) is 2:             # Thread Error
-                        err, val, tb = error[1]
-                    else:                           # Process Error
-                        err,tb = error[1],error[2]
+                    name, err, tb = worker.getErrorQueue().get_nowait()
 
                     # Error Handling depends on what kind of Thread/Process we are dealing with
                     if match(r"Producer:*",name):
-                        # Get Device ID and Data Collection Worker ID (DCWID-DeviceID)
-                        name = name[10:]  
-                        WorkerID: int = int(name[:len(name.split('-')[0])]
-                        deviceID: str = name[len(name.split('-')[0])+1:]
-
-                        worker: DataCollectionWorker = self._workers[WorkerID]
+                        deviceID = name[10:]  
 
                         device: DeviceAdapter = None # Extract device adapter for direct access 
                         for dev in self._devices:
@@ -86,7 +85,17 @@ class DataCollector:
 
 
                         if err is DeviceNotConnectedError:        # Disconnected Device
-                            pass
+                            if device in reconnects[worker]:
+                                reconnects[worker][device] += 1
+                            else:
+                                reconnects[worker][device] = 1
+
+                            if reconnects[worker][device] == MAX_ATTEMPTS:
+                                self._onError(err)                          # Inform user Chariot can't automattically reconnect
+                            else if reconnects[worker][device] > MAX_ATTEMPTS:
+                                continue
+                            else:
+                                worker.addDeviceDuringDCE(device,True)
                         else if err is InCollectionEpisodeError:    # Tried to do something during DCE, may need extra info on the kind of operation
                             pass
                         else if err is NotInCollectionEpisodeError: # Tried to do something outside a DCE
@@ -152,7 +161,7 @@ class DataCollector:
             index: int = i // avgDevicesPerWorker
             startIdx: int = i
             endIdx: int = min(startIdx + avgDevicesPerWorker, numDevices)
-            worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx], index, self._minPollDelay)
+            worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx], self._minPollDelay)
             # output hooks are called when data is received and chunked - this is where we would add the socket.send
             # for the DataOutputAdapter
             worker.addOutputHook(self._config.database.insertMany)
