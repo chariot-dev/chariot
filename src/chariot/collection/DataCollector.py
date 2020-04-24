@@ -92,24 +92,25 @@ class DataCollector:
 
                             if reconnects[worker][device] == MAX_ATTEMPTS:
                                 self._onError(err)                          # Inform user Chariot can't automattically reconnect
-                            else if reconnects[worker][device] > MAX_ATTEMPTS:
+
+                            elif reconnects[worker][device] > MAX_ATTEMPTS:
                                 continue
                             else:
                                 worker.addDeviceDuringDCE(device,True)
-                        else if err is InCollectionEpisodeError:    # Tried to do something during DCE, may need extra info on the kind of operation
+                        elif err is InCollectionEpisodeError:    # Tried to do something during DCE, may need extra info on the kind of operation
                             pass
-                        else if err is NotInCollectionEpisodeError: # Tried to do something outside a DCE
+                        elif err is NotInCollectionEpisodeError: # Tried to do something outside a DCE
                             pass
-                        else if err is FailedToBeginCollectionError:
+                        elif err is FailedToBeginCollectionError:
                             pass
                         else:
                             self._onError(err)      # assuming this is how _onError works
                         pass
-                    else if match(r"DataCollectionWorker-*",name):
+                    elif match(r"DataCollectionWorker-*",name):
 
                         if err is InCollectionEpisodeError:
                             pass
-                        else if err is FailedToBeginCollectionError:
+                        elif err is FailedToBeginCollectionError:
                             pass
                         else:
                             self._onError(err)
