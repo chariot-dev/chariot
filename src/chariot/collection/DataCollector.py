@@ -60,10 +60,15 @@ class DataCollector:
         while self._running:
             for worker in self._workers:
                 try:
-                # Error Formats 
                 # Process: (Process Name, Error, Error output as a list of strings)
                 # Thread: (Thread Name, Stack Trace)
-                    name, err, tb = worker.getErrorQueue().get_nowait()
+                    error = worker.getErrorQueue().get_nowait()
+                    name = error[0]
+
+                    if len(error) is 2:             # Thread Error
+                        err, val, tb = error[1]
+                    else:                           # Process Error
+                        err,tb = error[1],error[2]
 
                     # Error Handling depends on what kind of Thread/Process we are dealing with
                     if match(r"Producer:*",name):
