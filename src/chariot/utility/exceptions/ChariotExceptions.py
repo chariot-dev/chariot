@@ -7,8 +7,8 @@ class DeviceNotConnectedError(AssertionError):
 
 
 class InCollectionEpisodeError(AssertionError):
-    def __init__(self):
-        super().__init__('Network is in a Collection Episode.')
+    def __init__(self, msg):
+        super().__init__(msg)
 
 
 class NotInCollectionEpisodeError(AssertionError):
@@ -17,8 +17,8 @@ class NotInCollectionEpisodeError(AssertionError):
 
 
 class FailedToBeginCollectionError(Exception):
-    def __init__(self):
-        super().__init__('Data Collection could not be started')
+    def __init__(self, msg):
+        super().__init__(msg)
 
 
 class DatabaseConnectionError(Exception):

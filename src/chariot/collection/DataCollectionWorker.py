@@ -16,7 +16,8 @@ class DataCollectionWorker:
     PRODUCERS_PER_CONSUMER: int = 2
     THREAD_JOIN_TIMEOUT: float = 1.0
 
-    def __init__(self, devices: List[DeviceAdapter], minPollDelay: float = 0.01):
+    def __init__(self, devices: List[DeviceAdapter], index: int, minPollDelay: float = 0.01):
+        self._id = index
         self._devices = devices
         self._dataQueue: Queue = Queue()
         self._errorQueue: Queue = Queue()
@@ -116,16 +117,17 @@ class DataCollectionWorker:
 
     def start(self, stopEvent: Event) -> None:
         if self._running:
-            raise AssertionError
+            raise InCollectionEpisodeError('Worker already in a DCE.')
+            #raise AssertionError('Worker already in DCE')
 
         if len(self._devices) == 0:
-            raise AssertionError('Must have at least one device to collect from.')
+            raise FailedToBeginCollectionError('Must have at least one device to collect from.')
+            #raise AssertionError('Must have at least one device to collect from.')
 
         for device in self._devices:
             producer = HandledThread(
-                name=f'Producer: {device.getId()}', target=device.startDataCollection, args=(self._errorQueue,))
+                name=f'Producer: {self._id}-{device.getId()}', target=device.startDataCollection, args=(self._errorQueue,))
             self._producerThreads[device.getId()] = producer
-
         totalDevices: int = len(self._devices)
         numConsumers: int = ceil(totalDevices / self.PRODUCERS_PER_CONSUMER)
         avgProducersPerConsumer: int = int(round(totalDevices / numConsumers))
@@ -154,6 +156,24 @@ class DataCollectionWorker:
         self._outputThread.start()
         self._stopThread = HandledThread(name='Stop-Sentinel', target=self._waitForStopEvent, args=(self._errorQueue, stopEvent,))
         self._stopThread.start()
+
+    def addDeviceDuringDCE(self, device: DeviceAdapter, reconnect=False) -> None:
+        producer: HandledThread = HandledThread(
+            name=f'Producer: {self._id}-{device.getID()}', target=device.startDataCollection, args=(self._errorQueue,))
+        self._producerThreads[device.getId()] = producer
+        
+        if not reconnect:
+            self._devices.append(device)
+            # Inefficient as it creates a thread for a single Device, it would actually be better to redistribute devices to consumers again
+            consumer: HandledThread = HandledThread(name=f'Consumer-{len(self._devices)-1}',
+                target=self._consumeDataFromDevices, args=(self._errorQueue, len(self._devices)-1,1,))
+            self._consumerThreads.append(consumer)
+            consumer.start()
+
+        producer.start()
+
+
+        
 
     def _waitForStopEvent(self, event: Event) -> None:
         event.wait()

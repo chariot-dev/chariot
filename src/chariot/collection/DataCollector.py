@@ -66,23 +66,19 @@ class DataCollector:
                     name, err, tb = worker.getErrorQueue().get_nowait()
 
                     # Error Handling depends on what kind of Thread/Process we are dealing with
-                    if name == 'Stop-Sentinel':
-                        if err is Exception:
-                            pass
-                        else:
-                            self._onError(err)
-                    else if name == 'Output-Handler':
-                        if err is Exception:
-                            pass
-                        else:
-                            self._onError(err)
-                    else if match(r"Consumer-*",name):
-                        if err is Exception:
-                            pass
-                        else:
-                            self._onError(err)
-                    else if match(r"Producer:*",name):
-                        devID = name[10:]         # Extract deviceID for later use 
+                    if match(r"Producer:*",name):
+                        # Get Device ID and Data Collection Worker ID (DCWID-DeviceID)
+                        name = name[10:]  
+                        WorkerID: int = int(name[:len(name.split('-')[0])]
+                        deviceID: str = name[len(name.split('-')[0])+1:]
+
+                        worker: DataCollectionWorker = self._workers[WorkerID]
+
+                        device: DeviceAdapter = None # Extract device adapter for direct access 
+                        for dev in self._devices:
+                            if dev.getId == deviceID:
+                                device = dev
+
 
                         if err is DeviceNotConnectedError:        # Disconnected Device
                             pass
@@ -96,12 +92,15 @@ class DataCollector:
                             self._onError(err)      # assuming this is how _onError works
                         pass
                     else if match(r"DataCollectionWorker-*",name):
-                        err = error[1]
 
-                        if err is Exception:
+                        if err is InCollectionEpisodeError:
+                            pass
+                        else if err is FailedToBeginCollectionError:
                             pass
                         else:
                             self._onError(err)
+                    else                                            # Other, unchecked Error Generators
+                        pass
                 except Empty:
                     continue
                 
@@ -145,15 +144,16 @@ class DataCollector:
 
         # split devices as equally as possible among workers
         for i in range(0, numDevices, avgDevicesPerWorker):
+            index: int = i // avgDevicesPerWorker
             startIdx: int = i
             endIdx: int = min(startIdx + avgDevicesPerWorker, numDevices)
-            worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx], self._minPollDelay)
+            worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx], index, self._minPollDelay)
             # output hooks are called when data is received and chunked - this is where we would add the socket.send
             # for the DataOutputAdapter
             worker.addOutputHook(self._config.database.insertMany)
             self._workers.append(worker)
             workerProcess: HandledProcess = HandledProcess(
-                target=worker.start, name=f'DataCollectionWorker-{(i//8 + 1)}', args=(self._errorQueue, self._stopEvent))
+                target=worker.start, name=f'DataCollectionWorker-{(index + 1)}', args=(self._errorQueue, self._stopEvent))
             self._workerProcesses.append(workerProcess)
 
         self._running = True
