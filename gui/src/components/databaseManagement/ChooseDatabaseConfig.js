@@ -57,7 +57,7 @@ class ChooseDatabaseConfig extends Component {
         </Link>
 
         <Link to="/databaseConnection">
-          <Button variant="primary" className="float-right footer-button">Create</Button>
+          <Button variant="success" className="float-right footer-button">Create</Button>
         </Link>
       </div>
     );
