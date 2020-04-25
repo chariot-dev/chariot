@@ -22,5 +22,8 @@ __pycache__/
 #pytest
 .coverage
 
+#modules
+gui/node_modules/
+
 # Test folder
 /src/testing
