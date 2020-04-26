@@ -9,7 +9,9 @@ const getAllDbConfigsBaseUrl = 'http://localhost:5000/chariot/api/v1.0/database/
 class ChooseDatabaseConfig extends Component {
   constructor(props) {
     super(props);
+    
     this.state = {
+      chosenNetwork: this.props.location.networkProps["Network Name"],
       existingConfigs: []
     }
   }
@@ -24,9 +26,13 @@ class ChooseDatabaseConfig extends Component {
 
         var updatedDbJsonArray = this.state.existingConfigs;
 
+        // Create a json for the database config
         for (var key of Object.keys(responseJson)) {
           updatedDbJsonArray.push(responseJson[key]);
         }
+
+        // Add the chosen network to the database config
+        updatedDbJsonArray['chosenNetwork'] = this.state.chosenNetwork; 
 
         this.setState({ existingConfigs: updatedDbJsonArray });
       },
@@ -50,13 +56,14 @@ class ChooseDatabaseConfig extends Component {
           Select a database to begin data collection process.
         </p>
 
-        {this.state.existingConfigs ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} withLinks={false} type="chooseDatabase"></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingConfigs ? 
+          <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} chosenNetwork={this.state.chosenNetwork} withLinks={false} type="chooseDatabase"></NetworkDeviceCellScreenTemplate> : null}
 
-        <Link to="/chooseNetwork">
+        <Link to={{pathname: "/chooseNetwork"}}>
           <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
 
-        <Link to="/databaseConnection">
+        <Link to={{ pathname: "/databaseConnection", "Network Name": this.state.chosenNetwork }}>
           <Button variant="success" className="float-right footer-button">Create</Button>
         </Link>
       </div>

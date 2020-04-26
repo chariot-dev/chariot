@@ -14,6 +14,7 @@ class DatabaseConnection extends Component {
     super(props);
 
     this.state = {
+      "Network Name": this.props.location["Network Name"],
       supportedDatabaseTypes: [],
       'Database Type' : '',
       databaseConfig : {},
@@ -171,19 +172,13 @@ class DatabaseConnection extends Component {
     .then(
       // If post was successful, update state and display success modal
       () => {
-        this.setState({
-          confirmIsOpen: false
-        });
-        this.setState({
-          successIsOpen: !this.state.successIsOpen
-        });
+        this.setState({ confirmIsOpen: false });
+        this.setState({ successIsOpen: !this.state.successIsOpen });
       },
       // If post was unsuccessful, update state and display error modal
       (error) => {
         // Once error message is set, then launch the error modal
-        this.setState({
-          errorMessage: error.message
-        }, () => {
+        this.setState({ errorMessage: error.message }, () => {
           this.setState({ errorIsOpen: !this.state.errorIsOpen });
         });
       }
@@ -229,10 +224,7 @@ class DatabaseConnection extends Component {
 
         <form>
           {this.state.showDatabaseSpecificSettings ? this.createDatabaseFields() : null}
-          <Link to="/chooseDatabaseConfig">
-            <Button variant="primary" className="float-right footer-button" type="submit"
-                    onClick={this.createDatabaseConfiguration}>Create</Button>
-          </Link>
+          <Button variant="primary" className="float-right footer-button" onClick={this.createDatabaseConfiguration}>Create</Button>
         </form>
 
 
@@ -244,6 +236,17 @@ class DatabaseConnection extends Component {
                 onClick={this.testConfigurationConnection}>Test Connection</Button>
 
       </div>,
+
+      <Modal show={this.state.successIsOpen} key="addDatabaseConfigSuccessModal">
+      <SuccessModalBody successMessage="The database configuration was succesfully added!">
+      </SuccessModalBody>
+
+      <Modal.Footer>
+        <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"]} }}>
+          <Button variant="primary" className="float-right">Continue</Button>
+        </Link>
+      </Modal.Footer>
+    </Modal>,
 
       <Modal show={this.state.errorIsOpen} key="getDatabaseConfigError">
 
