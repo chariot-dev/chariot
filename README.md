@@ -28,10 +28,8 @@ Chariot offers:
 
 The Chariot core exposes a REST-ful API to manage devices, networks, and database connections. The following are required to set up and run the Chariot core:
 
-- A *nix environment,
-- [Python 3.5+](https://github.com/python/cpython)
-- [pip](https://github.com/pypa/pip)
-- The [venv](https://docs.python.org/3/library/venv.html) Python module.
+- [Docker](https://docs.docker.com/).
+- A \*nix shell. For Windows, consider [Git bash](https://gitforwindows.org/) or [Docker Quickstart terminal](https://docs.docker.com/toolbox/toolbox_install_windows/).
 
 The Chariot GUI interfaces with the core API. The following are required to set up and run the Chariot GUI:
 
@@ -40,7 +38,7 @@ The Chariot GUI interfaces with the core API. The following are required to set 
 
 ### Installation
 
-Use the *nix shell to install. Start by cloning this repository.
+Use the \*nix shell to install. Start by cloning this repository.
 
 `$ git clone https://github.com/chariot-dev/chariot.git`
 
@@ -56,28 +54,6 @@ To install just Chariot core, run the `install-core.sh` script.
 
 `$ bash install-core.sh`
 
-To install the Chariot GUI, run the `install-gui.sh` script.
-
-`$ bash install-gui.sh`
-
-### Installation via Docker
-
-Use a \*nix shell to install. If on Windows, you may use the Docker Quickstart Terminal. Start by cloning this repository.
-
-`$ git clone https://github.com/chariot-dev/chariot.git`
-
-Navigate to the `src` directory.
-
-`$ cd path/to/chariot/src`
-
-Run the following command to build the core Docker image.
-
-`$ docker build -t chariot-core:latest .`
-
-Run the following command to run the chariot-core container.
-
-`docker run -p 5000:5000 chariot-core`
-
 ### Usage
 
 #### Starting Chariot
@@ -87,12 +63,9 @@ To start Chariot's webserver and utilize its backend, navigate to the `run` dire
 `$ cd path/to/chariot/run`
 `$ bash run-core.sh`
 
-To start the Chariot GUI, run the `run-gui.sh` script.
-This will attempt to connect to the local server, and must be performed after it is started.
+To use Chariot via the GUI, run the `run-gui.sh` script.
 
 `$ bash run-gui.sh`
-
-To run the core and the GUI in a single command, run the `run.sh` script.
 
 #### CLI
 Chariot's server can be accessed via a terminal environment using utilities like curl.
@@ -100,7 +73,7 @@ Below is an example usage to create a new network, add a device, and review that
 
 ```
 (Creating a new network)
-$ curl -i -X POST localhost:5000/chariot/api/v1.0/network -H "content-Type: application/json" -d '{"networkName":"test", "description":"this is my test network"}'
+$ curl -i -X POST $(docker-machine ip default):5000/chariot/api/v1.0/network -H "content-Type: application/json" -d '{"networkName":"test", "description":"this is my test network"}'
 HTTP/1.0 200 OK
 Content-Type: application/json
 Content-Length: 22
@@ -114,7 +87,7 @@ Date: *Current Date and Time*
 
 (Adding a device to a network)
 (Notice that the associated network must be specified by the `networkName` field.)
-$ curl -i -X POST localhost:5000/chariot/api/v1.0/network/device -H "content-Type: application/json" -d '{"networkName":"test", "deviceID":"MyDevice", "deviceType":"Device", "ipAddress":"IP Address", "pollDelay":3, *Device Specific Configurations*}'
+$ curl -i -X POST $(docker-machine ip default):5000/chariot/api/v1.0/network/device -H "content-Type: application/json" -d '{"networkName":"test", "deviceID":"MyDevice", "deviceType":"Device", "ipAddress":"IP Address", "pollDelay":3, *Device Specific Configurations*}'
 HTTP/1.0 200 OK
 Content-Type: application/json
 Content-Length: 22
