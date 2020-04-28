@@ -20,11 +20,16 @@ class DatabaseConnection extends Component {
       databaseConfig : {},
       databaseProperties: {},
       showDatabaseSpecificSettings: false,
-      errorIsOpen: false
+      successIsOpen: false,
+      errorIsOpen: false,
+      testSuccessIsOpen: false,
+      testErrorIsOpen: false
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleDatabaseTypeChange = this.handleDatabaseTypeChange.bind(this);
+    this.hideTestSuccessModal = this.hideTestSuccessModal.bind(this);
+    this.hideTestErrorModal = this.hideTestErrorModal.bind(this);
   }
 
   // Gets supported database types when page initially loads in order to dynamically fill in select-menu
@@ -61,6 +66,16 @@ class DatabaseConnection extends Component {
     updatedDatabaseProperties[event.target.name] = event.target.value; // Update the json
     
     this.setState({ databaseProperties: updatedDatabaseProperties }); // Update the state
+  }
+
+  hideTestSuccessModal(event) {
+    this.setState({ testSuccessIsOpen: false });    
+    event.preventDefault();
+  }
+
+  hideTestErrorModal(event) {
+    this.setState({ testErrorIsOpen: false});
+    event.preventDefault();
   }
 
   /*
@@ -138,21 +153,12 @@ class DatabaseConnection extends Component {
     .then(
       // If post was successful, update state and display success modal
       () => {
-        this.setState({
-          confirmIsOpen: false
-        });
-        this.setState({
-          successIsOpen: !this.state.successIsOpen
-        });
+        this.setState({ testSuccessIsOpen: true });
       },
       // If post was unsuccessful, update state and display error modal
       (error) => {
-        // Once error message is set, then launch the error modal
-        this.setState({
-          errorMessage: error.message
-        }, () => {
-          this.setState({ errorIsOpen: !this.state.errorIsOpen });
-        });
+        console.log(error);
+        this.setState({ testErrorIsOpen: true });
       }
     )
   };
@@ -191,17 +197,20 @@ class DatabaseConnection extends Component {
 
     var formData = {};
 
-    for (var i = 0; i < this.state.databaseConfig["MongoDB"].settings.length; i++) {
-      //need to match the databaseProperties keys (which align to title in databaseConfig)
-      var textFieldTitle = this.state.databaseConfig[dbType].settings[i].title;
-      if (textFieldTitle in this.state.databaseProperties) {
-        //user has entered a value for this field, add it to payload as the alias
-        formData[this.state.databaseConfig[dbType].settings[i].alias] = this.state.databaseProperties[textFieldTitle]
+    // Only go into for loop if user provided settings, otherwise, return empty form data and api call will return error instead of gui returning undefined error
+    if (this.state.databaseConfig["MongoDB"]) {
+      for (var i = 0; i < this.state.databaseConfig["MongoDB"].settings.length; i++) {
+        //need to match the databaseProperties keys (which align to title in databaseConfig)
+        var textFieldTitle = this.state.databaseConfig[dbType].settings[i].title;
+        if (textFieldTitle in this.state.databaseProperties) {
+          //user has entered a value for this field, add it to payload as the alias
+          formData[this.state.databaseConfig[dbType].settings[i].alias] = this.state.databaseProperties[textFieldTitle]
+        }
       }
-    }
 
-    //database type can't be parsed from text fields, so add that in separately
-    formData["type"] = dbType;
+      //database type can't be parsed from text fields, so add that in separately
+      formData["type"] = dbType;
+    }
 
     return formData;
   };
@@ -232,21 +241,39 @@ class DatabaseConnection extends Component {
             <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
 
-        <Button variant="success" className="footer-button button-mid-bottom"
-                onClick={this.testConfigurationConnection}>Test Connection</Button>
+        <Button variant="success" className="footer-button button-mid-bottom" onClick={this.testConfigurationConnection}>Test Connection</Button>
 
       </div>,
 
       <Modal show={this.state.successIsOpen} key="addDatabaseConfigSuccessModal">
-      <SuccessModalBody successMessage="The database configuration was succesfully added!">
-      </SuccessModalBody>
+        <SuccessModalBody successMessage="The database configuration was succesfully added!">
+        </SuccessModalBody>
 
-      <Modal.Footer>
-        <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"]} }}>
-          <Button variant="primary" className="float-right">Continue</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>,
+        <Modal.Footer>
+          <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"]} }}>
+            <Button variant="primary" className="float-right">Continue</Button>
+          </Link>
+        </Modal.Footer>
+      </Modal>,
+
+      <Modal show={this.state.testSuccessIsOpen} key="testDatabaseConfigSuccessModal">
+        <SuccessModalBody successMessage="Chariot connected to the database succesfully!">
+        </SuccessModalBody>
+
+        <Modal.Footer>
+          <Button variant="primary" className="float-right" onClick={this.hideTestSuccessModal}>OK</Button>
+        </Modal.Footer>
+      </Modal>,
+
+      <Modal show={this.state.testErrorIsOpen} key="testDatabaseConfigErrorModal">
+        <ErrorModalBody errorMessage="Chariot did not connect to the database succesfully. Please try again.">
+        </ErrorModalBody>
+
+        <Modal.Footer>
+          <Button variant="primary" className="float-right" onClick={this.hideTestErrorModal}>OK</Button>
+        </Modal.Footer>
+      </Modal>,
+
 
       <Modal show={this.state.errorIsOpen} key="getDatabaseConfigError">
 
