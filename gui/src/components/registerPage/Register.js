@@ -16,6 +16,8 @@ import showPasswordImg from "../images/showPassword.PNG";
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 
+const registerUrl = 'http://localhost:5000/chariot/api/v1.0/register';
+
 class Register extends Component {
   constructor(props) {
     super(props);
@@ -68,6 +70,7 @@ class Register extends Component {
       confirmIsOpen: !this.state.confirmIsOpen
     });    
     event.preventDefault(); // To prevent screen from rerendering
+    this.registerUser()
   }
 
   /*
@@ -100,6 +103,46 @@ class Register extends Component {
     }
   }
 
+  registerUser = () => {
+    // Post request's body
+    var data = {
+      "fullName": this.state.accountInfo["Full Name"],
+      "username": this.state.accountInfo["Username"],
+      "password": this.state.accountInfo["Password"],
+      "eMail": this.state.accountInfo["Email Address"]
+    }
+
+    // Post request options
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    };
+
+    // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
+    fetch(registerUrl, requestOptions)
+    .then(res => res.json())
+    .then(
+      // If post was successful, update state and display success modal
+      () => {
+        this.setState({
+          confirmIsOpen: false
+        });
+        this.setState({
+          successIsOpen: !this.state.successIsOpen
+        });
+      },
+      // If post was unsuccessful, update state and display error modal
+      (error) => {
+        // Once error message is set, then launch the error modal
+        this.setState({
+          errorMessage: error.message
+        }, () => {
+          this.setState({ errorIsOpen: !this.state.errorIsOpen });
+        });
+      }
+    )
+  }
   /*
     Returns three separate objects with their unique keys. The first object
     is the Registration screen itself. This screen contains the fields that
@@ -146,26 +189,10 @@ class Register extends Component {
                   You'll need to verify that this email belongs to you.
                 </div>
 
-                <div className="form-group">
-                  <select required className="form-control" id="securityQuestion" name="Security Question" onChange={this.handleChange}>
-                    <option selected disabled hidden value="">Select a Security Question</option>
-                    <option>What was the house number you lived in as a child?</option>
-                    <option>What high school did you attend?</option>
-                    <option>What is your mother's maiden name?</option>
-                    <option>What is your favorite food?</option>
-                    <option>What is your favorite sports mascot?</option>
-                    <option>What is town/city were you born in?</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <input required type="text" className="form-control" id="securityQuestionAnswer" name="Security Question Answer" placeholder="Security Question Answer" onChange={this.handleChange}/>
-                </div>
-
                 <br></br>
                 
                 {/* Button to submit form for account creation */}
-                <Button type="submit" variant="primary" className="float-right">Next</Button>
+                <Button type="submit" variant="primary" className="float-right" >Next</Button>
 
                 <div className="float-left">
                   Already have a Chariot account? <Link to="/"> Log In</Link>

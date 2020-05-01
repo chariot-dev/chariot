@@ -1,6 +1,6 @@
 import flask
 from typing import Dict
-from flask import jsonify, request
+from flask import jsonify, request, session
 from flask_cors import CORS
 from chariot.device import DeviceAdapterFactory, DeviceConfigurationFactory
 from chariot.device.adapter import DeviceAdapter
@@ -11,18 +11,68 @@ from chariot.database.writer import DatabaseWriter
 from chariot.utility import PayloadParser
 from chariot.network import Network, NetworkManager
 from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, ItemNotSupported, DatabaseConnectionError, \
-    NoIdentifierError
+    NoIdentifierError, ErrorStrings, LoginFailure
 from chariot.network.configuration import NetworkConfiguration
 from chariot.database import DatabaseManager
 from chariot.utility.TypeStrings import TypeStrings
+from flask_pymongo import PyMongo
+from chariot.user import UserConfiguration, User
 
 app = flask.Flask(__name__)
+app.secret_key = "Chariot"  # Used to encrypt/decrypt data for session
+app.config["MONGO_URI"] = "mongodb://localhost:27017/users"
 CORS(app)  # This will enable CORS for all routes
 app.config["DEBUG"] = True
+mongo = PyMongo(app)
 
 nManagerBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
 defaultSuccessCode: int = 200
+
+
+# --- This section deals with login and registration --- #
+@app.route(nManagerBaseUrl + '/register', methods=['POST'])
+def register():
+    requestContent = request.get_json()
+    userConfig: UserConfiguration = UserConfiguration(requestContent)
+    username = userConfig.getId()
+
+    users = mongo.db.users  # table users will be created regardless if its currently present
+    # with the configuration set, check MongoDB to ensure username is unique
+    existingUser = users.find_one({str(userConfig.getIdField()): username})
+
+    if existingUser is None:
+        # go ahead and store user in db
+        users.insert_one(userConfig.toDict())
+    else:
+        # throw error indicating username is taken
+        raise DuplicateNameError(
+            ErrorStrings.ERR_Not_Unique_Name.value.format(userConfig.getId(), username)
+        )
+
+    return buildSuccessfulRequest(None, defaultSuccessCode)
+
+
+@app.route(nManagerBaseUrl + '/login', methods=['POST'])
+def login():
+    requestContent = request.get_json()
+    username = requestContent.get("username")
+    password = requestContent.get("password")
+
+    # authenticate username/password
+    users = mongo.db.users
+    loginUser = users.find_one({"username": username})
+
+    if loginUser:
+        if loginUser["password"] == password:
+            # authentication successful, create user object
+            userConfig: UserConfiguration = UserConfiguration(loginUser)
+            user: User = User(userConfig)
+            session["user"] = user
+    else:
+        raise LoginFailure(ErrorStrings.ERR_Login_Failed.value, 401)
+
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 # --- This section of api endpoints deals with netowrks  --- #
@@ -340,6 +390,13 @@ def handleItemNotSupported(error):
 
 
 @app.errorhandler(DatabaseConnectionError)
+def handleDatabaseNotConnected(error):
+    res = jsonify(toDict(error.message))
+    res.status_code = error.status_code
+    return res
+
+
+@app.errorhandler(LoginFailure)
 def handleDatabaseNotConnected(error):
     res = jsonify(toDict(error.message))
     res.status_code = error.status_code

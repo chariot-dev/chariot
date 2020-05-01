@@ -6,6 +6,11 @@ import showPasswordImg from "../images/showPassword.PNG";
 
 import '../../App.css';
 
+
+
+const loginUrl = 'http://localhost:5000/chariot/api/v1.0/login';
+
+
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -28,6 +33,7 @@ class Login extends Component {
 
   handleSubmit(event) {
     // Verify account credentials for correctness first
+    this.login()
     this.setState({ loginSuccess: true });
     event.preventDefault();
     this.props.history.push(`/welcome`);
@@ -42,6 +48,44 @@ class Login extends Component {
       this.setState({passwordImg: hiddenPasswordImg});
       this.setState({passwordVisible: false});
     }
+  }
+
+  login = () => {
+    // Post request's body
+    var that = this
+    var data = {
+      "username": this.state.username,
+      "password": this.state.password
+    }
+
+    console.log(data)
+
+    // Post request options
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    };
+
+    // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
+    fetch(loginUrl, requestOptions)
+    .then(res => res.json())
+    .then(
+      // If post was successful, update state and display success modal
+      () => {
+        that.setState({ loginSuccess: true });
+        //this.props.history.push(`/welcome`);
+      },
+      // If post was unsuccessful, update state and display error modal
+      (error) => {
+        // Once error message is set, then launch the error modal
+        this.setState({
+          errorMessage: error.message
+        }, () => {
+          this.setState({ errorIsOpen: !this.state.errorIsOpen });
+        });
+      }
+    )
   }
 
   render() {

@@ -8,3 +8,5 @@ class TypeStrings(Enum):
     Network_Identifier = 'networkName'
     Database_Type = 'database'
     Database_Identifier = 'dbId'
+    User_Type = 'user'
+    User_Identifier = 'username'
