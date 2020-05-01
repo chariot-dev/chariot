@@ -149,11 +149,14 @@ class DatabaseConnection extends Component {
     };
 
     fetch(databaseBaseUrl + "/test", requestOptions)
-    .then(res => res.json())
-    .then(
+    .then(res =>
       // If post was successful, update state and display success modal
-      () => {
-        this.setState({ testSuccessIsOpen: true });
+      (res) => {
+        if (res) {
+          this.setState({ testSuccessIsOpen: true });
+        } else {
+          this.setState({ testErrorIsOpen: true });
+        }
       },
       // If post was unsuccessful, update state and display error modal
       (error) => {
