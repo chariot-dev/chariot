@@ -61,6 +61,7 @@ To install just Chariot core, run the `install-core.sh` script.
 To start Chariot's webserver and utilize its backend, navigate to the `run` directory and run the `run-core.sh` script.
 
 `$ cd path/to/chariot/run`
+
 `$ bash run-core.sh`
 
 To use Chariot via the GUI, run the `run-gui.sh` script.
