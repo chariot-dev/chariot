@@ -23,7 +23,8 @@ class DatabaseConnection extends Component {
       successIsOpen: false,
       errorIsOpen: false,
       testSuccessIsOpen: false,
-      testErrorIsOpen: false
+      testErrorIsOpen: false,
+      testErrorMessage: ''
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -141,6 +142,7 @@ class DatabaseConnection extends Component {
 
   testConfigurationConnection = () => {
     var formData = this.parseFromTextFields();
+    
     // Post request options
     const requestOptions = {
       method: 'POST',
@@ -148,23 +150,28 @@ class DatabaseConnection extends Component {
       body: JSON.stringify(formData)
     };
 
+    // fetch request to test database connection
     fetch(databaseBaseUrl + "/test", requestOptions)
-    .then(res =>
-      // If post was successful, update state and display success modal
+    .then(
       (res) => {
-        if (res) {
-          this.setState({ testSuccessIsOpen: true });
-        } else {
-          this.setState({ testErrorIsOpen: true });
+        if (res.status === 400) { // If 400 error was returned from the api call
+          return res.json(); // Return the response to the next then()
         }
-      },
-      // If post was unsuccessful, update state and display error modal
-      (error) => {
-        console.log(error);
-        this.setState({ testErrorIsOpen: true });
-      }
-    )
-  };
+        else { // If a 400 wasn't returned, then the api call was successful
+          this.setState({ testSuccessIsOpen: true }); // Set to true so test connection success modal appears
+          return; // Since going to then(), return null since no need to parse response
+        }
+    })
+    .then(
+      // 
+      (resJson) => {
+        if (resJson) { // If the response exists (coming from 400 error)
+          this.setState({ testErrorMessage: resJson.message }, () => { // Set the error message
+            this.setState({ testErrorIsOpen: true }); // Then set test error modal to true
+          }); 
+        }
+    })
+  }
 
   //When the create button is clicked, take the values from the text fields and create a database configuration
   createDatabaseConfiguration = () => {
@@ -269,7 +276,7 @@ class DatabaseConnection extends Component {
       </Modal>,
 
       <Modal show={this.state.testErrorIsOpen} key="testDatabaseConfigErrorModal">
-        <ErrorModalBody errorMessage="Chariot did not connect to the database succesfully. Please try again.">
+        <ErrorModalBody errorMessage={this.state.testErrorMessage}>
         </ErrorModalBody>
 
         <Modal.Footer>
