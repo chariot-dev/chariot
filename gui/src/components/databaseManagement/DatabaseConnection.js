@@ -208,8 +208,8 @@ class DatabaseConnection extends Component {
     var formData = {};
 
     // Only go into for loop if user provided settings, otherwise, return empty form data and api call will return error instead of gui returning undefined error
-    if (this.state.databaseConfig["MongoDB"]) {
-      for (var i = 0; i < this.state.databaseConfig["MongoDB"].settings.length; i++) {
+    if (this.state.databaseConfig[dbType]) {
+      for (var i = 0; i < this.state.databaseConfig[dbType].settings.length; i++) {
         //need to match the databaseProperties keys (which align to title in databaseConfig)
         var textFieldTitle = this.state.databaseConfig[dbType].settings[i].title;
         if (textFieldTitle in this.state.databaseProperties) {
