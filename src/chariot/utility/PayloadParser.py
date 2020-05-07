@@ -68,7 +68,6 @@ class PayloadParser:
         return deviceName
 
     def getDbNameInPayload(self, requestContent) -> str:
-        # first ensure that a network name has been given to specify which network is to be modified
         dbId: str = requestContent.get(TypeStrings.Database_Identifier.value)
         return dbId
 

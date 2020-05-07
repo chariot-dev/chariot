@@ -199,13 +199,24 @@ def deleteDevice():
 # ---  This section of endpoints deals with databases  --- #
 @app.route(nManagerBaseUrl + '/database/test', methods=['POST'])
 def testDBConfiguration():
-    payloadConfig = request.get_json()
+    # one can test an already created configuration or by payload
+    requestContent = request.get_json()
+    dbId = parser.getDbNameInPayload(requestContent)
 
-    dbConfig: DatabaseConfiguration = DatabaseConfigurationFactory.getInstance(payloadConfig)
+    try:
+        dbWriter: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
+        dbWriter.connect()
+    except NameNotFoundError:
+        # if the name isn't found in collection, do not throw error as this can be to test
+        # a non-managed configuration
+        pass
+    except Exception as e:
+        raise DatabaseConnectionError(str(e))
 
+    # from the payload, create a dbWriter and test the connection
+    dbConfig: DatabaseConfiguration = DatabaseConfigurationFactory.getInstance(requestContent)
     # with configuration validated, now use the factory to create a dbWriter instance
     dbWriter: DatabaseWriter = DatabaseWriterFactory.getInstance(dbConfig)
-
     try:
         dbWriter.connect()
     except Exception as e:
@@ -301,31 +312,37 @@ def retrieveAllDbConfigs():
 
 # ---  This section deals with errorHandlers  --- #
 @app.errorhandler(NameNotFoundError)
+def handleNameNotFound(error):
+    res = jsonify(toDict(error.message))
+    res.status_code = error.status_code
+    return res
+
+
 @app.errorhandler(NoIdentifierError)
 def handleInvalidUsage(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(DuplicateNameError)
 def handleDuplicateName(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(ItemNotSupported)
 def handleItemNotSupported(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 
 @app.errorhandler(DatabaseConnectionError)
 def handleDatabaseNotConnected(error):
     res = jsonify(toDict(error.message))
-    res.status_code = error.statusCode
+    res.status_code = error.status_code
     return res
 
 

@@ -9,7 +9,6 @@ import SuccessModalBody from '../shared/SuccessModalBody';
 const getDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
 const modifyDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
 const deleteDeviceBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
-const xhr = new XMLHttpRequest();
 
 
 class ManageDeviceConfiguration extends React.Component {
@@ -40,56 +39,57 @@ class ManageDeviceConfiguration extends React.Component {
 
   // Gets run upon initial component render to load the default values of the text fields  
   componentDidMount() {
-    xhr.open('GET', getDeviceConfigurationBaseUrl + '?networkName=' + this.state.originalNetworkName + '&deviceId=' + this.state.originalDeviceName);
-    xhr.setRequestHeader("Content-Type", "application/json");
+   fetch(getDeviceConfigurationBaseUrl + '?networkName=' + this.state.originalNetworkName + '&deviceId=' + this.state.originalDeviceName)
+   .then(res => res.json())
+   .then(
+      // If post was successful, update state and display success modal
+      (result) => {
+        var responseJsonArray = result; // Response is a dictionary
+        
+        var properties = {};
+        properties["Device Name"] = this.state.originalDeviceName;
+        properties["IP Address"] = responseJsonArray["ipAddress"];
+        properties["Report Every n Tags"] = responseJsonArray["report_every_n_tags"];
+        properties["Session"] = responseJsonArray["session"];
+        properties["Start Inventory"] = responseJsonArray["start_inventory"];
+        properties["Mode Identifier"] = responseJsonArray["mode_identifier"];
+        properties["Tag Population"] = responseJsonArray["tag_population"]; 
+        properties["Poll Delay"] = responseJsonArray["pollDelay"];
+        properties["Tx Power"] = responseJsonArray["tx_power"];
+        properties["Enable Inventory Parameter Spec ID"] = responseJsonArray["EnableInventoryParameterSpecID"];
+        properties["Enable ROS Spec ID"] = responseJsonArray["EnableROSpecID"];
+        properties["Enable Spec Index"] = responseJsonArray["EnableSpecIndex"]; 
 
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          console.log(xhr.response);
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+        this.setState({originalDeviceProperties: properties});
 
-          var properties = {};
-          properties["Device Name"] = this.state.originalDeviceName;
-          properties["IP Address"] = responseJsonArray["ipAddress"];
-          properties["Report Every n Tags"] = responseJsonArray["report_every_n_tags"];
-          properties["Session"] = responseJsonArray["session"];
-          properties["Start Inventory"] = responseJsonArray["start_inventory"];
-          properties["Mode Identifier"] = responseJsonArray["mode_identifier"];
-          properties["Tag Population"] = responseJsonArray["tag_population"]; 
-          properties["Poll Delay"] = responseJsonArray["pollDelay"];
-          properties["Tx Power"] = responseJsonArray["tx_power"];
-          properties["Enable Inventory Parameter Spec ID"] = responseJsonArray["EnableInventoryParameterSpecID"];
-          properties["Enable ROS Spec ID"] = responseJsonArray["EnableROSpecID"];
-          properties["Enable Spec Index"] = responseJsonArray["EnableSpecIndex"]; 
+        // Initialize all to-be-saved properties to be the original, in the event not all properties are modified so can still be saved
+        this.setState({newDeviceProperties: properties});
+        console.log(properties);
+        console.log(responseJsonArray);
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
 
-          this.setState({originalDeviceProperties: properties});
-
-          // Initialize all to-be-saved properties to be the original, in the event not all properties are modified so can still be saved
-          this.setState({newDeviceProperties: properties});
-          console.log(properties);
-          console.log(responseJsonArray);
-        }
-      }
-    }
     
-    xhr.send();
+        /*
+          Have an error modal for being unable to get device fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
+        */ 
+      }
+   )
+
   }
 
 
   createDeviceConfigurationFields = () => {
     var configurationFields = [];
 
-    console.log(this.state.originalDeviceProperties);
-
     for (var key in this.state.originalDeviceProperties) {
       configurationFields.push(
         <div className="form-group">
           {key}: <input className="form-control" id={key} name={key} defaultValue={this.state.originalDeviceProperties[key]} onChange={this.handleChange}/>
         </div>
-      );
-      
+      ); 
     }
 
     return configurationFields;
@@ -100,38 +100,19 @@ class ManageDeviceConfiguration extends React.Component {
     this.setState({deleteConfirmIsOpen: !this.state.deleteConfirmIsOpen});
   }
 
+
   toggleModifyConfirmationModal = () => {
     this.setState({saveConfirmIsOpen: !this.state.saveConfirmIsOpen});
   }
+
   
   modifyDevice = () => {
-    xhr.open('PUT', modifyDeviceConfigurationBaseUrl + "?networkName=" + this.state.originalNetworkName + "&deviceId=" + this.state.originalDeviceName);
-    xhr.setRequestHeader("Content-Type", "application/json");
-
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          this.setState({
-            saveConfirmIsOpen: false
-          });
-          this.setState({
-            saveSuccessIsOpen: !this.state.successIsOpen
-          });      
-        }
-        else {
-          console.log(xhr);
-          console.log(xhr.response);
-        }
-      }
-    }    
-
-
     var data = {};
     var temp = [this.state.newDeviceProperties['Tag Population']];
 
     // ======= When creating fields, no reference to field type, so some fields are would be sent as strings when they need to be ints. Also antenna beeds array. Need to fix ========
 
-    if (this.state.originalDeviceName == this.state.newDeviceProperties["Device Name"]) {
+    if (this.state.originalDeviceName === this.state.newDeviceProperties["Device Name"]) {
       data = {
         "networkName": this.state.originalNetworkName,
         "deviceId": this.state.newDeviceProperties['Device Name'],
@@ -170,34 +151,67 @@ class ManageDeviceConfiguration extends React.Component {
         "EnableInventoryParameterSpecID": this.state.newDeviceProperties['Enable Inventory Parameter Spec ID'],
         "EnableRFPhaseAngle": this.state.newDeviceProperties['Enable RF Phase Angle']
       }
-    }    
+    }  
+    
+    // Put request options
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    };
 
-    console.log(data);
-    xhr.send(JSON.stringify(data));
+    fetch(modifyDeviceConfigurationBaseUrl + "?networkName=" + this.state.originalNetworkName + "&deviceId=" + this.state.originalDeviceName, requestOptions)
+    .then(
+      () => {
+        this.setState({
+          saveConfirmIsOpen: false
+        });
+        this.setState({
+          saveSuccessIsOpen: !this.state.successIsOpen
+        });   
+      },
+      // If put was unsuccessful, update state and display error modal
+      (error) => {
+        console.log(error.message);
 
+      
+        /*
+          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
+        */ 
+      }
+    )
   }
 
+
   toggleDeletionSuccessModal = () => {
-    xhr.open('DELETE', deleteDeviceBaseUrl + "?networkName=" + this.state.originalNetworkName + "&deviceId=" + this.state.originalDeviceName);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    // Delete request options
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    };
 
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          this.setState({
-            deleteConfirmIsOpen: false
-          });
-          this.setState({
-            deleteSuccessIsOpen: !this.state.saveSuccessIsOpen
-          });    
-        }
-        else {
-          console.log("ERROR");
-        }  
+    fetch(deleteDeviceBaseUrl + "?networkName=" + this.state.originalNetworkName + "&deviceId=" + this.state.originalDeviceName, requestOptions)
+    .then(res => res.json())
+    // On success
+    .then(
+      () => {
+        this.setState({
+          deleteConfirmIsOpen: false
+        });
+        this.setState({
+          deleteSuccessIsOpen: !this.state.saveSuccessIsOpen
+        });         
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+
+    
+        /*
+          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
+        */ 
       }
-    }
-
-    xhr.send();
+    )
   }
   
   

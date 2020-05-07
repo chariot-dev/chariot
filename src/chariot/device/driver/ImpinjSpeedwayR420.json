@@ -161,14 +161,6 @@
                         "type": "Boolean",
                         "inputType": "checkbox",
                         "required": false
-                    },
-                    {
-                        "title": "Enable Tag Seen Count",
-                        "alias": "EnableTagSeenCount",
-                        "description": "",
-                        "type": "Boolean",
-                        "inputType": "checkbox",
-                        "required": false
                     }
                 ]
             },
