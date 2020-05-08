@@ -156,7 +156,7 @@ class DataCollectionWorker:
         self._stopThread = HandledThread(name='Stop-Sentinel', target=self._waitForStopEvent, args=(self._errorQueue, stopEvent,))
         self._stopThread.start()
 
-    def addDeviceDuringDCE(self, device: DeviceAdapter, reconnect=False) -> None:
+    def addDeviceDuringDCE(self, device: DeviceAdapter, reconnect: bool = False) -> None:
         producer: HandledThread = HandledThread(
             name=f'Producer: {device.getID()}', target=device.startDataCollection, args=(self._errorQueue,))
         self._producerThreads[device.getId()] = producer

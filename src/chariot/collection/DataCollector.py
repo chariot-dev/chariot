@@ -6,7 +6,7 @@ from sys import exc_info
 from re import match
 from threading import Lock, Timer
 from time import sleep
-from typing import Callable, Iterable, List, Optional
+from typing import Callable, Dict, Iterable, List, Optional
 from chariot.collection.configuration import DataCollectionConfiguration
 from chariot.collection import DataCollectionWorker
 from chariot.database.writer import DatabaseWriter
@@ -107,14 +107,11 @@ class DataCollector:
                             self._onError(err)      # assuming this is how _onError works
                         pass
                     elif match(r"DataCollectionWorker-*",name):
-
-                        if err is InCollectionEpisodeError:
-                            pass
-                        elif err is FailedToBeginCollectionError:
-                            pass
-                        else:
-                            self._onError(err)
-                    else                                            # Other, unchecked Error Generators
+                        workerNum: int = int(name[21:]) - 1
+                        
+                        # Need to test for different kinds of errors first, for now just remake thread
+                        self._restartWorker(workerNum)
+                    else:                                            # Other, unchecked Error Generators
                         pass
                 except Empty:
                     continue
@@ -135,6 +132,26 @@ class DataCollector:
         if not callable(handler):
             raise AssertionError
         self._onEnd = handler
+
+    def _restartWorker(self, workerNum: int) -> None:
+        numDevices: int = len(self._devices)
+        numWorkers: int = ceil(numDevice / self.MAX_DEVICES_PER_WORKER)
+        avgDevicesPerWorker: int = int(round(numDevices / numWorkers))
+
+        startIdx: int = avgDevicesPerWorker * workerNum
+        endIdx: int = min(startIdx + avgDevicesPerWorker, numDevices)
+        
+        worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx], self._minPollDelay)
+        worker.addOutputHook(self._config.database.insertMany)
+        self._workers[workerNum] = worker
+
+        workerProcess: HandledProcess = HandledProcess(
+            target=worker.start, name=f'DataCollectionWorker-{(workerNum + 1)}', args=(self._errorQueue, self._stopEvent))
+
+        self._workerProcesses[workerNum] = workerProcess
+
+        workerProcess.start()
+
 
     def startCollection(self) -> None:
         if self._running:

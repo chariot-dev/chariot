@@ -62,7 +62,7 @@ class DeviceAdapter(metaclass=ABCMeta):
     def setId(self, newId) -> str:
         self._config.deviceId = newId
 
-    def _reportData(self, data: Dict[str, JSONObject]):
+    def _reportData(self, data: Dict[str, JSONObject]) -> None:
         self._dataQueue.put({
             'device_name': self._config.deviceId,
             'production_time': int(round(time() * 1000)),
