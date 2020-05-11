@@ -10,6 +10,7 @@ const getDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/ne
 const modifyDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
 const deleteDeviceBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
 const getDeviceTypeConfiguration = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
+const uniqueDeviceId = "deviceId";
 
 class ManageDeviceConfiguration extends React.Component {
   constructor(props) {
@@ -33,7 +34,17 @@ class ManageDeviceConfiguration extends React.Component {
 
   handleChange(event) {
     var updatedDeviceProperties = this.state.newDeviceProperties; // Store from current state
-    updatedDeviceProperties[event.target.name] = event.target.value; // Update the json
+    // with the inputType known, convert the value from text field to appropriate type
+    var fieldType = event.target.type;
+    var fieldVal = event.target.value;
+
+    if (fieldType === "number") {
+      fieldVal = parseInt(fieldVal)
+    }
+    else if (fieldType === "checkbox") {
+      fieldVal = document.getElementById(event.target.id).checked;
+    }
+    updatedDeviceProperties[event.target.id] = fieldVal; // Update the json
     
     this.setState({ newDeviceProperties: updatedDeviceProperties }); // Update the state
   }
@@ -70,6 +81,7 @@ class ManageDeviceConfiguration extends React.Component {
     .then((result) => {
       var settings = result[this.state.originalDeviceProperties["deviceType"]]["settings"];
       var configurationFields = [];
+      var deviceTypeIndex;
 
       this.setState({ deviceConfiguration : result });
 
@@ -79,18 +91,32 @@ class ManageDeviceConfiguration extends React.Component {
       //combine originalDeviceProperties with result to have an object containing fields and their values
       for(var i = 0 ; i < settings.length; i++) {
         var currentAlias = settings[i].alias;
+
         if (currentAlias in this.state.originalDeviceProperties &&
             this.state.originalDeviceProperties[currentAlias] != null) {
           //combine the two
           settings[i].currentValue = this.state.originalDeviceProperties[currentAlias]
         }
+
+        if (currentAlias === "deviceType") {
+          //do not allow modification of deviceType
+          deviceTypeIndex = i;
+        }
       }
 
+      //do not allow modification of deviceType
+      settings.splice(deviceTypeIndex, 1);
+
       for(var i = 0 ; i < settings.length; i++) {
+        var curFieldAlias = settings[i].alias;
+        var curFieldIsRequired = settings[i].required;
+        var valueType = settings[i].inputType;
+        var curFieldTitle = settings[i].title;
         configurationFields.push(
             <div className="form-group" key={settings[i].title + " Field"}>
-              {settings[i].title}: <input className="form-control" id={settings[i].alias} name={settings[i].title}
-                                          defaultValue={settings[i].currentValue} onChange={this.handleChange}/>
+              {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
+              {curFieldTitle}: <input type={valueType} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'}
+                                      id={curFieldAlias} name={curFieldTitle} defaultValue={settings[i].currentValue} onChange={this.handleChange}/>
             </div>
         );
       }
@@ -112,50 +138,32 @@ class ManageDeviceConfiguration extends React.Component {
   
   modifyDevice = () => {
     var data = {};
-    var temp = [this.state.newDeviceProperties['Tag Population']];
 
     // ======= When creating fields, no reference to field type, so some fields are would be sent as strings when they need to be ints. Also antenna beeds array. Need to fix ========
 
-    if (this.state.originalDeviceName === this.state.newDeviceProperties["Device Name"]) {
-      data = {
-        "networkName": this.state.originalNetworkName,
-        "deviceId": this.state.newDeviceProperties['Device Name'],
-        //"newDeviceId": this.state.newDeviceProperties['IP Address'], // Not needed because not changing name
-        "ipAddress": this.state.newDeviceProperties['IP Address'],
-        "pollDelay": this.state.newDeviceProperties['Poll Delay'],
-        "antennas": temp,
-        "tag_population": this.state.newDeviceProperties['Tag Population'],
-        "report_every_n_tags": this.state.newDeviceProperties['Report Every n Tags'],
-        "tx_power": this.state.newDeviceProperties['Tx Power'],
-        "session": this.state.newDeviceProperties['Session'],
-        "start_inventory": this.state.newDeviceProperties['Start Inventory'],
-        "mode_identifier": this.state.newDeviceProperties['Mode Identifier'],
-        "EnableROSpecID": this.state.newDeviceProperties['Enable ROS Spec ID'],
-        "EnableSpecIndex": this.state.newDeviceProperties['Enable Spec Index'],
-        "EnableInventoryParameterSpecID": this.state.newDeviceProperties['Enable Inventory Parameter Spec ID'],
-        "EnableRFPhaseAngle": this.state.newDeviceProperties['Enable RF Phase Angle']
-      }
+    if (this.state.originalDeviceName === this.state.newDeviceProperties[uniqueDeviceId]) {
+      // if the device name is the same, can just use newDeviceProperties as data
+      data = this.state.newDeviceProperties;
     }
     else {
-      data = {
-        "networkName": this.state.originalNetworkName,
-        "deviceId": this.state.originalDeviceName,
-        "newDeviceId": this.state.newDeviceProperties['Device Name'], // Needed because changing name
-        "ipAddress": this.state.newDeviceProperties['IP Address'],
-        "pollDelay": this.state.newDeviceProperties['Poll Delay'],
-        "antennas": temp,
-        "tag_population": this.state.newDeviceProperties['Tag Population'],
-        "report_every_n_tags": this.state.newDeviceProperties['Report Every n Tags'],
-        "tx_power": this.state.newDeviceProperties['Tx Power'],
-        "session": this.state.newDeviceProperties['Session'],
-        "start_inventory": this.state.newDeviceProperties['Start Inventory'],
-        "mode_identifier": this.state.newDeviceProperties['Mode Identifier'],
-        "EnableROSpecID": this.state.newDeviceProperties['Enable ROS Spec ID'],
-        "EnableSpecIndex": this.state.newDeviceProperties['Enable Spec Index'],
-        "EnableInventoryParameterSpecID": this.state.newDeviceProperties['Enable Inventory Parameter Spec ID'],
-        "EnableRFPhaseAngle": this.state.newDeviceProperties['Enable RF Phase Angle']
-      }
-    }  
+      // if the device is not the same, then use the old name as "deviceId" and the new name as "newDeviceId"
+      var originalName = this.state.originalDeviceProperties[uniqueDeviceId];
+      var newName = this.state.newDeviceProperties[uniqueDeviceId];
+      data = this.state.newDeviceProperties;
+
+      delete this.state.newDeviceProperties[uniqueDeviceId];
+
+      this.state.newDeviceProperties["deviceId"] = originalName;
+      this.state.newDeviceProperties["newDeviceId"] = newName;
+    }
+
+    //add network name to payload to specify device on network
+    data["networkName"] = this.state.originalNetworkName;
+    //cannot have deviceType in modification api call
+    delete data["deviceType"];
+
+    // now convert data to its correct type
+
     
     // Put request options
     const requestOptions = {

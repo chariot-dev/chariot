@@ -344,8 +344,8 @@
         "title": "String length",
         "alias": "strLen",
         "description": "",
-        "type": "String",
-        "inputType": "text",
+        "type": "Number",
+        "inputType": "number",
         "required": false
       }
     ]
