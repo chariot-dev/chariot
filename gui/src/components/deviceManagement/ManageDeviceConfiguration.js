@@ -21,6 +21,7 @@ class ManageDeviceConfiguration extends React.Component {
       originalDeviceProperties: {}, // Filled by componentDidMount()
       deviceConfiguration: {},
       newDeviceProperties: {},
+      configurationFields: null,
       saveConfirmIsOpen: false,
       saveSuccessIsOpen: false,
       deleteConfirmIsOpen: false,
@@ -46,73 +47,61 @@ class ManageDeviceConfiguration extends React.Component {
       // GET the values of the selected device
       (result) => {
         // this result gives
-        var responseJsonArray = result; // Response is a dictionary
-        
-        var properties = result;
+        var properties = result; // Response is a dictionary
 
         this.setState({originalDeviceProperties: properties});
 
         // Initialize all to-be-saved properties to be the original, in the event not all properties are modified so can still be saved
         this.setState({newDeviceProperties: properties});
-        console.log(properties);
-        console.log(responseJsonArray);
+
+
+        return fetch(getDeviceTypeConfiguration + '?deviceId=' + this.state.originalDeviceProperties["deviceType"])
       },
       // On error
       (error) => {
         console.log(error.message);
-
     
         /*
           Have an error modal for being unable to get device fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
         */ 
       }
-   )
+    )
+    .then(result => result.json())
+    .then((result) => {
+      var settings = result[this.state.originalDeviceProperties["deviceType"]]["settings"];
+      var configurationFields = [];
+
+      this.setState({ deviceConfiguration : result });
+
+      console.log(settings);
+      console.log(this.state.newDeviceProperties);
+
+      //combine originalDeviceProperties with result to have an object containing fields and their values
+      for(var i = 0 ; i < settings.length; i++) {
+        var currentAlias = settings[i].alias;
+        if (currentAlias in this.state.originalDeviceProperties &&
+            this.state.originalDeviceProperties[currentAlias] != null) {
+          //combine the two
+          settings[i].currentValue = this.state.originalDeviceProperties[currentAlias]
+        }
+      }
+
+      for(var i = 0 ; i < settings.length; i++) {
+        configurationFields.push(
+            <div className="form-group" key={settings[i].title + " Field"}>
+              {settings[i].title}: <input className="form-control" id={settings[i].alias} name={settings[i].title}
+                                          defaultValue={settings[i].currentValue} onChange={this.handleChange}/>
+            </div>
+        );
+      }
+
+      this.setState({ configurationFields: configurationFields });
+    });
   }
 
 
-  createDeviceConfigurationFields = () => {
-    var configurationFields = [];
-
-    fetch(getDeviceTypeConfiguration + '?deviceId=' + this.state.originalDeviceProperties["deviceType"])
-   .then(res => res.json())
-   .then(
-      // GET call to build configuration fields (add value to configuration form)
-      (result) => {
-        var settings = result[this.state.originalDeviceProperties["deviceType"]]["settings"];
-
-        this.state.deviceConfiguration = result;
-        //combine originalDeviceProperties with result to have an object containing fields and their values
-        for(let i = 0 ; i < settings.length; i++) {
-          var currentAlias = settings[i].alias;
-          if (currentAlias in this.state.originalDeviceProperties &&
-              this.state.originalDeviceProperties[currentAlias] != null) {
-            //combine the two
-            settings[i].currentValue = this.state.originalDeviceProperties[currentAlias]
-          }
-        }
-
-
-        for(let i = 0 ; i < settings.length; i++) {
-          configurationFields.push(
-              <div className="form-group">
-                {settings[i].title}: <input className="form-control" id={settings[i].alias} name={settings[i].title}
-                                            defaultValue={settings[i].currentValue} onChange={this.handleChange}/>
-              </div>
-          );
-        }
-        return configurationFields
-      },
-      // On error
-      (error) => {
-        console.log(error.message);
-
-      }
-   )
-  };
-
-
   toggleDeletionConfirmationModal = () => {
-    this.setState({deleteConfirmIsOpen: !this.state.deleteConfirmIsOpen});
+    this.setState({ deleteConfirmIsOpen: !this.state.deleteConfirmIsOpen });
   }
 
 
@@ -241,6 +230,7 @@ class ManageDeviceConfiguration extends React.Component {
 
   render() {
     console.log(this.state.newDeviceProperties);
+    console.log(Object.keys(this.state.newDeviceProperties).length);
 
     return [
       <div className="container" key="manageDeviceConfigurationScreen">
@@ -248,7 +238,7 @@ class ManageDeviceConfiguration extends React.Component {
         <p className="screenInfo">Modifying configuration settings of {this.state.originalDeviceName} for {this.state.originalNetworkName}.</p>
 
         <form id="modifyDeviceForm">
-          {Object.keys(this.state.newDeviceProperties).length === 0 ? null : this.createDeviceConfigurationFields()}
+          {this.state.configurationFields}
         </form>
 
         <Link to="/manageExistingNetworks">
