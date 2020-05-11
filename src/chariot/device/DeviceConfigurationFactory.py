@@ -2,6 +2,7 @@ from typing import Dict, Type
 from chariot.device.configuration import DeviceConfiguration, ImpinjR420Configuration, ImpinjXArrayConfiguration
 from chariot.utility import AbstractFactory
 from chariot.utility.JSONTypes import JSONObject
+from test.testutils import TestDeviceConfiguration
 
 
 class _DeviceConfigurationFactory(AbstractFactory):
@@ -9,6 +10,7 @@ class _DeviceConfigurationFactory(AbstractFactory):
         self.instanceMap: Dict[str, Type[DeviceConfiguration]] = {
             'ImpinjXArray': ImpinjXArrayConfiguration,
             'ImpinjSpeedwayR420': ImpinjR420Configuration,
+            'TestDevice': TestDeviceConfiguration
         }
         self.typeField = 'deviceType'
         self.instanceName: str = 'device configuration'

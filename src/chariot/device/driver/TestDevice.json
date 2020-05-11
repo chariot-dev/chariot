@@ -1,0 +1,26 @@
+{
+  "TestDevice": {
+    "imgSrc": "some_imgur_link",
+    "description": "A simulated device for testing purposes.",
+    "settings": [
+      {
+        "title": "Port",
+        "alias": "port",
+        "description": "Device port to establish connection to.",
+        "type": "Number",
+        "inputType": "number",
+        "required": true,
+        "maxLength": 4,
+        "validationRegex": "TODO"
+      },
+      {
+        "title": "String length",
+        "alias": "strLen",
+        "description": "",
+        "type": "String",
+        "inputType": "text",
+        "required": false
+      }
+    ]
+  }
+}

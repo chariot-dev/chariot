@@ -9,7 +9,7 @@ import SuccessModalBody from '../shared/SuccessModalBody';
 const getDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
 const modifyDeviceConfigurationBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
 const deleteDeviceBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device';
-
+const getDeviceTypeConfiguration = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
 
 class ManageDeviceConfiguration extends React.Component {
   constructor(props) {
@@ -19,6 +19,7 @@ class ManageDeviceConfiguration extends React.Component {
       originalDeviceName : this.props.location.networkProps["Device Name"], // this.props.location.deviceProps obtained from prop passed through from Link in ManageExistingNetworks jsx element
       originalNetworkName : this.props.location.networkProps["Network Name"],
       originalDeviceProperties: {}, // Filled by componentDidMount()
+      deviceConfiguration: {},
       newDeviceProperties: {},
       saveConfirmIsOpen: false,
       saveSuccessIsOpen: false,
@@ -42,23 +43,12 @@ class ManageDeviceConfiguration extends React.Component {
    fetch(getDeviceConfigurationBaseUrl + '?networkName=' + this.state.originalNetworkName + '&deviceId=' + this.state.originalDeviceName)
    .then(res => res.json())
    .then(
-      // If post was successful, update state and display success modal
+      // GET the values of the selected device
       (result) => {
+        // this result gives
         var responseJsonArray = result; // Response is a dictionary
         
-        var properties = {};
-        properties["Device Name"] = this.state.originalDeviceName;
-        properties["IP Address"] = responseJsonArray["ipAddress"];
-        properties["Report Every n Tags"] = responseJsonArray["report_every_n_tags"];
-        properties["Session"] = responseJsonArray["session"];
-        properties["Start Inventory"] = responseJsonArray["start_inventory"];
-        properties["Mode Identifier"] = responseJsonArray["mode_identifier"];
-        properties["Tag Population"] = responseJsonArray["tag_population"]; 
-        properties["Poll Delay"] = responseJsonArray["pollDelay"];
-        properties["Tx Power"] = responseJsonArray["tx_power"];
-        properties["Enable Inventory Parameter Spec ID"] = responseJsonArray["EnableInventoryParameterSpecID"];
-        properties["Enable ROS Spec ID"] = responseJsonArray["EnableROSpecID"];
-        properties["Enable Spec Index"] = responseJsonArray["EnableSpecIndex"]; 
+        var properties = result;
 
         this.setState({originalDeviceProperties: properties});
 
@@ -77,23 +67,48 @@ class ManageDeviceConfiguration extends React.Component {
         */ 
       }
    )
-
   }
 
 
   createDeviceConfigurationFields = () => {
     var configurationFields = [];
 
-    for (var key in this.state.originalDeviceProperties) {
-      configurationFields.push(
-        <div className="form-group">
-          {key}: <input className="form-control" id={key} name={key} defaultValue={this.state.originalDeviceProperties[key]} onChange={this.handleChange}/>
-        </div>
-      ); 
-    }
+    fetch(getDeviceTypeConfiguration + '?deviceId=' + this.state.originalDeviceProperties["deviceType"])
+   .then(res => res.json())
+   .then(
+      // GET call to build configuration fields (add value to configuration form)
+      (result) => {
+        var settings = result[this.state.originalDeviceProperties["deviceType"]]["settings"];
 
-    return configurationFields;
-  }
+        this.state.deviceConfiguration = result;
+        //combine originalDeviceProperties with result to have an object containing fields and their values
+        for(let i = 0 ; i < settings.length; i++) {
+          var currentAlias = settings[i].alias;
+          if (currentAlias in this.state.originalDeviceProperties &&
+              this.state.originalDeviceProperties[currentAlias] != null) {
+            //combine the two
+            settings[i].currentValue = this.state.originalDeviceProperties[currentAlias]
+          }
+        }
+
+
+        for(let i = 0 ; i < settings.length; i++) {
+          configurationFields.push(
+              <div className="form-group">
+                {settings[i].title}: <input className="form-control" id={settings[i].alias} name={settings[i].title}
+                                            defaultValue={settings[i].currentValue} onChange={this.handleChange}/>
+              </div>
+          );
+        }
+        return configurationFields
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+
+      }
+   )
+  };
 
 
   toggleDeletionConfirmationModal = () => {
