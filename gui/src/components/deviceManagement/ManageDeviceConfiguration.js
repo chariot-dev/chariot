@@ -102,6 +102,31 @@ class ManageDeviceConfiguration extends React.Component {
           //do not allow modification of deviceType
           deviceTypeIndex = i;
         }
+        if (settings[i].settingsList) {
+          for (var k = 0; k < settings[i].settingsList.length; k++) {
+            var fieldJsonObj = {};
+            var curFieldTitle = settings[i].settingsList[k].title;
+            var curFieldAlias = settings[i].settingsList[k].alias;
+            var curFieldDescription = settings[i].settingsList[k].description;
+            var curFieldIsRequired = settings[i].settingsList[k].required;
+            var curFieldType = settings[i].settingsList[k].inputType;
+
+            fieldJsonObj["currentValue"] = "";
+            fieldJsonObj["alias"] = curFieldAlias;
+            fieldJsonObj['description'] = curFieldDescription;
+            fieldJsonObj["required"] = curFieldIsRequired;
+            fieldJsonObj["inputType"] = curFieldType;
+            fieldJsonObj["title"] = curFieldTitle;
+            if (currentAlias in this.state.originalDeviceProperties &&
+                this.state.originalDeviceProperties[currentAlias] != null) {
+              //combine the two
+              settings[i].currentValue = this.state.originalDeviceProperties[currentAlias]
+            }
+            settings.push(fieldJsonObj);
+
+            console.log(curFieldTitle);
+          }
+        }
       }
 
       //do not allow modification of deviceType
@@ -112,6 +137,7 @@ class ManageDeviceConfiguration extends React.Component {
         var curFieldIsRequired = settings[i].required;
         var valueType = settings[i].inputType;
         var curFieldTitle = settings[i].title;
+
         configurationFields.push(
             <div className="form-group" key={settings[i].title + " Field"}>
               {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
@@ -142,7 +168,7 @@ class ManageDeviceConfiguration extends React.Component {
     // ======= When creating fields, no reference to field type, so some fields are would be sent as strings when they need to be ints. Also antenna beeds array. Need to fix ========
 
     if (this.state.originalDeviceName === this.state.newDeviceProperties[uniqueDeviceId]) {
-      // if the device name is the same, can just use newDeviceProperties as data
+      // if the device name is the same, can just use newDeviceProperties as data (remove fields with null)
       data = this.state.newDeviceProperties;
     }
     else {
@@ -162,8 +188,13 @@ class ManageDeviceConfiguration extends React.Component {
     //cannot have deviceType in modification api call
     delete data["deviceType"];
 
-    // now convert data to its correct type
+    //remove fields that are null
+    for(var field in data) {
+      if (data[field] === "" || data[field] === null) {
+        delete data[field];
+      }
 
+    }
     
     // Put request options
     const requestOptions = {
