@@ -124,7 +124,7 @@
                     },
                     {
                         "title": "Enable Peak RSSI",
-                        "alias": "EnablePeakRSSI",
+                        "alias": "EnablePeakRSSI_General",
                         "description": "",
                         "type": "Boolean",
                         "inputType": "checkbox",
@@ -170,7 +170,7 @@
                 "settingsList": [
                     {
                         "title": "Enable Peak RSSI",
-                        "alias": "EnablePeakRSSI",
+                        "alias": "EnablePeakRSSI_Impinj",
                         "description": "",
                         "type": "Boolean",
                         "inputType": "checkbox",

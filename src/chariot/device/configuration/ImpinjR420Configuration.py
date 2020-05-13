@@ -16,12 +16,14 @@ class ImpinjR420Configuration(DeviceConfiguration):
         'start_inventory': bool,
         'mode_identifier': bool,
         'EnableROSpecID': bool,
+        'EnableAccessSpecID': bool,
         'EnableSpecIndex': bool,
         'EnableInventoryParameterSpecID': bool,
         'EnableAntennaID': bool,
         'EnableChannelIndex': bool,
         'EnablePeakRSSI_General': bool,
         'EnableFirstSeenTimestamp': bool,
+        'EnableLastSeenTimestamp': bool,
         'EnableTagSeenCount': bool,
         'EnableAccessSpecID': bool,
         'EnablePeakRSSI_Impinj': bool,
@@ -41,6 +43,9 @@ class ImpinjR420Configuration(DeviceConfiguration):
                 for key, value in entry.items():
                     configMap[key] = value
         return configMap
+
+    def updateConfig(self, configMap: JSONDict) -> JSONDict:
+        super().updateConfig(self._flattenSettingsGroups(configMap))
 
     def _validateInitialConfig(self, configMap: JSONDict) -> None:
         super()._validateInitialConfig(configMap)
