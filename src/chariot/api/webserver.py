@@ -317,14 +317,15 @@ def retrieveAllDbConfigs():
 @app.route(apiBaseUrl + '/data', methods=['POST'])
 def createDataCollector():
     requestContent = request.get_json()
-    # in this method, it is expected that a networkName and dbId are given so that a DataCollection can be created
+    # in this method, it is expected that a networkName and dbId are given in payload so that a DataCollection can be
+    # created as well as a configId that is a unique identifier for DataCollector
     dbId: str = parser.getDbNameInPayload(requestContent)
     networkName: str = parser.getNameInPayload(requestContent)
 
     # Retrieve from respective managers, invalid names will throw error
     db: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
     network: Network = NetworkManager.getNetwork(networkName)
-    configId: str = "1"  # For now, creating a hard-coded configuration Id
+    configId: str = parser.getDataCollectorInPayload(requestContent)
 
     # create a configMap to create a DataCollectionConfiguration
     configMap = {}
@@ -359,30 +360,12 @@ def deleteDataCollector():
 # ---  This section deals with data collection  --- #
 @app.route(apiBaseUrl + '/data/start', methods=['GET'])
 def startDataCollection():
-    # in this method, it is expected that a networkName and dbId are given so that the collection can begin
-    dbId: str = parser.getDbNameInURL(request)
-    networkName: str = parser.getNameInURL(request)
+    configId: str = parser.getDataCollectorInURL(request)
 
-    # Retrieve from respective managers, invalid names will throw error
-    db: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
-    network: Network = NetworkManager.getNetwork(networkName)
-    configId: str = "1"  # For now, creating a hard-coded configuration Id
-
-    # create a configMap to create a DataCollectionConfiguration
-    configMap = {}
-    configMap["configId"] = configId
-    configMap[TypeStrings.Network_Type.value] = network
-    configMap[TypeStrings.Database_Type.value] = db
-    configMap["runTime"] = 100
-
-    collectionConfig: DataCollectionConfiguration = DataCollectionConfiguration(configMap)
-
-    collector: DataCollector = DataCollector(collectionConfig)
-
-    DataCollectionManager.addCollector(collector)
+    dataCollector: DataCollector = DataCollectionManager.getCollector(configId)
 
     # For a test device, the MockServer must be started in order to get generated data
-    devices = network.getDevices()
+    devices = dataCollector.getNetwork().getDevices()
     for key in devices:
         device = devices[key]
         if device.getDeviceType() == "TestDeviceAdapter":
@@ -391,7 +374,7 @@ def startDataCollection():
             break
 
     # start data collection
-    collector.startCollection()
+    dataCollector.startCollection()
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
