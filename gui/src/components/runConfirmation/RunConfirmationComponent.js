@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 
+const dataCollectionBaseURL = 'http://localhost:5000/chariot/api/v1.0/data';
+
+
 class RunConfirmationComponent extends Component {
   constructor(props) {
     super(props);
@@ -13,6 +16,27 @@ class RunConfirmationComponent extends Component {
         "Database Type": this.props.location.networkProps["Database Type"]
     }
   }
+
+  startDataCollection = () => {
+      var dbId = this.state["Database ID"];
+      var networkName = this.state["Network Name"];
+
+      // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
+      fetch(dataCollectionBaseURL + "?networkName=" + networkName + "&dbId=" + dbId)
+          .then(res => res.json())
+          .then(
+              // If post was successful, then move to visualizer page
+              (result) => {
+                  console.log(result);
+                  },
+              // If post was unsuccessful, update state and display error modal
+              (error) => {
+                  console.log(error.message);
+              }
+          )
+
+  };
+
 
   render() {
     return (
@@ -36,7 +60,7 @@ class RunConfirmationComponent extends Component {
             <Link to="/chooseNetwork">
                 <Button variant="primary" className="float-left footer-button">Back</Button>
             </Link>
-            <Button variant="primary" className="float-right footer-button">Begin Collection</Button>
+            <Button variant="primary" className="float-right footer-button" onClick={this.startDataCollection}>Begin Collection</Button>
         </div>
     );
   }

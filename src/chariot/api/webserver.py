@@ -14,34 +14,37 @@ from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, It
     NoIdentifierError
 from chariot.network.configuration import NetworkConfiguration
 from chariot.database import DatabaseManager
-from chariot.utility.TypeStrings import TypeStrings
+from chariot.utility import TypeStrings
+from test.testutils import MockServer
+from chariot.collection.configuration import DataCollectionConfiguration
+from chariot.collection import DataCollector, DataCollectionManager
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 app.config["DEBUG"] = True
 
-nManagerBaseUrl: str = '/chariot/api/v1.0'
+apiBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
 defaultSuccessCode: int = 200
 
 
 # --- This section of api endpoints deals with netowrks  --- #
 
-@app.route(nManagerBaseUrl + '/networks/names', methods=['GET'])
+@app.route(apiBaseUrl + '/networks/names', methods=['GET'])
 # This method will return all network names known to the networkManager and their descriptions
 def retrieveAllNetworkNames():
     allNetworks: Dict[str, str] = NetworkManager.getAllNetworks()
     return buildSuccessfulRequest(allNetworks, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/networks/all', methods=['GET'])
+@app.route(apiBaseUrl + '/networks/all', methods=['GET'])
 # This method will return all known networks along with their devices
 def retrieveAllNetworkDetails():
     networksAndDevices = NetworkManager.getNetworksAndDevices()
     return buildSuccessfulRequest(networksAndDevices, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/network', methods=['POST'])
+@app.route(apiBaseUrl + '/network', methods=['POST'])
 def createNetwork():
     requestContent = request.get_json()
 
@@ -55,7 +58,7 @@ def createNetwork():
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/network', methods=['PUT'])
+@app.route(apiBaseUrl + '/network', methods=['PUT'])
 def modifyNetwork():
     # through this endpoint, a network can have its name and/or description changed
     # it must be that the old name('networkName') is specified and a new name('newNetworkName') is given in the payload
@@ -83,7 +86,7 @@ def modifyNetwork():
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/network', methods=['DELETE'])
+@app.route(apiBaseUrl + '/network', methods=['DELETE'])
 def deleteNetwork():
     networkToDelete = parser.getNameInURL(request)
     NetworkManager.deleteNetwork(networkToDelete)
@@ -91,7 +94,7 @@ def deleteNetwork():
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/network', methods=['GET'])
+@app.route(apiBaseUrl + '/network', methods=['GET'])
 def getNetworkDetails():
     # this method returns a specific network details
     networkName = parser.getNameInURL(request)
@@ -102,13 +105,13 @@ def getNetworkDetails():
 
 # ---  This section of endpoints deals with devices  --- #
 
-@app.route(nManagerBaseUrl + '/network/device/supportedDevices', methods=['GET'])
+@app.route(apiBaseUrl + '/network/device/supportedDevices', methods=['GET'])
 def getSupportedDevices():
     # returns a dictionary of supported devices, with key as deviceType and value as the configuration
     return buildSuccessfulRequest(DeviceAdapterFactory.getsupportedDevices(), None)
 
 
-@app.route(nManagerBaseUrl + '/network/device/config', methods=['GET'])
+@app.route(apiBaseUrl + '/network/device/config', methods=['GET'])
 def getSupportedDeviceConfig():
     deviceTemplateName = parser.getDeviceNameInURL(request)
 
@@ -118,7 +121,7 @@ def getSupportedDeviceConfig():
     return buildSuccessfulRequest(deviceTemplate, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/network/device', methods=['GET'])
+@app.route(apiBaseUrl + '/network/device', methods=['GET'])
 def getDeviceDetails():
     # ensure that a network is specified in the payload
     networkName = parser.getNameInURL(request)
@@ -131,7 +134,7 @@ def getDeviceDetails():
     return buildSuccessfulRequest(deviceConfig.toDict(), defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/network/device', methods=['POST'])
+@app.route(apiBaseUrl + '/network/device', methods=['POST'])
 def createDevice():
     # ensure that a network is specified in the payload
     requestContent = request.get_json()
@@ -155,7 +158,7 @@ def createDevice():
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/network/device', methods=['PUT'])
+@app.route(apiBaseUrl + '/network/device', methods=['PUT'])
 def modifyDevice():
     # through this endpoint, a device can have its configuration changed
     # it must be that the old name('deviceId') is specified and a new name('newDeviceId') is given in the payload
@@ -183,7 +186,7 @@ def modifyDevice():
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/network/device', methods=['DELETE'])
+@app.route(apiBaseUrl + '/network/device', methods=['DELETE'])
 def deleteDevice():
     # ensure that a network is specified in the payload
     networkName = parser.getNameInURL(request)
@@ -197,7 +200,7 @@ def deleteDevice():
 
 
 # ---  This section of endpoints deals with databases  --- #
-@app.route(nManagerBaseUrl + '/database/test', methods=['POST'])
+@app.route(apiBaseUrl + '/database/test', methods=['POST'])
 def testDBConfiguration():
     # one can test an already created configuration or by payload
     requestContent = request.get_json()
@@ -227,7 +230,7 @@ def testDBConfiguration():
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/database', methods=['POST'])
+@app.route(apiBaseUrl + '/database', methods=['POST'])
 def createDBConfiguration():
     payloadConfig = request.get_json()
 
@@ -242,7 +245,7 @@ def createDBConfiguration():
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/database', methods=['PUT'])
+@app.route(apiBaseUrl + '/database', methods=['PUT'])
 def modifyDatabaseConfiguration():
     # through this endpoint, a database can have its id and/or attributes changed
     # it must be that the old name('dbId') is specified and a new name('newDbId') is given in the payload
@@ -270,15 +273,15 @@ def modifyDatabaseConfiguration():
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/database', methods=['DELETE'])
+@app.route(apiBaseUrl + '/database', methods=['DELETE'])
 def deleteDatabaseConfiguration():
-    dbId = parser.getNameInURL(request)
+    dbId = parser.getDbNameInURL(request)
     DatabaseManager.deleteDbWriter(dbId)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/database', methods=['GET'])
+@app.route(apiBaseUrl + '/database', methods=['GET'])
 def getDatabaseConfiguration():
     # this method returns a specific database config
     dbId = parser.getDbNameInURL(request)
@@ -287,13 +290,13 @@ def getDatabaseConfiguration():
     return buildSuccessfulRequest(db, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/database/supportedDatabases', methods=['GET'])
+@app.route(apiBaseUrl + '/database/supportedDatabases', methods=['GET'])
 def getSupportedDatabases():
     # returns a dictionary of supported devices, with key as deviceType and value as the configuration
     return buildSuccessfulRequest(DatabaseWriterFactory.getsupportedDatabases(), None)
 
 
-@app.route(nManagerBaseUrl + '/database/config', methods=['GET'])
+@app.route(apiBaseUrl + '/database/config', methods=['GET'])
 def getSupportedDatabaseConfig():
     deviceTemplateName = parser.getDbNameInURL(request)
 
@@ -303,11 +306,103 @@ def getSupportedDatabaseConfig():
     return buildSuccessfulRequest(deviceTemplate, defaultSuccessCode)
 
 
-@app.route(nManagerBaseUrl + '/database/all', methods=['GET'])
+@app.route(apiBaseUrl + '/database/all', methods=['GET'])
 # This method will return all known networks along with their devices
 def retrieveAllDbConfigs():
     dbConfigs = DatabaseManager.getAllConfigurations()
     return buildSuccessfulRequest(dbConfigs, defaultSuccessCode)
+
+
+# ---  This section deals with data collectors  --- #
+@app.route(apiBaseUrl + '/data', methods=['POST'])
+def createDataCollector():
+    requestContent = request.get_json()
+    # in this method, it is expected that a networkName and dbId are given so that a DataCollection can be created
+    dbId: str = parser.getDbNameInPayload(requestContent)
+    networkName: str = parser.getNameInPayload(requestContent)
+
+    # Retrieve from respective managers, invalid names will throw error
+    db: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
+    network: Network = NetworkManager.getNetwork(networkName)
+    configId: str = "1"  # For now, creating a hard-coded configuration Id
+
+    # create a configMap to create a DataCollectionConfiguration
+    configMap = {}
+    configMap["configId"] = configId
+    configMap[TypeStrings.Network_Type.value] = network
+    configMap[TypeStrings.Database_Type.value] = db
+    configMap["runTime"] = 100
+
+    collectionConfig: DataCollectionConfiguration = DataCollectionConfiguration(configMap)
+
+    collector: DataCollector = DataCollector(collectionConfig)
+
+    DataCollectionManager.addCollector(collector)
+    return buildSuccessfulRequest(None, defaultSuccessCode)
+
+
+@app.route(apiBaseUrl + '/data', methods=['GET'])
+def getDataCollector():
+    dataConfigId: str = parser.getDataCollectorInURL(request)
+    dataCollector: DataCollector = DataCollectionManager.getCollector(dataConfigId).getConfiguration().toDict()
+
+    return buildSuccessfulRequest(dataCollector, defaultSuccessCode)
+
+
+@app.route(apiBaseUrl + '/data', methods=['DELETE'])
+def deleteDataCollector():
+    dataConfigId: str = parser.getDataCollectorInURL(request)
+    DataCollectionManager.deleteCollector(dataConfigId)
+    return buildSuccessfulRequest(None, defaultSuccessCode)
+
+
+# ---  This section deals with data collection  --- #
+@app.route(apiBaseUrl + '/data/start', methods=['GET'])
+def startDataCollection():
+    # in this method, it is expected that a networkName and dbId are given so that the collection can begin
+    dbId: str = parser.getDbNameInURL(request)
+    networkName: str = parser.getNameInURL(request)
+
+    # Retrieve from respective managers, invalid names will throw error
+    db: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
+    network: Network = NetworkManager.getNetwork(networkName)
+    configId: str = "1"  # For now, creating a hard-coded configuration Id
+
+    # create a configMap to create a DataCollectionConfiguration
+    configMap = {}
+    configMap["configId"] = configId
+    configMap[TypeStrings.Network_Type.value] = network
+    configMap[TypeStrings.Database_Type.value] = db
+    configMap["runTime"] = 100
+
+    collectionConfig: DataCollectionConfiguration = DataCollectionConfiguration(configMap)
+
+    collector: DataCollector = DataCollector(collectionConfig)
+
+    DataCollectionManager.addCollector(collector)
+
+    # For a test device, the MockServer must be started in order to get generated data
+    devices = network.getDevices()
+    for key in devices:
+        device = devices[key]
+        if device.getDeviceType() == "TestDeviceAdapter":
+            server: MockServer = MockServer()
+            server.start()
+            break
+
+    # start data collection
+    collector.startCollection()
+
+    return buildSuccessfulRequest(None, defaultSuccessCode)
+
+
+@app.route(apiBaseUrl + '/data/stop', methods=['GET'])
+def endDataCollection():
+    dataConfigId: str = parser.getDataCollectorInURL(request)
+    dataCollector: DataCollector = DataCollectionManager.getCollector(dataConfigId)
+    dataCollector.stopCollection()
+
+    return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 # ---  This section deals with errorHandlers  --- #

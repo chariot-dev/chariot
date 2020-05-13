@@ -6,7 +6,7 @@ import string
 from chariot.utility.JSONTypes import JSONObject
 
 class MockServer:
-    RANDOM_STR_LEN = 10
+    RANDOM_STR_LEN = 100
 
     def __init__(self, port: int = 6000):
         self.port = port
@@ -28,11 +28,7 @@ class MockServer:
         strLen: int = request.args.get('strLen')
         if not strLen:
             strLen = self.RANDOM_STR_LEN
-        # https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits
-        return {
-            'name': ''.join(random.choices(string.ascii_uppercase + string.digits, k=strLen)),
-            'info': ''.join(random.choices(string.ascii_uppercase + string.digits, k=strLen)),
-        }
+        return {'data': random.randint(0, strLen)}
 
     def run(self, **kwargs) -> None:
         self.app.run(**kwargs)
