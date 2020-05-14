@@ -6,6 +6,7 @@ from time import sleep
 from typing import Callable, Iterable, List, Optional
 from chariot.collection.configuration import DataCollectionConfiguration
 from chariot.collection import DataCollectionWorker
+from chariot.collection.adapter import DataOutputAdapter, SocketServer
 from chariot.database.writer import DatabaseWriter
 from chariot.device.adapter import DeviceAdapter
 from chariot.network import Network
@@ -33,6 +34,8 @@ class DataCollector:
         self._workers: List[DataCollectionWorker] = []
         self._workerProcesses: List[HandledProcess] = []
         self._minPollDelay: float = 0.01
+        self._socket: SocketServer = SocketServer('localhost', 65432)
+        self._socketHandler: HandledThread = HandledThread(name="Socket-Server", target=self._socket.start, args=(self._errorQueue,))
 
     def __del__(self) -> None:
         self.stopCollection()
@@ -102,6 +105,7 @@ class DataCollector:
             # output hooks are called when data is received and chunked - this is where we would add the socket.send
             # for the DataOutputAdapter
             worker.addOutputHook(self._config.database.insertMany)
+            worker.addOutputHook(self._socket.enqueue)
             self._workers.append(worker)
             workerProcess: HandledProcess = HandledProcess(
                 target=worker.start, name=f'DataCollectionWorker-{(i//8 + 1)}', args=(self._errorQueue, self._stopEvent))
@@ -112,6 +116,7 @@ class DataCollector:
         network.lock(self._runLock, 'a data collection episode')
         self._config.database.lock(self._runLock, 'a data collection episode')
         self._errorHandler.start()
+        self._socketHandler.start()
         for workerProcess in self._workerProcesses:
             workerProcess.start()
             sleep(self.PROCESS_CREATION_DELAY)  # seems to be necessary to avoid random bad forks
@@ -132,6 +137,8 @@ class DataCollector:
             for workerProcess in self._workerProcesses:
                 workerProcess.join(self.JOIN_TIMEOUT)
                 alive |= workerProcess.is_alive()
+            self._socket.stop()
+            self._socketHandler.join(self.JOIN_TIMEOUT)
             self._errorHandler.join(self.JOIN_TIMEOUT)
             alive |= self._errorHandler.is_alive()
         self._config.database.disconnect()
