@@ -22,15 +22,16 @@ class NetworkDeviceCellScreenTemplate extends Component {
     var networkLinks = [];
 
     for (var i = 0; i < this.state.dataJson.length; i++) {
-      // For network/device page use
-      let deviceTags;
-      let curNetworkName;
-      let curNetworkDescription;
 
       // For database page use 
       let curDatabaseId;
       let curDatabaseName;
       let curDatabaseType;
+
+      var deviceTags = []; // Reset list of devices for network-to-be-displayed
+      var curNetworkName = this.state.dataJson[i]["NetworkName"];
+      var curNetworkDevices = this.state.dataJson[i]["Devices"];
+      var curNetworkDescription = this.state.dataJson[i]["Description"];
 
       var buttonElement = [];
 
@@ -68,7 +69,8 @@ class NetworkDeviceCellScreenTemplate extends Component {
           curNetworkDescription = this.state.dataJson[i]["Description"];
     
           buttonElement.push(
-            <Link key={"chooseNetworkButton" + i} to={{pathname:'/chooseDatabaseConfig', networkProps:{'Network Name': curNetworkName}}}>
+
+            <Link key={"chooseNetworkButton" + i} to={{pathname:'/databaseConnection', networkProps:{'Network Name': curNetworkName, 'Devices': curNetworkDevices}}}> 
               <Button className="float-right" variant="success" size="sm">
                 Choose Network
               </Button>
@@ -92,6 +94,8 @@ class NetworkDeviceCellScreenTemplate extends Component {
             </Link>
           )         
           break;
+        default:
+          buttonElement.push(undefined);
       }
       
       if (this.state.withLinks) {

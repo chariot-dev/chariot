@@ -25,8 +25,8 @@ class DatabaseConnection extends Component {
       testSuccessIsOpen: false,
       testErrorIsOpen: false,
       testErrorMessage: ''
-    }
 
+    };
     this.handleChange = this.handleChange.bind(this);
     this.handleDatabaseTypeChange = this.handleDatabaseTypeChange.bind(this);
     this.hideTestSuccessModal = this.hideTestSuccessModal.bind(this);
@@ -58,7 +58,6 @@ class DatabaseConnection extends Component {
     for (var k = 0; k < this.state.supportedDatabaseTypes.length; k++) {
       databaseOptionsElement.push(<option>{this.state.supportedDatabaseTypes[k]}</option>);
     }
-
     return databaseOptionsElement;
   }
 
@@ -70,7 +69,7 @@ class DatabaseConnection extends Component {
   }
 
   hideTestSuccessModal(event) {
-    this.setState({ testSuccessIsOpen: false });    
+    this.setState({ testSuccessIsOpen: false });
     event.preventDefault();
   }
 
@@ -250,8 +249,7 @@ class DatabaseConnection extends Component {
         <Link to="/chooseNetwork">
             <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
-
-        <Button variant="success" className="footer-button button-mid-bottom" onClick={this.testConfigurationConnection}>Test Connection</Button>
+        <Button variant="success" className="footer-button button-mid-bottom" onClick={this.testConfigurationConnection}>Test Connection </Button>
 
       </div>,
 
@@ -290,6 +288,7 @@ class DatabaseConnection extends Component {
         <ErrorModalBody errorMessage='Could not get database configuration due to an error. Please try again.'>
         </ErrorModalBody>
 
+
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.toggleErrorModal}>OK</Button>
         </Modal.Footer>
@@ -297,8 +296,6 @@ class DatabaseConnection extends Component {
 
     ]
   }
-
-
 
 
 }

@@ -141,7 +141,7 @@ class AddNetwork extends Component {
           <Link to="/networkManager">
             <Button variant="primary" className="float-left">No</Button>
           </Link>
-          <Link to={{pathname:'/addDeviceHome', networkProps:{'Network Name': this.state.networkProperties['Network Name']} }}>
+          <Link to={{ pathname:'/addDeviceHome', networkProps:{'Network Name': this.state.networkProperties['Network Name']} }}>
             <Button variant="primary" className="float-right">Yes</Button>
           </Link>
         </Modal.Footer>
