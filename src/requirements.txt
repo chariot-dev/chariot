@@ -2,6 +2,7 @@ astroid==2.3.3
 attrs==19.3.0
 Automat==20.2.0
 bandit==1.6.2
+celery[redis]==4.4.2
 certifi==2019.11.28
 chardet==3.0.4
 Click==7.0
@@ -12,6 +13,7 @@ filelock==3.0.12
 flake8==3.7.9
 Flask==1.1.1
 Flask-Cors==3.0.8
+Flask-SocketIO==4.3.0
 gitdb2==2.0.6
 GitPython==3.0.5
 hyperlink==19.0.0

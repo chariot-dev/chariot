@@ -2,6 +2,8 @@ import flask
 from typing import Dict
 from flask import jsonify, request
 from flask_cors import CORS
+from celery import Celery
+from flask_socketio import SocketIO, emit, disconnect
 from chariot.device import DeviceAdapterFactory, DeviceConfigurationFactory
 from chariot.device.adapter import DeviceAdapter
 from chariot.configuration import Configuration
@@ -26,6 +28,17 @@ app.config["DEBUG"] = True
 apiBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
 defaultSuccessCode: int = 200
+
+# Celery configuration
+app.config['CELERY_BROKER_URL']: str = 'redis://localhost:6379/0'
+app.config['CELERY_RESULT_BACKEND']: str = 'redis://localhost:6379/0'
+
+# SocketIO
+socketio: SocketIO = SocketIO(app)
+
+# Initialize Celery
+celery: Celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celer.conf.update(app.config)
 
 
 # --- This section of api endpoints deals with netowrks  --- #
