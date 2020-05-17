@@ -65,7 +65,6 @@ class ManageDeviceConfiguration extends React.Component {
         // Initialize all to-be-saved properties to be the original, in the event not all properties are modified so can still be saved
         this.setState({newDeviceProperties: properties});
 
-
         return fetch(getDeviceTypeConfiguration + '?deviceId=' + this.state.originalDeviceProperties["deviceType"])
       },
       // On error
@@ -80,12 +79,16 @@ class ManageDeviceConfiguration extends React.Component {
     .then(result => result.json())
     .then((result) => {
       var settings = result[this.state.originalDeviceProperties["deviceType"]]["settings"];
+
+      console.log( result[this.state.originalDeviceProperties["deviceType"]]["settings"] );
+      console.log(settings);
+      console.log(settings.length);
+
       var configurationFields = [];
       var deviceTypeIndex;
 
       this.setState({ deviceConfiguration : result });
 
-      console.log(settings);
       console.log(this.state.newDeviceProperties);
 
       //combine originalDeviceProperties with result to have an object containing fields and their values
@@ -102,6 +105,7 @@ class ManageDeviceConfiguration extends React.Component {
           //do not allow modification of deviceType
           deviceTypeIndex = i;
         }
+
         if (settings[i].settingsList) {
           for (var k = 0; k < settings[i].settingsList.length; k++) {
             var fieldJsonObj = {};
@@ -117,14 +121,12 @@ class ManageDeviceConfiguration extends React.Component {
             fieldJsonObj["required"] = curFieldIsRequired;
             fieldJsonObj["inputType"] = curFieldType;
             fieldJsonObj["title"] = curFieldTitle;
-            if (currentAlias in this.state.originalDeviceProperties &&
+            if (curFieldTitle in this.state.originalDeviceProperties &&
                 this.state.originalDeviceProperties[currentAlias] != null) {
               //combine the two
               settings[i].currentValue = this.state.originalDeviceProperties[currentAlias]
             }
             settings.push(fieldJsonObj);
-
-            console.log(curFieldTitle);
           }
         }
       }
@@ -139,7 +141,7 @@ class ManageDeviceConfiguration extends React.Component {
         var curFieldTitle = settings[i].title;
 
         configurationFields.push(
-            <div className="form-group" key={settings[i].title + " Field"}>
+            <div className="form-group" key={settings[i].title + " Field" + i}>
               {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
               {curFieldTitle}: <input type={valueType} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'}
                                       id={curFieldAlias} name={curFieldTitle} defaultValue={settings[i].currentValue} onChange={this.handleChange}/>
@@ -166,6 +168,8 @@ class ManageDeviceConfiguration extends React.Component {
     var data = {};
 
     // ======= When creating fields, no reference to field type, so some fields are would be sent as strings when they need to be ints. Also antenna beeds array. Need to fix ========
+    console.log(this.state.originalDeviceName);
+    console.log(this.state.newDeviceProperties[uniqueDeviceId]);
 
     if (this.state.originalDeviceName === this.state.newDeviceProperties[uniqueDeviceId]) {
       // if the device name is the same, can just use newDeviceProperties as data (remove fields with null)
@@ -173,11 +177,14 @@ class ManageDeviceConfiguration extends React.Component {
     }
     else {
       // if the device is not the same, then use the old name as "deviceId" and the new name as "newDeviceId"
-      var originalName = this.state.originalDeviceProperties[uniqueDeviceId];
+      var originalName = this.state.originalDeviceName;
       var newName = this.state.newDeviceProperties[uniqueDeviceId];
       data = this.state.newDeviceProperties;
 
       delete this.state.newDeviceProperties[uniqueDeviceId];
+
+      console.log(originalName);
+      console.log(newName);
 
       this.state.newDeviceProperties["deviceId"] = originalName;
       this.state.newDeviceProperties["newDeviceId"] = newName;
@@ -196,6 +203,8 @@ class ManageDeviceConfiguration extends React.Component {
 
     }
     
+    console.log(data);
+
     // Put request options
     const requestOptions = {
       method: 'PUT',
@@ -303,7 +312,7 @@ class ManageDeviceConfiguration extends React.Component {
       </Modal>,
 
       <Modal show={this.state.saveSuccessIsOpen} key="deviceSaveSuccessModal">
-        <SuccessModalBody successMessage= {this.state.newDeviceProperties['Device Name'] + ' has successfully been modified.'}>
+        <SuccessModalBody successMessage= {this.state.newDeviceProperties['deviceId'] + ' has successfully been modified.'}>
         </SuccessModalBody>
         <Modal.Footer>
           <Link to="/welcome">

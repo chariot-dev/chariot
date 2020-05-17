@@ -7,7 +7,7 @@ import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
-const databaseBaseUrl = "http://localhost:5000/chariot/api/v1.0/database"
+const databaseBaseUrl = "http://localhost:5000/chariot/api/v1.0/database";
 
 class DatabaseConnection extends Component {
   constructor(props) {
@@ -141,6 +141,8 @@ class DatabaseConnection extends Component {
 
   testConfigurationConnection = () => {
     var formData = this.parseFromTextFields();
+
+    console.log(formData);
     
     // Post request options
     const requestOptions = {
@@ -265,7 +267,7 @@ class DatabaseConnection extends Component {
       </Modal>,
 
       <Modal show={this.state.testSuccessIsOpen} key="testDatabaseConfigSuccessModal">
-        <SuccessModalBody successMessage="Chariot connected to the database succesfully!">
+        <SuccessModalBody successMessage="Chariot connected to the database succesfully! To create the database configuration, please close this window and then click 'Create'.">
         </SuccessModalBody>
 
         <Modal.Footer>

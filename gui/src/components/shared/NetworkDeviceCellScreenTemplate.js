@@ -7,6 +7,8 @@ import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
+import './NetworkDeviceCellScreenTemplate.css';
+
 class NetworkDeviceCellScreenTemplate extends Component {
   constructor(props) {
     super(props);
@@ -15,6 +17,11 @@ class NetworkDeviceCellScreenTemplate extends Component {
       withLinks: this.props.withLinks, // withLinks = true means clicking on network/devices is possible
       type: this.props.type // manage, delete, choose
     }
+  }
+
+  handleTestDatabaseConnection = (curDatabaseId, curDatabaseName, curDatabaseType, curDatabaseHost) => {
+    console.log("hi");
+    this.props.testDatabaseConnection(curDatabaseId, curDatabaseName, curDatabaseType, curDatabaseHost);
   }
 
 
@@ -27,6 +34,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
       let curDatabaseId;
       let curDatabaseName;
       let curDatabaseType;
+      let curDatabaseHost;
 
       var deviceTags = []; // Reset list of devices for network-to-be-displayed
       var curNetworkName = this.state.dataJson[i]["NetworkName"];
@@ -70,7 +78,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
     
           buttonElement.push(
 
-            <Link key={"chooseNetworkButton" + i} to={{pathname:'/databaseConnection', networkProps:{'Network Name': curNetworkName, 'Devices': curNetworkDevices}}}> 
+            <Link key={"chooseNetworkButton" + i} to={{pathname:'/chooseDatabaseConfig', networkProps:{'Network Name': curNetworkName, 'Devices': curNetworkDevices}}}> 
               <Button className="float-right" variant="success" size="sm">
                 Choose Network
               </Button>
@@ -82,9 +90,10 @@ class NetworkDeviceCellScreenTemplate extends Component {
           console.log(this.state.dataJson)
           curNetworkName = this.state.dataJson["chosenNetwork"];
           curDatabaseId = this.state.dataJson[i]["dbId"];
+          curDatabaseHost = this.state.dataJson[i]["host"];
           curDatabaseName = this.state.dataJson[i]["databaseName"];
           curDatabaseType =  this.state.dataJson[i]["type"];
-          buttonElement.push(
+          buttonElement.push(         
             <Link 
               key={"chooseDatabaseButton" + i} 
               to={{pathname:'/runConfirmationComponent', networkProps:{'Network Name': curNetworkName, 'Database ID': curDatabaseId, 'Database Name': curDatabaseName, 'Database Type': curDatabaseType}}}>
@@ -92,7 +101,13 @@ class NetworkDeviceCellScreenTemplate extends Component {
                 Choose Database
               </Button>
             </Link>
-          )         
+          )    
+          console.log(this.props)
+          buttonElement.push(
+            <Button key={"testDatabaseButton" + i}  className="float-right testDatabaseConnectionButton" variant="info" size="sm" onClick={this.handleTestDatabaseConnection.bind(this, curDatabaseId, curDatabaseName, curDatabaseType, curDatabaseHost)} curDatabaseId={curDatabaseId}>
+              Test Database Connection
+            </Button>
+          )     
           break;
         default:
           buttonElement.push(undefined);

@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
+import Modal from 'react-bootstrap/Modal';
+
 
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
+import SuccessModalBody from '../shared/SuccessModalBody';
+import ErrorModalBody from '../shared/ErrorModalBody';
 
 const getAllDbConfigsBaseUrl = 'http://localhost:5000/chariot/api/v1.0/database/all';
+const databaseTestUrl = "http://localhost:5000/chariot/api/v1.0/database/test";
 
 class ChooseDatabaseConfig extends Component {
   constructor(props) {
@@ -12,8 +17,14 @@ class ChooseDatabaseConfig extends Component {
     
     this.state = {
       chosenNetwork: this.props.location.networkProps["Network Name"],
-      existingConfigs: []
+      existingConfigs: [],
+      testSuccessIsOpen: false,
+      testErrorIsOpen: false,
+      testErrorMessage: ""
     }
+    
+    this.hideTestSuccessModal = this.hideTestSuccessModal.bind(this);
+    this.hideTestErrorModal = this.hideTestErrorModal.bind(this);
   }
 
   componentDidMount () {
@@ -47,9 +58,58 @@ class ChooseDatabaseConfig extends Component {
     )
   }
 
+  hideTestSuccessModal(event) {
+    this.setState({ testSuccessIsOpen: false });
+    event.preventDefault();
+  }
+
+  hideTestErrorModal(event) {
+    this.setState({ testErrorIsOpen: false});
+    event.preventDefault();
+  }
+
+  // Callback from child, NetworkkDeviceCellScreen
+  testDatabaseConnection = (curDatabaseId, curDatabaseName, curDatabaseType, curDatabaseHost) => {
+    var data = {
+      "dbId": curDatabaseId,
+      "host": curDatabaseHost,
+      "databaseName": curDatabaseName,
+      "type": curDatabaseType
+    }
+    
+    // Post request options
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    };
+
+    // fetch request to test database connection
+    fetch(databaseTestUrl, requestOptions)
+    .then(
+      (res) => {
+        if (res.status === 400) { // If 400 error was returned from the api call
+          return res.json(); // Return the response to the next then()
+        }
+        else { // If a 400 wasn't returned, then the api call was successful
+          this.setState({ testSuccessIsOpen: true }); // Set to true so test connection success modal appears
+          return; // Since going to then(), return null since no need to parse response
+        }
+    })
+    .then(
+      // 
+      (resJson) => {
+        if (resJson) { // If the response exists (coming from 400 error)
+          this.setState({ testErrorMessage: resJson.message }, () => { // Set the error message
+            this.setState({ testErrorIsOpen: true }); // Then set test error modal to true
+          }); 
+        }
+    })
+  }
+
   render() {
 
-    return (
+    return [
       <div className="container">
         <h1>Choose a Database</h1>
         <p className="screenInfo">
@@ -57,7 +117,7 @@ class ChooseDatabaseConfig extends Component {
         </p>
 
         {this.state.existingConfigs ? 
-          <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} chosenNetwork={this.state.chosenNetwork} withLinks={false} type="chooseDatabase"></NetworkDeviceCellScreenTemplate> : null}
+          <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} chosenNetwork={this.state.chosenNetwork} withLinks={false} type="chooseDatabase" testDatabaseConnection={this.testDatabaseConnection}></NetworkDeviceCellScreenTemplate> : null}
 
         <Link to={{pathname: "/chooseNetwork"}}>
           <Button variant="primary" className="float-left footer-button">Back</Button>
@@ -66,8 +126,27 @@ class ChooseDatabaseConfig extends Component {
         <Link to={{ pathname: "/databaseConnection", "Network Name": this.state.chosenNetwork }}>
           <Button variant="success" className="float-right footer-button">Create</Button>
         </Link>
-      </div>
-    );
+      </div>,
+      
+      <Modal show={this.state.testSuccessIsOpen} key="testDatabaseConfigSuccessModal">
+        <SuccessModalBody successMessage="Chariot connected to the database succesfully!">
+        </SuccessModalBody>
+
+        <Modal.Footer>
+          <Button variant="primary" className="float-right" onClick={this.hideTestSuccessModal}>OK</Button>
+        </Modal.Footer>
+      </Modal>,
+
+      <Modal show={this.state.testErrorIsOpen} key="testDatabaseConfigErrorModal">
+        <ErrorModalBody errorMessage={this.state.testErrorMessage}>
+        </ErrorModalBody>
+
+        <Modal.Footer>
+          <Button variant="primary" className="float-right" onClick={this.hideTestErrorModal}>OK</Button>
+        </Modal.Footer>
+      </Modal>
+
+    ]
   }
 
 }
