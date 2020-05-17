@@ -43,6 +43,14 @@ class Welcome extends Component {
 
         <br></br>
 
+        <div>
+          <Link className="link" to="/databaseManager">Database Manager</Link>
+          <br></br>
+          View, create, delete, modify, or manage your existing databases.
+        </div>
+
+        <br></br>
+
         {/* Data analysis portion of welcome page. Contains the link to go to 'Data Analysis' screen and description of what that entails */}
         <div>
           <Link to="/dataAnalysisMain">Perform Data Analysis</Link>

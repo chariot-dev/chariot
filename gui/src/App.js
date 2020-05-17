@@ -3,9 +3,11 @@ import Login from './components/loginPage/Login'
 import Welcome from './components/welcomePage/Welcome';
 import Register from './components/registerPage/Register';
 import NetworkManager from "./components/networkManagement/NetworkManager";
+import DatabaseManager from "./components/databaseManagement/DatabaseManager";
 import AddNetwork from "./components/networkManagement/AddNetwork";
 import ManageExistingNetworks from "./components/networkManagement/ManageExistingNetworks";
-import DeleteNetwork from "./components/networkManagement/DeleteNetwork";
+import DeleteNetwork from './components/networkManagement/DeleteNetwork';
+import DeleteDatabase from "./components/databaseManagement/DeleteDatabase";
 import ChooseNetwork from "./components/networkManagement/ChooseNetwork";
 import DatabaseConnection from './components/databaseManagement/DatabaseConnection';
 import ChooseDatabaseConfig from './components/databaseManagement/ChooseDatabaseConfig';
@@ -41,6 +43,8 @@ function App() {
           <Route path="/manageExistingDevices/devices/:networkName" exact component={ManageDevices} />
           <Route path="/manageExistingDevices/devices/:networkName/:deviceName" exact component={ManageDeviceConfiguration} />
           <Route path="/runConfirmationComponent" exact component={RunConfirmationComponent} />
+          <Route path="/databaseManager" component={DatabaseManager} />
+          <Route path="/deleteDatabaseConfiguration" component={DeleteDatabase} />
         </Switch>
       </div>
     </Router>

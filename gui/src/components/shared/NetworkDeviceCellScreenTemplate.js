@@ -1,6 +1,5 @@
 /*
-
-
+  Template used for screens that separate networks/database configurations into individual cells on the screen
 */
 
 import React, { Component } from 'react';
@@ -18,18 +17,17 @@ class NetworkDeviceCellScreenTemplate extends Component {
       type: this.props.type // manage, delete, choose
     }
   }
-
+  
+  // Call callback function from parent component, ChooseDatabaseConfig
   handleTestDatabaseConnection = (curDatabaseId, curDatabaseName, curDatabaseType, curDatabaseHost) => {
-    console.log("hi");
     this.props.testDatabaseConnection(curDatabaseId, curDatabaseName, curDatabaseType, curDatabaseHost);
   }
 
-
+  // Create individual "cells," or sections, on the screen for each individual network/database
   createCells = () => {
     var networkLinks = [];
-
+    
     for (var i = 0; i < this.state.dataJson.length; i++) {
-
       // For database page use 
       let curDatabaseId;
       let curDatabaseName;
@@ -101,13 +99,26 @@ class NetworkDeviceCellScreenTemplate extends Component {
                 Choose Database
               </Button>
             </Link>
-          )    
-          console.log(this.props)
+          )
           buttonElement.push(
             <Button key={"testDatabaseButton" + i}  className="float-right testDatabaseConnectionButton" variant="info" size="sm" onClick={this.handleTestDatabaseConnection.bind(this, curDatabaseId, curDatabaseName, curDatabaseType, curDatabaseHost)} curDatabaseId={curDatabaseId}>
               Test Database Connection
             </Button>
           )     
+          break;
+        case "deleteDatabase":
+          console.log(this.state.dataJson);
+          curNetworkName = this.state.dataJson["chosenNetwork"];
+          curDatabaseId = this.state.dataJson[i]["dbId"];
+          curDatabaseHost = this.state.dataJson[i]["host"];
+          curDatabaseName = this.state.dataJson[i]["databaseName"];
+          curDatabaseType =  this.state.dataJson[i]["type"];
+
+          buttonElement.push(
+            <Button key={"deleteDatabaseConfigurationButton" + i} className="float-right" variant="danger" size="sm" onClick={this.props.deleteDatabaseConfiguration.bind(this, curDatabaseId)}>
+              Delete Database Configuration
+            </Button>
+          )
           break;
         default:
           buttonElement.push(undefined);
@@ -160,8 +171,8 @@ class NetworkDeviceCellScreenTemplate extends Component {
           </div>
         );
       }
-      else { // without links
-        if (this.state.type !== "chooseDatabase") {
+      else { // without links in text
+        if (this.state.type !== "chooseDatabase" && this.state.type !== "deleteDatabase") {
           if (this.state.dataJson[i]["Devices"].length > 0) {
             for (var j = 0; j < this.state.dataJson[i]["Devices"].length; j++) {
               curDeviceKey = curNetworkName + "Device" + j;
@@ -184,7 +195,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
         }
 
         // Create links for network, then create the jsx for networks/devices
-        if (this.state.type !== "chooseDatabase") {
+        if (this.state.type !== "chooseDatabase" && this.state.type !== "deleteDatabase") {
           networkLinks.push(
             <div className="existingNetworkBox" key={i}>
               <div className="existingNetworkCell">
@@ -200,6 +211,8 @@ class NetworkDeviceCellScreenTemplate extends Component {
             </div>
           );
         }
+
+        // Links for DB configs
         else {
           networkLinks.push(
             <div className="existingNetworkBox" key={i}>
@@ -211,15 +224,14 @@ class NetworkDeviceCellScreenTemplate extends Component {
                   <b>Database ID: </b> {curDatabaseId}<br></br>
                   <b>Database Name: </b> {curDatabaseName}<br></br>
                   <b>Database Type: </b> {curDatabaseType}<br></br>
+                  <b>Database Host: </b> {curDatabaseHost}<br></br>
                 </div>
               </div>
             </div>          
           );
         }
       }
-
     }
-
 
     return networkLinks;
   }

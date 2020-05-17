@@ -49,10 +49,6 @@ class ChooseDatabaseConfig extends Component {
       // On error
       (error) => {
         console.log(error.message);
-
-       /*
-         Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
-       */
       }
     )
   }
@@ -96,7 +92,6 @@ class ChooseDatabaseConfig extends Component {
         }
     })
     .then(
-      // 
       (resJson) => {
         if (resJson) { // If the response exists (coming from 400 error)
           this.setState({ testErrorMessage: resJson.message }, () => { // Set the error message
