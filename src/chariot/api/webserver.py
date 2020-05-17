@@ -2,6 +2,7 @@ import flask
 from typing import Dict
 from flask import jsonify, request
 from flask_cors import CORS
+from flask_socketio import SocketIO
 from chariot.device import DeviceAdapterFactory, DeviceConfigurationFactory
 from chariot.device.adapter import DeviceAdapter
 from chariot.configuration import Configuration
@@ -21,12 +22,14 @@ from chariot.collection import DataCollector, DataCollectionManager
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
-app.config["DEBUG"] = True
+socketio = SocketIO(app)
 
 apiBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
 defaultSuccessCode: int = 200
 
+runningCollectors: Dict[str, bool] = {}
+mockServer = MockServer()
 
 # --- This section of api endpoints deals with netowrks  --- #
 
@@ -353,6 +356,11 @@ def getDataCollector():
 @app.route(apiBaseUrl + '/data', methods=['DELETE'])
 def deleteDataCollector():
     dataConfigId: str = parser.getDataCollectorInURL(request)
+    if dataConfigId in runningCollectors:
+        # can't delete a running data collector
+        response = jsonify(toDict(f'The data collector with id {dataConfigId} cannot be deleted while it is running.'))
+        response.status_code = 400
+        return response
     DataCollectionManager.deleteCollector(dataConfigId)
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
@@ -363,28 +371,48 @@ def startDataCollection():
     configId: str = parser.getDataCollectorInURL(request)
 
     dataCollector: DataCollector = DataCollectionManager.getCollector(configId)
+    if configId in runningCollectors:
+        # data collection is already running
+        response = jsonify(toDict(f'The data collection with id {configId} is already running.'))
+        response.status_code = 400
+        return response
 
     # For a test device, the MockServer must be started in order to get generated data
     devices = dataCollector.getNetwork().getDevices()
-    for key in devices:
-        device = devices[key]
-        if device.getDeviceType() == "TestDeviceAdapter":
-            server: MockServer = MockServer()
-            server.start()
+    hasTestDevice = False
+    for device in devices.values():
+        if device.getDeviceType() == 'TestDeviceAdapter':
+            if not mockServer.isRunning():
+                mockServer.start()
+            hasTestDevice = True
             break
 
     # start data collection
+    dataCollector.addOutputHook(emitData)
+    runningCollectors[configId] = hasTestDevice
     dataCollector.startCollection()
-
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
 @app.route(apiBaseUrl + '/data/stop', methods=['GET'])
 def endDataCollection():
-    dataConfigId: str = parser.getDataCollectorInURL(request)
-    dataCollector: DataCollector = DataCollectionManager.getCollector(dataConfigId)
-    dataCollector.stopCollection()
+    configId: str = parser.getDataCollectorInURL(request)
+    if not configId in runningCollectors:
+         # data collection was not running
+        response = jsonify(toDict(f'The data collection with id {configId} was not running.'))
+        response.status_code = 400
+        return response
 
+    dataCollector: DataCollector = DataCollectionManager.getCollector(configId)
+    dataCollector.stopCollection()
+    del runningCollectors[configId]
+
+    # if no running collectors are using the MockServer, shut it down
+    if not any(runningCollectors.values()):
+        mockServer.stop()
+
+    # inform socket subscribers that data collection has ended
+    socketio.emit('end')
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
@@ -443,5 +471,9 @@ def buildSuccessfulRequest(data, code):
 
     return response, code
 
+def emitData(data: JSONObject) -> None:
+    socketio.emit('data', data)
 
-app.run()
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True, threaded=True)
