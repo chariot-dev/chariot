@@ -166,14 +166,14 @@ def modifyDevice():
     # through this endpoint, a device can have its configuration changed
     # it must be that the old name('deviceId') is specified and a new name('newDeviceId') is given in the payload
     requestContent = request.get_json()
-    hasNewName = False
+    newDeviceName: str = None
     networkName = parser.getNameInPayload(requestContent)
     deviceName: str = parser.getDeviceNameInPayload(requestContent)
 
     # check if a new device name is specified in the payload, if so capture old name so its deleted from collection
     if parser.getNewDeviceIdStr() in requestContent:
-        hasNewName = True
-        requestContent[TypeStrings.Device_Identifier.value] = requestContent[parser.getNewDeviceIdStr()]
+        newDeviceName = requestContent[parser.getNewDeviceIdStr()]
+        requestContent[TypeStrings.Device_Identifier.value] = newDeviceName
         del requestContent[parser.getNewDeviceIdStr()]
 
     # remove networkName key so that updating configuration does not raise an error
@@ -182,9 +182,8 @@ def modifyDevice():
     NetworkManager.getNetwork(networkName).getDevice(deviceName).updateConfig(requestContent)
 
     # if applicable, modify collection so the new device name is in collection and old one is deleted
-    if hasNewName:
-        NetworkManager.getNetwork(networkName).replaceDevice(requestContent[TypeStrings.Device_Identifier.value],
-                                                             deviceName)
+    if newDeviceName:
+        NetworkManager.getNetwork(networkName).replaceDevice(deviceName, newDeviceName)
 
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
