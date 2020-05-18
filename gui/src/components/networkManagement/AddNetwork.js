@@ -33,6 +33,7 @@ class AddNetwork extends Component {
     }
 
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
+    this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
   
@@ -44,10 +45,12 @@ class AddNetwork extends Component {
   }
 
   toggleConfirmationModal(event) {
-    this.setState({
-      confirmIsOpen: !this.state.confirmIsOpen
-    });
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
     event.preventDefault();
+  }
+
+  hideConfirmationModal(event) {
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });   
   }
 
   toggleErrorModal = () => {
@@ -120,7 +123,7 @@ class AddNetwork extends Component {
         </form>
       </div>,
 
-      <Modal show={this.state.confirmIsOpen} key="addNetworkConfirmation">
+      <Modal show={this.state.confirmIsOpen} onHide={this.hideConfirmationModal} key="addNetworkConfirmation">
           <ConfirmationModalBody
             confirmationQuestion='Is this information for your network correct?'
             confirmationData = {this.state.networkProperties}

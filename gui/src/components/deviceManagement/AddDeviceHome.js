@@ -37,7 +37,7 @@ class AddDeviceHome extends Component {
       confirmIsOpen: false, // Is the confirm modal open?
       successIsOpen: false, // Is the success modal open?
       errorIsOpen: false, // Is the error modal open?
-      errorMessage: '',
+      errorMessage: '', // Error messagae to be displayed, if necessary
       deviceState: {} // All configuration setting values for the device (From AddDeviceHome and AddDeviceVars)
     }
 
@@ -62,11 +62,6 @@ class AddDeviceHome extends Component {
       // On error
       (error) => {
         console.log(error.message);
-
-    
-        /*
-          Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
-        */ 
       }
     )
   }
@@ -95,7 +90,6 @@ class AddDeviceHome extends Component {
     As the device type the user selects changes, update that in the state.
   */
   handleDeviceTypeChange(event) {
-    console.log("------------------- changed -------------------");
     var lastDeviceType = this.state.newDeviceTypeGeneralVals['Device Type'];
     
     if (lastDeviceType !== event.target.value) { // If device type was changed
@@ -151,46 +145,34 @@ class AddDeviceHome extends Component {
     data["networkName"] = this.props.location.networkProps["Network Name"];
     data["deviceType"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Type'];
 
-    console.log(this.props.location.networkProps);
-    console.log(this.state.deviceState.newDeviceTypeConfigVals);
-
     for (var key in this.state.deviceState.newDeviceTypeConfigVals) {
-      console.log(key);
-      console.log(this.state.deviceState.newDeviceTypeConfigVals[key]);
-
       var fieldVal = this.state.deviceState.newDeviceTypeConfigVals[key].value;
-
 
       //only add to data if the value is not empty
       if (fieldVal !== "") {
+        var curFieldId = this.state.deviceState.newDeviceTypeConfigVals[key].alias;
+        var fieldType = this.state.deviceState.newDeviceTypeConfigVals[key].inputType;
 
+        if (fieldType === "number") {
+            fieldVal = parseInt(fieldVal)
+        }
+        else if (fieldType === "checkbox") {
+            fieldVal = document.getElementById(curFieldId).checked;
+        }
+        else if (fieldType === "numberArray") {
+            var inputValues = fieldVal.split(" ");
 
-          //TODO: find a better way to do this
-          var curFieldId = this.state.deviceState.newDeviceTypeConfigVals[key].alias;
-          var fieldType = this.state.deviceState.newDeviceTypeConfigVals[key].inputType;
+            //again need to verify that all values will be ints
+            var arr = [];
 
+            inputValues.forEach(function (item) {
+                arr.push(parseInt(item))
+            });
 
-          if (fieldType === "number") {
-              fieldVal = parseInt(fieldVal)
-          }
-          else if (fieldType === "checkbox") {
-              fieldVal = document.getElementById(curFieldId).checked;
-          }
-          else if (fieldType === "numberArray") {
-              var inputValues = fieldVal.split(" ");
-
-
-              //again need to verify that all values will be ints
-              var arr = [];
-
-
-              inputValues.forEach(function (item) {
-                  arr.push(parseInt(item))
-              });
-
-              fieldVal = arr;
-          }
-          data[curFieldId] = fieldVal;
+            fieldVal = arr;
+        }
+        
+        data[curFieldId] = fieldVal;
       }
     }
 
@@ -228,12 +210,8 @@ class AddDeviceHome extends Component {
 
 
   toggleErrorModal = () => {
-    this.setState({
-      confirmIsOpen: false
-    });
-    this.setState({
-      errorIsOpen: !this.state.errorIsOpen
-    });
+    this.setState({ confirmIsOpen: false });
+    this.setState({ errorIsOpen: !this.state.errorIsOpen });
   }
 
 
@@ -254,7 +232,6 @@ class AddDeviceHome extends Component {
 
   parseConfirmationData = () => {
     var confirmationDataJson = {};
-
     confirmationDataJson['Device Type'] = this.state.newDeviceTypeGeneralVals['Device Type'];
 
     for (var key in this.state.deviceState.newDeviceTypeConfigVals) {

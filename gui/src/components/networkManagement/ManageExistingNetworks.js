@@ -52,8 +52,6 @@ class ManageExistingNetworks extends Component {
   
 
   render() {
-    console.log(this.state.existingNetworks);
-
     return (
       <div className="container">
         <h1>Manage Existing Networks</h1>

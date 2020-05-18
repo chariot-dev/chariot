@@ -10,13 +10,13 @@ class DatabaseManager extends Component {
           <p className="screenInfo">Add, delete, or manage a database.</p>
           
           <div>
-            <Link to="/">Add a Database</Link>
+            <Link to="/databaseConnection">Add a Database</Link>
             <br></br>
             <br></br>
             <Link to="/deleteDatabaseConfiguration">Delete a Database</Link>
             <br></br>
             <br></br>
-            <Link to="/manageExistingDatabaseConfiguration">Manage Existing Database</Link>
+            <Link to="/manageExistingDatabaseConfigurations">Manage Existing Database</Link>
           </div>
 
           <Link to="/welcome">

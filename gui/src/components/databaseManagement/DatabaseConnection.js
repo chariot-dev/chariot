@@ -82,7 +82,6 @@ class DatabaseConnection extends Component {
   As the database type the user selects changes, update that in the state.
   */
   handleDatabaseTypeChange(event) {
-    console.log("------- changed --------");
     var lastDatabaseType = this.state['Database Type'];
 
     if (lastDatabaseType !== event.target.value) { // If database type was changed
@@ -103,7 +102,7 @@ class DatabaseConnection extends Component {
         )
       });
 
-      this.setState({ showDatabaseSpecificSettings: false}); // Reset to false after render to get ready for next render (if use changes database type)
+      this.setState({ showDatabaseSpecificSettings: false}); // Reset to false after render to get ready for next render (if user changes database type)
     }
   }
 
@@ -260,9 +259,16 @@ class DatabaseConnection extends Component {
         </SuccessModalBody>
 
         <Modal.Footer>
-          <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"]} }}>
-            <Button variant="primary" className="float-right">Continue</Button>
-          </Link>
+          {/* Either go to "Choose a Database Screen" (Configure data collection) or back to "Database Manager" (Add a db)*/}
+          {this.state["Network Name"] ? 
+            <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"]} }}>
+              <Button variant="primary" className="float-right">Continue</Button>
+            </Link> :
+            <Link to={{pathname:'/databaseManager'}}>
+              <Button variant="primary" className="float-right">Continue</Button>
+            </Link>
+          }
+          
         </Modal.Footer>
       </Modal>,
 

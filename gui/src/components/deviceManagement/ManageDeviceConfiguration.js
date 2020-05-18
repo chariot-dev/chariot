@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -12,7 +12,7 @@ const deleteDeviceBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/devi
 const getDeviceTypeConfiguration = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
 const uniqueDeviceId = "deviceId";
 
-class ManageDeviceConfiguration extends React.Component {
+class ManageDeviceConfiguration extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -65,6 +65,7 @@ class ManageDeviceConfiguration extends React.Component {
         // Initialize all to-be-saved properties to be the original, in the event not all properties are modified so can still be saved
         this.setState({newDeviceProperties: properties});
 
+        // Make another api call to get the device type's template configuration
         return fetch(getDeviceTypeConfiguration + '?deviceId=' + this.state.originalDeviceProperties["deviceType"])
       },
       // On error
@@ -167,10 +168,6 @@ class ManageDeviceConfiguration extends React.Component {
   modifyDevice = () => {
     var data = {};
 
-    // ======= When creating fields, no reference to field type, so some fields are would be sent as strings when they need to be ints. Also antenna beeds array. Need to fix ========
-    console.log(this.state.originalDeviceName);
-    console.log(this.state.newDeviceProperties[uniqueDeviceId]);
-
     if (this.state.originalDeviceName === this.state.newDeviceProperties[uniqueDeviceId]) {
       // if the device name is the same, can just use newDeviceProperties as data (remove fields with null)
       data = this.state.newDeviceProperties;
@@ -203,8 +200,6 @@ class ManageDeviceConfiguration extends React.Component {
 
     }
     
-    console.log(data);
-
     // Put request options
     const requestOptions = {
       method: 'PUT',
@@ -225,11 +220,6 @@ class ManageDeviceConfiguration extends React.Component {
       // If put was unsuccessful, update state and display error modal
       (error) => {
         console.log(error.message);
-
-      
-        /*
-          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
       }
     )
   }
@@ -257,11 +247,6 @@ class ManageDeviceConfiguration extends React.Component {
       // On error
       (error) => {
         console.log(error.message);
-
-    
-        /*
-          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
       }
     )
   }

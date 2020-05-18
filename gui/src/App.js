@@ -8,6 +8,8 @@ import AddNetwork from "./components/networkManagement/AddNetwork";
 import ManageExistingNetworks from "./components/networkManagement/ManageExistingNetworks";
 import DeleteNetwork from './components/networkManagement/DeleteNetwork';
 import DeleteDatabase from "./components/databaseManagement/DeleteDatabase";
+import ManageExistingDatabaseConfigurations from './components/databaseManagement/ManageExistingDatabaseConfigurations';
+import ManageDatabaseConfiguration from './components/databaseManagement/ManageDatabaseConfiguration';
 import ChooseNetwork from "./components/networkManagement/ChooseNetwork";
 import DatabaseConnection from './components/databaseManagement/DatabaseConnection';
 import ChooseDatabaseConfig from './components/databaseManagement/ChooseDatabaseConfig';
@@ -45,6 +47,8 @@ function App() {
           <Route path="/runConfirmationComponent" exact component={RunConfirmationComponent} />
           <Route path="/databaseManager" component={DatabaseManager} />
           <Route path="/deleteDatabaseConfiguration" component={DeleteDatabase} />
+          <Route path="/manageExistingDatabaseConfigurations" exact component={ManageExistingDatabaseConfigurations} />
+          <Route path="/manageExistingDatabaseConfigurations/:databaseId" exact component={ManageDatabaseConfiguration} />
         </Switch>
       </div>
     </Router>

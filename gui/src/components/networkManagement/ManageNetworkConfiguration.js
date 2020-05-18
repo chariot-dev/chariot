@@ -6,6 +6,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
@@ -114,15 +115,8 @@ class ManageNetworkConfiguration extends React.Component {
 
           this.setState({ errorMessage: returnedErrorMessage }, function () {
             console.log(this.state.errorMessage);
-
-            /*
-              Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-            */ 
           });
-        });      
-        /*
-          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
+        });
       }
     )
   }

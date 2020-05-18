@@ -25,8 +25,8 @@ class NetworkDeviceCellScreenTemplate extends Component {
 
   // Create individual "cells," or sections, on the screen for each individual network/database
   createCells = () => {
-    var networkLinks = [];
-    
+    var links = [];
+
     for (var i = 0; i < this.state.dataJson.length; i++) {
       // For database page use 
       let curDatabaseId;
@@ -120,11 +120,21 @@ class NetworkDeviceCellScreenTemplate extends Component {
             </Button>
           )
           break;
+          case "manageDatabase":
+            console.log(this.state.dataJson);
+            curNetworkName = this.state.dataJson["chosenNetwork"];
+            curDatabaseId = this.state.dataJson[i]["dbId"];
+            curDatabaseHost = this.state.dataJson[i]["host"];
+            curDatabaseName = this.state.dataJson[i]["databaseName"];
+            curDatabaseType =  this.state.dataJson[i]["type"];
+            break;
+
         default:
           buttonElement.push(undefined);
       }
       
-      if (this.state.withLinks) {
+      // Network-related links conditional
+      if (this.state.withLinks && this.state.type !== "manageDatabase") {
         var curDeviceKey;
         var curDeviceName;
 
@@ -153,7 +163,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
         }
 
         // Create links for network, then create the jsx for networks/devices
-        networkLinks.push(
+        links.push(
           <div className="existingNetworkBox" key={i}>
             <div className="existingNetworkCell">
 
@@ -169,6 +179,30 @@ class NetworkDeviceCellScreenTemplate extends Component {
               {deviceTags}
             </div>
           </div>
+        );
+      }
+      // Database-related links conditional
+      else if (this.state.withLinks && this.state.type === "manageDatabase"){
+        links.push(
+          <div className="existingNetworkBox" key={i}>
+            <div className="existingNetworkCell">
+
+              {buttonElement}
+              
+              <div>
+                <b>Database ID: </b> 
+                  <Link to={{pathname:"/manageExistingDatabaseConfigurations/" + curDatabaseId, databaseProps:{'Database Id': curDatabaseId} }}>
+                    {curDatabaseId}
+                  </Link><br></br>
+
+
+
+                <b>Database Name: </b> {curDatabaseName}<br></br>
+                <b>Database Type: </b> {curDatabaseType}<br></br>
+                <b>Database Host: </b> {curDatabaseHost}<br></br>
+              </div>
+            </div>
+          </div>  
         );
       }
       else { // without links in text
@@ -196,7 +230,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
 
         // Create links for network, then create the jsx for networks/devices
         if (this.state.type !== "chooseDatabase" && this.state.type !== "deleteDatabase") {
-          networkLinks.push(
+          links.push(
             <div className="existingNetworkBox" key={i}>
               <div className="existingNetworkCell">
 
@@ -214,7 +248,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
 
         // Links for DB configs
         else {
-          networkLinks.push(
+          links.push(
             <div className="existingNetworkBox" key={i}>
               <div className="existingNetworkCell">
 
@@ -233,7 +267,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
       }
     }
 
-    return networkLinks;
+    return links;
   }
 
 
