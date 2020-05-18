@@ -13,7 +13,7 @@ class DataCollectionEpisodeStatus extends Component {
     super(props);
     this.state = {
       chosenNetwork: this.props.location.networkProps['Network Name'],
-      networkDevices: this.props.location.networkProps['Devices'],
+      //networkDevices: this.props.location.networkProps['Devices'],
       data: [
         {timeInSeconds: '1', uv: 4000, pv: 2400, amt: 2400},
         {timeInSeconds: '2', uv: 3000, pv: 1000, amt: 2210},
@@ -31,6 +31,7 @@ class DataCollectionEpisodeStatus extends Component {
     }
   }
 
+  /*
   getDeviceStatus(curDeviceName) {
     var networkName = this.state.chosenNetwork;
 
@@ -46,6 +47,7 @@ class DataCollectionEpisodeStatus extends Component {
         return <img src={redCircleImg} alt="redCircleImage" className="deviceStatusImg"/>;
     }
   }
+
 
   generateDevicesStatusTable() {
     var devicesTableElement = [];
@@ -82,6 +84,7 @@ class DataCollectionEpisodeStatus extends Component {
       </>
     );
   }
+  */
 
   generateVisualizer() {
     console.log(this.state.data);
@@ -109,11 +112,16 @@ class DataCollectionEpisodeStatus extends Component {
       <div className="container">
         <h1>Data Collection Episode</h1>
         <p>Data collection episode for {this.state.chosenNetwork}.</p>
+
+        {/*
         <div id="devicesCollectionStatus">
           {this.generateDevicesStatusTable()}
           {this.generateVisualizer()}
         
         </div>
+        */}
+
+        {this.generateVisualizer()}
 
         {/* Does nothing except go back to welcome screen for now */}
         <Link to={{pathname:'/welcome'}}>

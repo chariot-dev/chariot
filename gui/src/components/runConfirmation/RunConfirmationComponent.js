@@ -13,8 +13,11 @@ class RunConfirmationComponent extends Component {
         "Network Name": this.props.location.networkProps["Network Name"],
         "Database ID": this.props.location.networkProps["Database ID"],
         "Database Name": this.props.location.networkProps["Database Name"],
-        "Database Type": this.props.location.networkProps["Database Type"]
+        "Database Type": this.props.location.networkProps["Database Type"],
+        configurationSettings: {}
     }
+
+    this.handleChange = this.handleChange.bind(this);
   }
 
   startDataCollection = () => {
@@ -22,9 +25,12 @@ class RunConfirmationComponent extends Component {
       var data = {
           "dbId" : this.state["Database ID"],
           "networkName" : this.state["Network Name"],
-          "configId": document.getElementById("configId").value,
-          "runTime": parseInt(document.getElementById("runTime").value)
+          "configId": this.state.configurationSettings["configId"],
+          "runTime": parseInt(this.state.configurationSettings["runTime"])
       };
+
+      console.log(this.state);
+      console.log(data);
 
       const requestOptions = {
       method: 'POST',
@@ -48,6 +54,14 @@ class RunConfirmationComponent extends Component {
 
   };
 
+  // Update state when text field is updated
+  handleChange(event) {
+    var updatedConfigurationSettings = this.state.configurationSettings; // Store from current state
+    updatedConfigurationSettings[event.target.id] = event.target.value; // Update the json
+    
+    this.setState({ configurationSettings: updatedConfigurationSettings }); // Update the state
+  }
+
 
   render() {
     return (
@@ -68,16 +82,23 @@ class RunConfirmationComponent extends Component {
             <div>
                 <p> <b>Database Type:</b> {this.state["Database Type"]} </p>
             </div>
-             <div className="form-group">
-              Run Time: <input type="number" className="form-control" id="runTime" />
-            </div>
-             <div className="form-group">
-              Configuration Name: <input className="form-control" id="configId" />
-            </div>
-            <Link to="/chooseNetwork">
-                <Button variant="primary" className="float-left footer-button">Back</Button>
-            </Link>
-            <Button variant="primary" className="float-right footer-button" onClick={this.startDataCollection}>Begin Collection</Button>
+
+            <form>
+                <div className="form-group">
+                Run Time: <input type="number" className="form-control" id="runTime" onChange={this.handleChange}/>
+                </div>
+                <div className="form-group">
+                Configuration Name: <input className="form-control" id="configId" onChange={this.handleChange}/>
+                </div>
+
+                <Link to="/chooseNetwork">
+                    <Button variant="primary" className="float-left footer-button">Back</Button>
+                </Link>
+                <Link to={{ pathname: "/dataCollectionEpisodeStatus", networkProps:{"Network Name": this.state["Network Name"]} }}>
+                    <Button type="submit" variant="primary" className="float-right footer-button" onClick={this.startDataCollection}>Begin Collection</Button>
+                </Link>
+            </form>
+
         </div>
     );
   }

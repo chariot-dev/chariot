@@ -19,6 +19,7 @@ from chariot.utility import TypeStrings
 from test.testutils import MockServer
 from chariot.collection.configuration import DataCollectionConfiguration
 from chariot.collection import DataCollector, DataCollectionManager
+from chariot.utility.JSONTypes import JSONObject
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -475,4 +476,4 @@ def emitData(data: JSONObject) -> None:
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, threaded=True)
+    socketio.run(app)

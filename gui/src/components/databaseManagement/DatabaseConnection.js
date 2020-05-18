@@ -27,6 +27,7 @@ class DatabaseConnection extends Component {
       testErrorMessage: ''
 
     };
+    
     this.handleChange = this.handleChange.bind(this);
     this.handleDatabaseTypeChange = this.handleDatabaseTypeChange.bind(this);
     this.hideTestSuccessModal = this.hideTestSuccessModal.bind(this);
@@ -230,7 +231,7 @@ class DatabaseConnection extends Component {
     console.log(this.state);
     return [
       <div className="container" key="databaseConnectionScreen">
-        <h1>Database Connection</h1>
+        <h1>Add Database Connection</h1>
         <p className="screenInfo">Please fill in the following fields to connect to the database that will store the data.</p>
 
         <div className="form-group">
