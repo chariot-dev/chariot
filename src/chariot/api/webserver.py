@@ -386,9 +386,11 @@ def startDataCollection():
                 mockServer.start()
             hasTestDevice = True
             break
-
-    # start data collection
+    
     dataCollector.addOutputHook(emitData)
+    # if it is timed, this will make sure it is no longer flagged as running when it stops
+    dataCollector.setEndHandler(removeRunningCollector)
+    # start data collection    
     runningCollectors[configId] = hasTestDevice
     dataCollector.startCollection()
     return buildSuccessfulRequest(None, defaultSuccessCode)
@@ -473,6 +475,13 @@ def buildSuccessfulRequest(data, code):
 
 def emitData(data: JSONObject) -> None:
     socketio.emit('data', data)
+
+def removeRunningCollector(configId: str) -> None:
+    if configId in runningCollectors:
+        del runningCollectors[configId]
+
+    if not any(runningCollectors.values()):
+        mockServer.stop()
 
 
 if __name__ == '__main__':
