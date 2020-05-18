@@ -35,8 +35,8 @@ class Network(Manager):
         return self._retrieveFromCollection(deviceId)
 
     # This method gives a new device name to an already defined device in the collection
-    def replaceDevice(self, newName: str, toFind: str):
-        self._modifyNameInCollection(newName, toFind)
+    def replaceDevice(self, toFind: str, newName: str):
+        self._modifyNameInCollection(toFind, newName)
 
     def getDeviceNames(self) -> List[str]:
         devices: List[str] = []
