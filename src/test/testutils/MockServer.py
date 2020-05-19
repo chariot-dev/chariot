@@ -3,6 +3,7 @@ from flask_cors import CORS
 from multiprocessing import Process
 import random
 import string
+from typing import Optional
 from chariot.utility.JSONTypes import JSONObject
 
 class MockServer:
@@ -11,8 +12,7 @@ class MockServer:
     def __init__(self, port: int = 6000):
         self._port = port
         self._app: Flask = self._buildApp()
-        self._appProcess = Process(name='Mock-Server-Process', target=self.run,
-            kwargs={'debug': True, 'port': self._port, 'use_reloader': False, 'threaded': True})
+        self._appProcess: Optional[Process] = None
         self._running = False
 
     def _buildApp(self) -> Flask:
@@ -38,11 +38,15 @@ class MockServer:
         self._app.run(**kwargs)
 
     def start(self) -> None:
-        self._appProcess.start()
-        self._running = True
+        if not self._running:
+            self._appProcess = Process(name='Mock-Server-Process', target=self.run,
+                kwargs={'debug': True, 'port': self._port, 'use_reloader': False, 'threaded': True})
+            self._appProcess.start()
+            self._running = True
 
     def stop(self) -> None:
         if self._appProcess.is_alive():
             self._appProcess.terminate()
             self._appProcess.join()
+            self._appProcess = None
             self._running = False
