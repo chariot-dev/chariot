@@ -19,7 +19,6 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         self.connected: bool = False
         self._modLock: Optional[Lock] = None
         self._lockReason: Optional[str] = None
-        self._writeLock: ProcessLock = ProcessLock()
 
     def __del__(self):
         self.disconnect()
@@ -64,8 +63,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
             raise AssertionError
         self.validateRecord(record)
         record['insertion_time'] = int(round(time() * 1000))
-        with self._writeLock:
-            self._insertOne(record)
+        self._insertOne(record)
 
     @abc.abstractmethod
     def _insertOne(self, records: List[Dict[str, JSONObject]]):
@@ -80,8 +78,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         for record in records:
             self.validateRecord(record)
             record['insertion_time'] = int(round(time() * 1000))
-        with self._writeLock:
-            self._insertMany(records)
+        self._insertMany(records)
 
     @abc.abstractmethod
     def _insertMany(self, records: List[Dict[str, JSONObject]]):

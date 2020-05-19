@@ -10,7 +10,7 @@ class MockServer:
     RANDOM_STR_LEN = 100
 
     def __init__(self, port: int = 6000):
-        self._port = port
+        self.port = port
         self._app: Flask = self._buildApp()
         self._appProcess: Optional[Process] = None
         self._running = False
@@ -40,7 +40,7 @@ class MockServer:
     def start(self) -> None:
         if not self._running:
             self._appProcess = Process(name='Mock-Server-Process', target=self.run,
-                kwargs={'debug': True, 'port': self._port, 'use_reloader': False, 'threaded': True})
+                kwargs={'debug': True, 'port': self.port, 'use_reloader': False, 'threaded': True})
             self._appProcess.start()
             self._running = True
 
