@@ -16,8 +16,8 @@ import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 import BaseURL from "../utility/BaseURL";
 
+
 const postCreateNetworkBaseUrl = BaseURL + 'network';
-const xhr = new XMLHttpRequest();
 
 class AddNetwork extends Component {
   constructor(props) {
@@ -30,19 +30,22 @@ class AddNetwork extends Component {
       isSubmitted: false,
       confirmIsOpen: false,
       successIsOpen: false,
-      errorIsOpen: false
+      errorIsOpen: false,
+      errorMessage: ''
     }
+
 
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
-
+  
   handleChange(event) {
     var updatedNetworkProperties = this.state.networkProperties; // Store from current state
     updatedNetworkProperties[event.target.name] = event.target.value; // Update the json
-
+    
     this.setState({ networkProperties: updatedNetworkProperties }); // Update the state
   }
+
 
   toggleConfirmationModal(event) {
     this.setState({
@@ -50,6 +53,7 @@ class AddNetwork extends Component {
     });
     event.preventDefault();
   }
+
 
   toggleErrorModal = () => {
     this.setState({
@@ -60,45 +64,62 @@ class AddNetwork extends Component {
     });
   }
 
+
   createNetworkAndToggleSuccessModal = () => {
-    xhr.open('POST', postCreateNetworkBaseUrl);
-    xhr.setRequestHeader("Content-Type", "application/json");
-
-    xhr.onreadystatechange = () => { // Call a function when the state changes.
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          this.setState({
-            confirmIsOpen: false
-          });
-          this.setState({
-            successIsOpen: !this.state.successIsOpen
-          });
-        }
-        else {
-          this.setState({ errorIsOpen: !this.state.errorIsOpen });
-        }
-      }
-    }
-
+    // Post request's body
     var data = {
       "networkName": this.state.networkProperties["Network Name"],
       "description": this.state.networkProperties["Network Description"]
     }
 
-    xhr.send(JSON.stringify(data));
+
+    // Post request options
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    };
+
+
+    // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
+    fetch(postCreateNetworkBaseUrl, requestOptions)
+    .then(res => res.json())
+    .then(
+      // If post was successful, update state and display success modal
+      () => {
+        this.setState({
+          confirmIsOpen: false
+        });
+        this.setState({
+          successIsOpen: !this.state.successIsOpen
+        });
+      },
+      // If post was unsuccessful, update state and display error modal
+      (error) => {
+        // Once error message is set, then launch the error modal
+        this.setState({
+          errorMessage: error.message 
+        }, () => {
+          this.setState({ errorIsOpen: !this.state.errorIsOpen });
+        });
+      }
+    )
   }
+
 
   render() {
     return [
       <div className="container" key="addNetworkForm">
         <h1>Add a New Network</h1>
           <p className="screenInfo">Please fill in the fields below to create a network. Then, click "Next".</p>
-
+          
           <form id="createNetworkForm" onSubmit={this.toggleConfirmationModal}>
             <div className="form-group">
+              <div className="requiredStar">*</div>
               Network Name: <input required className="form-control" id="networkNameInput" name="Network Name" onChange={this.handleChange}/>
             </div>
             <div className="form-group">
+              <div className="requiredStar">*</div>
               Network Description: <textarea required className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
             </div>
             <Link to="/networkManager">
@@ -108,22 +129,25 @@ class AddNetwork extends Component {
         </form>
       </div>,
 
+
       <Modal show={this.state.confirmIsOpen} key="addNetworkConfirmation">
           <ConfirmationModalBody
             confirmationQuestion='Is this information for your network correct?'
             confirmationData = {this.state.networkProperties}
             >
           </ConfirmationModalBody>
-
+          
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.toggleConfirmationModal}>No</Button>
           <Button variant="primary" className="float-right" onClick={this.createNetworkAndToggleSuccessModal}>Yes</Button>
         </Modal.Footer>
       </Modal>,
 
+
       <Modal show={this.state.successIsOpen} key="addNetworkSuccessModal">
         <SuccessModalBody successMessage="Your network was succesfully added! Would you like to add a device to this network as well?">
         </SuccessModalBody>
+
 
         <Modal.Footer>
           <Link to="/networkManager">
@@ -135,10 +159,11 @@ class AddNetwork extends Component {
         </Modal.Footer>
       </Modal>,
 
-      <Modal show={this.state.errorIsOpen} key="addNetworkErrorModal">
 
-        <ErrorModalBody errorMessage="Your network was not created. Please go back, verify that the information is correct, and then try again.">
+      <Modal show={this.state.errorIsOpen} key="addNetworkErrorModal">
+        <ErrorModalBody errorMessage={this.state.errorMessage + ". Please ensure that the server is running, the inputted values are valid, and try again." }>
         </ErrorModalBody>
+
 
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.toggleErrorModal}>OK</Button>
@@ -147,6 +172,8 @@ class AddNetwork extends Component {
     ]
   }
 
+
 }
+
 
 export default AddNetwork;

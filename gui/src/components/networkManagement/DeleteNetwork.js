@@ -19,7 +19,6 @@ import BaseURL from "../utility/BaseURL";
 
 const getAllNetworksBaseUrl = BaseURL + 'networks/all';
 const deleteNetworkBaseUrl = BaseURL + 'network';
-const xhr = new XMLHttpRequest();
 
 class DeleteNetwork extends Component {
   constructor(props) {
@@ -31,32 +30,44 @@ class DeleteNetwork extends Component {
       successIsOpen: false
     }
 
+
     this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
-  }
+  } 
+
 
   componentDidMount() {
-    xhr.open('GET', getAllNetworksBaseUrl);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    fetch(getAllNetworksBaseUrl)
+    .then(res => res.json())
+    .then(
+      // On success
+      (result) => {
+        var responseJsonArray = result; // Response is a dictionary  
 
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary
 
-          var updatedNetworksJsonArray = this.state.existingNetworks;
+        var updatedNetworksJsonArray = this.state.existingNetworks;
 
-          for (var i = 0; i < responseJsonArray.length; i++) {
-            updatedNetworksJsonArray.push(responseJsonArray[i]);
-          }
 
-          this.setState({ existingNetworks: updatedNetworksJsonArray });
+        for (var i = 0; i < responseJsonArray.length; i++) {
+          updatedNetworksJsonArray.push(responseJsonArray[i]);
         }
-      }
-    }
 
-    xhr.send();
+
+        this.setState({ existingNetworks: updatedNetworksJsonArray });
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+
+
+  
+        /*
+          Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
+        */ 
+      }
+    )
   }
+
+
 
 
   deleteConfirmation(selectedNetwork) {
@@ -66,36 +77,51 @@ class DeleteNetwork extends Component {
   }
 
 
+
+
   hideConfirmationModal(event) {
     this.setState({
       confirmIsOpen: !this.state.confirmIsOpen
-    });
+    });    
     event.preventDefault();
   }
 
 
+
+
   toggleSuccessModal = () => {
-    xhr.open('DELETE', deleteNetworkBaseUrl + "?networkName=" + this.state.selectedNetworkToDelete);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    // Delete request options
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    };
 
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          this.setState({
-            confirmIsOpen: false
-          });
-          this.setState({
-            successIsOpen: !this.state.successIsOpen
-          });
-        }
-        else {
-          console.log("ERROR");
-        }
+
+    fetch(deleteNetworkBaseUrl + "?networkName=" + this.state.selectedNetworkToDelete, requestOptions)
+    // On success
+    .then(
+      () => {
+        this.setState({
+          confirmIsOpen: false
+        });
+        this.setState({
+          successIsOpen: !this.state.successIsOpen
+        });
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+
+
+    
+        /*
+          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
+        */ 
       }
-    }
-
-    xhr.send();
+    )
   }
+
+
 
 
   render() {
@@ -106,14 +132,17 @@ class DeleteNetwork extends Component {
           Select a network to delete. Deleting a network will also delete its corresponding devices.
         </p>
 
+
         {/* {this.state.existingNetworkNames ? this.createNetworkLinks() : null} */}
 
-        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="delete" deleteNetwork={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : null}
 
+        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="delete" deleteNetwork={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : null}
+        
         <Link to="/networkManager">
           <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
       </div>,
+
 
       <Modal show={this.state.confirmIsOpen} key="networkDeletionConfirmModal">
         <Modal.Body>
@@ -125,10 +154,13 @@ class DeleteNetwork extends Component {
         </Modal.Footer>
       </Modal>,
 
+
       <Modal show={this.state.successIsOpen} key="networkDeletionSuccessModal">
+
 
         <SuccessModalBody successMessage="The network has been deleted!">
         </SuccessModalBody>
+
 
         <Modal.Footer>
           <Link to="/welcome">
@@ -139,6 +171,8 @@ class DeleteNetwork extends Component {
     ]
   }
 
+
 }
+
 
 export default DeleteNetwork;

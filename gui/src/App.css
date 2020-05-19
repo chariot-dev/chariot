@@ -100,8 +100,8 @@
   width: 25px; 
   height: 25px;
   vertical-align: bottom;
-  margin-right: 7px;
-  margin-bottom: 6px;
+  margin-right: 6px;
+  margin-bottom: -2px;
   *overflow: hidden;
 }
 
@@ -121,4 +121,10 @@
 
 .button-mid-bottom {
   margin-left: 37%;
+}
+
+.requiredStar {
+  color: red;
+  font-size: 21px;
+  display:inline-block;
 }

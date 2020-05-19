@@ -15,7 +15,6 @@ import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTe
 import BaseURL from "../utility/BaseURL";
 
 const getAllNetworksBaseUrl = BaseURL + 'networks/all';
-const xhr = new XMLHttpRequest();
 
 class ChooseNetwork extends Component {
   constructor(props) {
@@ -25,33 +24,40 @@ class ChooseNetwork extends Component {
     }
   }
 
+
   componentDidMount () {
-    xhr.open('GET', getAllNetworksBaseUrl);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    fetch(getAllNetworksBaseUrl)
+    .then(res => res.json())
+    .then(
+      // On success
+      (result) => {
+        var responseJsonArray = result;  
 
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary
 
-          var updatedNetworksJsonArray = this.state.existingNetworks;
-
-          for (var i = 0; i < responseJsonArray.length; i++) {
-            updatedNetworksJsonArray.push(responseJsonArray[i]);
-          }
-
-          this.setState({ existingNetworks: updatedNetworksJsonArray });
+        var updatedNetworksJsonArray = this.state.existingNetworks;
+        
+        for (var i = 0; i < responseJsonArray.length; i++) {
+          updatedNetworksJsonArray.push(responseJsonArray[i]);
         }
-      }
-    }
 
-    xhr.send();
+
+        this.setState({ existingNetworks: updatedNetworksJsonArray });
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+
+
+   
+       /*
+         Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
+       */ 
+      }
+    )
   }
 
-  render() {
-    console.log(this.state.existingNetworks);
 
+  render() {
     return (
       <div className="container">
         <h1>Choose a Network</h1>
@@ -59,7 +65,9 @@ class ChooseNetwork extends Component {
           Select a network to begin data collection process.
         </p>
 
-        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="choose"></NetworkDeviceCellScreenTemplate> : null}
+
+        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="chooseNetwork"></NetworkDeviceCellScreenTemplate> : null}
+
 
         <Link to="/welcome">
           <Button variant="primary" className="float-left footer-button">Back</Button>
@@ -68,6 +76,8 @@ class ChooseNetwork extends Component {
     );
   }
 
+
 }
+
 
 export default ChooseNetwork;
