@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from multiprocessing import Process
 import random
+import requests
 import string
 from typing import Optional
 from chariot.utility.JSONTypes import JSONObject
@@ -42,6 +43,14 @@ class MockServer:
             self._appProcess = Process(name='Mock-Server-Process', target=self.run,
                 kwargs={'debug': True, 'port': self.port, 'use_reloader': False, 'threaded': True})
             self._appProcess.start()
+            serverRunning: bool = False
+            # hack to wait until the flask server is up and ready to receive requests
+            while not serverRunning:
+                try:
+                    requests.get(f'http://localhost:{self.port}/data')
+                    serverRunning = True
+                except requests.ConnectionError:
+                    continue
             self._running = True
 
     def stop(self) -> None:

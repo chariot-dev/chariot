@@ -1,8 +1,8 @@
 import flask
-from typing import Dict
 from flask import jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from typing import Dict
 from chariot.device import DeviceAdapterFactory, DeviceConfigurationFactory
 from chariot.device.adapter import DeviceAdapter
 from chariot.configuration import Configuration
