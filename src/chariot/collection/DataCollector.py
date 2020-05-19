@@ -3,7 +3,7 @@ from multiprocessing import Event
 from multiprocessing import SimpleQueue as Queue
 from threading import Lock, Timer
 from time import sleep
-from typing import Callable, Iterable, List, Optional
+from typing import Callable, Iterable, List, Optional, Set
 from chariot.collection.configuration import DataCollectionConfiguration
 from chariot.collection import DataCollectionWorker
 from chariot.database.writer import DatabaseWriter
@@ -27,6 +27,7 @@ class DataCollector:
         self._runLock = Lock()
         self._onEnd: Optional[Callable] = onEnd
         self._onError: Optional[Callable[Exception], None] = onError
+        self._outputHooks: Set[Callable] = set()
         self._running: bool = False
         self._stopEvent: Event = Event()
         self._stopTimer: Optional[Timer] = None
@@ -36,6 +37,14 @@ class DataCollector:
 
     def __del__(self) -> None:
         self.stopCollection()
+
+
+    # output hooks cannot be added during a collection episode
+    def addOutputHook(self, hook: Callable) -> None:
+        self._outputHooks.add(hook)
+
+    def clearOutputHooks(self) -> None:
+        self._outputHooks.clear()
 
     def getConfiguration(self) -> DataCollectionConfiguration:
         return self._config
@@ -60,6 +69,10 @@ class DataCollector:
 
     def isRunning(self) -> bool:
         return self._running
+        
+    # output hooks cannot be removed during a collection episode
+    def removeOutputHook(self, hook: Callable) -> None:
+        self._outputHooks.remove(hook)
 
     def setErrorHandler(self, handler: Callable[[Exception], None]) -> None:
         if not callable(handler):
@@ -99,9 +112,10 @@ class DataCollector:
             startIdx: int = i
             endIdx: int = min(startIdx + avgDevicesPerWorker, numDevices)
             worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx], self._minPollDelay)
-            # output hooks are called when data is received and chunked - this is where we would add the socket.send
-            # for the DataOutputAdapter
             worker.addOutputHook(self._config.database.insertMany)
+            for hook in self._outputHooks:
+                worker.addOutputHook(hook)
+
             self._workers.append(worker)
             workerProcess: HandledProcess = HandledProcess(
                 target=worker.start, name=f'DataCollectionWorker-{(i//8 + 1)}', args=(self._errorQueue, self._stopEvent))
