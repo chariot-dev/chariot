@@ -2,8 +2,8 @@ import requests
 from requests import ConnectionError
 from typing import Optional
 from test.testutils.MockServer import MockServer
-from test.testutils.TestDeviceAdapter import TestDeviceAdapter
-from test.testutils.TestDeviceConfiguration import TestDeviceConfiguration
+from test.testutils.TestDeviceAdapter import TestDeviceAdapter, ErrorDeviceAdapter
+from test.testutils.TestDeviceConfiguration import TestDeviceConfiguration, ErrorDeviceConfiguration
 
 
 class MockDeviceTester:
@@ -36,6 +36,21 @@ class MockDeviceTester:
         return TestDeviceConfiguration({
             'deviceId': name,
             'deviceType': 'TestDevice',
+            'pollDelay': pollDelay,
+            'port': self.server.port,
+            'strLen': strLen,
+        })
+
+    
+    def _buildErrorDevice(self, name: str, pollDelay: int = 500, strLen: int = 10, error:int = 0) -> ErrorDeviceAdapter:
+        config: ErrorDeviceConfiguration = self._buildErrorDeviceConfig(name, pollDelay, strLen)
+        device: ErrorDeviceAdapter = ErrorDeviceAdapter(config, error)
+        return device
+
+    def _buildErrorDeviceConfig(self, name: str, pollDelay, strLen) -> ErrorDeviceConfiguration:
+        return ErrorDeviceConfiguration({
+            'deviceId': name,
+            'deviceType': 'ErrorDevice',
             'pollDelay': pollDelay,
             'port': self.server.port,
             'strLen': strLen,

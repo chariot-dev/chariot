@@ -135,7 +135,7 @@ class DataCollector:
 
     def _restartWorker(self, workerNum: int) -> None:
         numDevices: int = len(self._devices)
-        numWorkers: int = ceil(numDevice / self.MAX_DEVICES_PER_WORKER)
+        numWorkers: int = ceil(numDevices / self.MAX_DEVICES_PER_WORKER)
         avgDevicesPerWorker: int = int(round(numDevices / numWorkers))
 
         startIdx: int = avgDevicesPerWorker * workerNum
