@@ -410,7 +410,7 @@ def endDataCollection():
     del runningCollectors[configId]
 
     # if no running collectors are using the MockServer, shut it down
-    if not any(runningCollectors.values()):
+    if not any(runningCollectors.values()) and mockServer.isRunning():
         mockServer.stop()
 
     # inform socket subscribers that data collection has ended

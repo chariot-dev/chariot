@@ -8,13 +8,13 @@ const dataCollectionBaseURL = 'http://localhost:5000/chariot/api/v1.0/data';
 class RunConfirmationComponent extends Component {
   constructor(props) {
     super(props);
-    console.log(this.props.location);
+
     this.state = {
         "Network Name": this.props.location.networkProps["Network Name"],
         "Database ID": this.props.location.networkProps["Database ID"],
         "Database Name": this.props.location.networkProps["Database Name"],
         "Database Type": this.props.location.networkProps["Database Type"],
-        configurationSettings: {}
+        configurationSettings: {} // Contains configId and runTime
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -29,10 +29,8 @@ class RunConfirmationComponent extends Component {
           "runTime": parseInt(this.state.configurationSettings["runTime"])
       };
 
-      console.log(this.state);
-      console.log(data);
 
-      const requestOptions = {
+    const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -50,6 +48,23 @@ class RunConfirmationComponent extends Component {
               (error) => {
                   console.log(error.message);
               }
+          )
+          .then(
+            () => {
+                fetch(dataCollectionBaseURL + '/start?configId=' + this.state.configurationSettings["configId"])
+                .then(res => res.json())
+                .then(
+                  // On success
+                  (result) => {
+                    console.log("started the data collection episode");
+                    console.log(result)
+                  },
+                  // On error
+                  (error) => {
+                    console.log(error.message);
+                  }
+                )
+            }
           )
 
   };
@@ -94,7 +109,7 @@ class RunConfirmationComponent extends Component {
                 <Link to="/chooseNetwork">
                     <Button variant="primary" className="float-left footer-button">Back</Button>
                 </Link>
-                <Link to={{ pathname: "/dataCollectionEpisodeStatus", networkProps:{"Network Name": this.state["Network Name"]} }}>
+                <Link to={{ pathname: "/dataCollectionEpisodeStatus", runProps:{"Network Name": this.state["Network Name"], "configId": this.state.configurationSettings["configId"]} }}>
                     <Button type="submit" variant="primary" className="float-right footer-button" onClick={this.startDataCollection}>Begin Collection</Button>
                 </Link>
             </form>

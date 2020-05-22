@@ -82,12 +82,8 @@ class AddNetwork extends Component {
     .then(
       // If post was successful, update state and display success modal
       () => {
-        this.setState({
-          confirmIsOpen: false
-        });
-        this.setState({
-          successIsOpen: !this.state.successIsOpen
-        });
+        this.setState({ confirmIsOpen: false });
+        this.setState({ successIsOpen: !this.state.successIsOpen });
       },
       // If post was unsuccessful, update state and display error modal
       (error) => {
@@ -95,6 +91,7 @@ class AddNetwork extends Component {
         this.setState({
           errorMessage: error.message 
         }, () => {
+          this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
           this.setState({ errorIsOpen: !this.state.errorIsOpen });
         });
       }

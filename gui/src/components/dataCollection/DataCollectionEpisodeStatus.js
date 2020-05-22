@@ -2,18 +2,21 @@ import React, {Component} from 'react';
 import { Table, Tooltip } from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
+import socketIOClient from 'socket.io-client';
 
 import greenCircleImg from "../images/green_circle.png";
 import yellowCircleImg from "../images/yellow_circle.png";
 import redCircleImg from "../images/red_circle.png";
 import { LineChart, Line, XAxis, YAxis, Legend, Label } from 'recharts';
 
+const dataCollectionBaseURL = 'http://localhost:5000/chariot/api/v1.0/data';
+
 class DataCollectionEpisodeStatus extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      chosenNetwork: this.props.location.networkProps['Network Name'],
-      //networkDevices: this.props.location.networkProps['Devices'],
+      chosenNetwork: this.props.location.runProps['Network Name'],
+      configId: this.props.location.runProps["configId"],
       data: [
         {timeInSeconds: '1', uv: 4000, pv: 2400, amt: 2400},
         {timeInSeconds: '2', uv: 3000, pv: 1000, amt: 2210},
@@ -31,60 +34,6 @@ class DataCollectionEpisodeStatus extends Component {
     }
   }
 
-  /*
-  getDeviceStatus(curDeviceName) {
-    var networkName = this.state.chosenNetwork;
-
-    // API CALL TO GET DEVICE STATUS ON THE NETWORK
-    var deviceStatus = false;
-
-    switch(deviceStatus) {
-      case true:
-        return <img src={greenCircleImg} alt="redCircleImage" className="deviceStatusImg"/>;
-      case false:
-        return <img src={redCircleImg} alt="redCircleImage" className="deviceStatusImg"/>;
-      default:
-        return <img src={redCircleImg} alt="redCircleImage" className="deviceStatusImg"/>;
-    }
-  }
-
-
-  generateDevicesStatusTable() {
-    var devicesTableElement = [];
-
-    for (var i = 0; i < this.state.networkDevices.length; i++) {
-      var curDeviceName = this.state.networkDevices[i];
-      console.log(this.state.networkDevices[i]);
-
-      // Create status row for current device. First cell is device name, second cell will use API call to determine device's status presently
-      devicesTableElement.push(
-        <tr key={curDeviceName + "StatusRow"}>
-          <td>{curDeviceName}</td>
-          <td> {this.getDeviceStatus(curDeviceName)} </td>
-        </tr>
-      );
-    }
-
-    return (
-      <>
-        <Table striped bordered>
-          <thead>
-            <tr>
-              <th colSpan="2">{this.state.chosenNetwork}</th>
-            </tr>
-            <tr>
-              <td>Device Name</td>
-              <td>Device Status</td>
-            </tr>
-          </thead>
-          <tbody>
-            {devicesTableElement}
-          </tbody>
-        </Table>
-      </>
-    );
-  }
-  */
 
   generateVisualizer() {
     console.log(this.state.data);
@@ -101,11 +50,34 @@ class DataCollectionEpisodeStatus extends Component {
   }
   
   addDataPoint = () => {
+
+
+    /*
     var updatedData = [... this.state.data];
     // Instead of getting random numbers, will read from socket to get actual device data
     updatedData.push({timeInSeconds: (this.state.data.length+1).toString(), uv: (Math.floor(Math.random() * 10000) + 1), pv: (Math.floor(Math.random() * 10000) + 1), amt: (Math.floor(Math.random() * 5000) + 1)});
     this.setState({data: updatedData});
+    */
   }
+
+
+  endDataCollection = () => {
+    console.log("end the data collection episode");
+
+    fetch(dataCollectionBaseURL + '/stop?configId=' + this.state.configId)
+    .then(res => res.json())
+    .then(
+      // On success
+      (result) => {
+        console.log(result);
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+      }
+    )
+  }
+
 
   render() {
     return [
@@ -113,20 +85,9 @@ class DataCollectionEpisodeStatus extends Component {
         <h1>Data Collection Episode</h1>
         <p>Data collection episode for {this.state.chosenNetwork}.</p>
 
-        {/*
-        <div id="devicesCollectionStatus">
-          {this.generateDevicesStatusTable()}
-          {this.generateVisualizer()}
-        
-        </div>
-        */}
-
         {this.generateVisualizer()}
 
-        {/* Does nothing except go back to welcome screen for now */}
-        <Link to={{pathname:'/welcome'}}>
-          <Button variant="danger" className="float-right">End Data Collection</Button>
-        </Link>
+        <Button variant="danger" className="float-right" onClick={this.endDataCollection}>End Data Collection</Button>
 
         <Button onClick={this.addDataPoint}variant="primary" className="float-left">Add Data Point</Button>
 

@@ -76,7 +76,7 @@ class ManageDatabaseConfiguration extends Component {
       var curFieldTitle = curSetting[i].title;
       var curFieldIsRequired = curSetting[i].required;
       var isDisabled = false;
-      if (curFieldAlias == "type") {
+      if (curFieldAlias === "type") {
         isDisabled = true;
       }
       

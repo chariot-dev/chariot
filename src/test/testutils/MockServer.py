@@ -54,8 +54,9 @@ class MockServer:
             self._running = True
 
     def stop(self) -> None:
-        if self._appProcess.is_alive():
-            self._appProcess.terminate()
-            self._appProcess.join()
+        if self._appProcess:
+            if self._appProcess.is_alive():
+                self._appProcess.terminate()
+                self._appProcess.join()
             self._appProcess = None
             self._running = False
