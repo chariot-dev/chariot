@@ -71,10 +71,6 @@ class ManageDeviceConfiguration extends Component {
       // On error
       (error) => {
         console.log(error.message);
-    
-        /*
-          Have an error modal for being unable to get device fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
       }
     )
     .then(result => result.json())

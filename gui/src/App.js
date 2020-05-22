@@ -40,7 +40,7 @@ function App() {
           <Route path="/chooseDatabaseConfig" component={ChooseDatabaseConfig} />
           <Route path="/dataAnalysisMain" component={DataAnalysisMain} />
           <Route path="/addDeviceHome" component={AddDeviceHome} />
-          <Route path="/DataCollectionEpisodeStatus" component={DataCollectionEpisodeStatus} />
+          <Route path="/dataCollectionEpisodeStatus" component={DataCollectionEpisodeStatus} />
           <Route path="/manageExistingNetwork/:networkName" exact component={ManageNetworkConfiguration} />
           <Route path="/manageExistingDevices/devices/:networkName" exact component={ManageDevices} />
           <Route path="/manageExistingDevices/devices/:networkName/:deviceName" exact component={ManageDeviceConfiguration} />

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
+import socketIOClient from "socket.io-client";
 
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 import SuccessModalBody from '../shared/SuccessModalBody';
@@ -107,7 +108,7 @@ class ChooseDatabaseConfig extends Component {
       <div className="container">
         <h1>Choose a Database</h1>
         <p className="screenInfo">
-          Select a database to begin data collection process.
+          Select a database to begin data collection process. If you haven't created a database configuration yet, please create one.
         </p>
 
         {this.state.existingConfigs ? 
