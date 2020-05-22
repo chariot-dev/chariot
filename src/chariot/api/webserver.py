@@ -23,7 +23,7 @@ from chariot.utility.JSONTypes import JSONObject
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins='*')
 
 apiBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
