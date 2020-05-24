@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 from chariot.device.adapter import DeviceAdapter
 from chariot.network.configuration.NetworkConfiguration import NetworkConfiguration
 from chariot.utility.JSONTypes import JSONObject
-from chariot.utility import Manager
+from chariot.utility import Manager, TypeStrings
 
 
 class Network(Manager):
@@ -35,8 +35,8 @@ class Network(Manager):
         return self._retrieveFromCollection(deviceId)
 
     # This method gives a new device name to an already defined device in the collection
-    def replaceDevice(self, newName: str, toFind: str):
-        self._modifyNameInCollection(newName, toFind)
+    def replaceDevice(self, toFind: str, newName: str):
+        self._modifyNameInCollection(toFind, newName)
 
     def getDeviceNames(self) -> List[str]:
         devices: List[str] = []
@@ -58,9 +58,8 @@ class Network(Manager):
         network: Dict[str, str] = self._config.toDict()
 
         # add each deviceId as key and the configuration as value
-        # TODO: devices should be under a nested dict 'devices'
         for key, device in self.collection.items():
-            network[key] = device.toDict()
+            network[TypeStrings.Device_Type.value] = device.toDict()
 
         return network
 
@@ -75,6 +74,5 @@ class Network(Manager):
             self._modLock = None
         self._config.updateConfig(config)
 
-    # importDeviceConfig
-    # exportNetwork - again seems like a utility method
-    # saveNetwork - idea is to save this network configuration to the UserAccount
+    def clearCollection(self):
+        self._clearCollection()

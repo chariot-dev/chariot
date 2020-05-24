@@ -9,3 +9,4 @@ class ErrorStrings(Enum):
     ERR_Generic_Device_Template = 'Could not open file {0}'
     Err_General_Id = 'id'
     ERR_Login_Failed = 'The credentials are invalid'
+    ERR_Not_Authenticated = 'Please login before attempting to access this resource.'

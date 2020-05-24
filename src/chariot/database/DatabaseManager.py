@@ -18,8 +18,8 @@ class _DatabaseManager(Manager):
         return self._retrieveFromCollection(dbId)
 
     # This method gives a new id to an already defined dbWriter in the collection and deletes the old one
-    def replaceDbWriter(self, newName: str, toFind: str):
-        self._modifyNameInCollection(newName, toFind)
+    def replaceDbWriter(self, toFind: str, newName: str):
+        self._modifyNameInCollection(toFind, newName)
 
     def getAllConfigurations(self) -> Dict[str, DatabaseWriter]:
         allConfigs: Dict[str, DatabaseWriter] = {}
@@ -27,6 +27,9 @@ class _DatabaseManager(Manager):
             allConfigs[key] = self._retrieveFromCollection(key).getConfiguration().toDict()
 
         return allConfigs
+
+    def clearCollection(self):
+        self._clearCollection()
 
 
 # return a singleton instance
