@@ -2,7 +2,7 @@ import flask
 from flask import jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO
-from typing import Dict
+from typing import Dict, List
 from chariot.device import DeviceAdapterFactory, DeviceConfigurationFactory
 from chariot.device.adapter import DeviceAdapter
 from chariot.configuration import Configuration
@@ -23,7 +23,7 @@ from chariot.utility.JSONTypes import JSONObject
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
-socketio = SocketIO(app, cors_allowed_origins='*')
+socketio: SocketIO = SocketIO(app, cors_allowed_origins='*', message_queue='redis://')
 
 apiBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
@@ -31,6 +31,42 @@ defaultSuccessCode: int = 200
 
 runningCollectors: Dict[str, bool] = {}
 mockServer = MockServer()
+
+
+# -- useful utility methods --
+def toDict(e):
+    rv = dict()
+    rv["message"] = e
+    return rv
+
+
+def buildSuccessfulRequest(data, code):
+    # NOTE: data should be in dictionary format
+    if data is None:
+        data = {'success': True}
+
+    if code is None:
+        code = 200
+
+    response = jsonify(data)
+
+    return response, code
+
+
+def externalEmit(data: List[JSONObject]) -> None:
+    # this is a quick and dirty method - definitely inefficient to instantiate a new server
+    # every time, but for now this works when calling from an external process
+    externalSocketio: SocketIO = SocketIO(message_queue='redis://')
+    externalSocketio.emit('data', data)
+
+
+def removeRunningCollector(configId: str) -> None:
+    if configId in runningCollectors:
+        del runningCollectors[configId]
+
+    if not any(runningCollectors.values()):
+        mockServer.stop()
+
 
 # --- This section of api endpoints deals with netowrks  --- #
 
@@ -386,11 +422,12 @@ def startDataCollection():
                 mockServer.start()
             hasTestDevice = True
             break
-    
-    dataCollector.addOutputHook(emitData)
+
+    # automatically output data via socket
+    dataCollector.addOutputHook(externalEmit)
     # if it is timed, this will make sure it is no longer flagged as running when it stops
     dataCollector.setEndHandler(removeRunningCollector)
-    # start data collection    
+
     runningCollectors[configId] = hasTestDevice
     dataCollector.startCollection()
     return buildSuccessfulRequest(None, defaultSuccessCode)
@@ -399,8 +436,8 @@ def startDataCollection():
 @app.route(apiBaseUrl + '/data/stop', methods=['GET'])
 def endDataCollection():
     configId: str = parser.getDataCollectorInURL(request)
-    if not configId in runningCollectors:
-         # data collection was not running
+    if configId not in runningCollectors:
+        # data collection was not running
         response = jsonify(toDict(f'The data collection with id {configId} was not running.'))
         response.status_code = 400
         return response
@@ -452,36 +489,6 @@ def handleDatabaseNotConnected(error):
     res = jsonify(toDict(error.message))
     res.status_code = error.status_code
     return res
-
-
-# -- useful utility methods --
-def toDict(e):
-    rv = dict()
-    rv["message"] = e
-    return rv
-
-
-def buildSuccessfulRequest(data, code):
-    # NOTE: data should be in dictionary format
-    if data is None:
-        data = {'success': True}
-
-    if code is None:
-        code = 200
-
-    response = jsonify(data)
-
-    return response, code
-
-def emitData(data: JSONObject) -> None:
-    socketio.emit('data', data)
-
-def removeRunningCollector(configId: str) -> None:
-    if configId in runningCollectors:
-        del runningCollectors[configId]
-
-    if not any(runningCollectors.values()):
-        mockServer.stop()
 
 
 if __name__ == '__main__':
