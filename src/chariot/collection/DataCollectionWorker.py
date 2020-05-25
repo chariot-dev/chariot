@@ -2,7 +2,7 @@ from math import ceil
 from multiprocessing import Event
 from time import sleep
 from typing import Callable, Dict, List, Optional, Set
-from queue import SimpleQueue as Queue, Empty as QueueEmptyException
+from queue import Queue, Empty
 from chariot.device.adapter import DeviceAdapter
 from chariot.utility.concurrency import HandledThread
 from chariot.utility.JSONTypes import JSONObject
@@ -41,14 +41,14 @@ class DataCollectionWorker:
                 data: JSONObject = device.getDataQueue().get(
                     block=True, timeout=self._consumeTimeout)
                 output.append(data)
-            except QueueEmptyException:
+            except Empty:
                 pass
 
             while True:
                 try:
-                    data: JSONObject = device.getDataQueue().get(block=False)
+                    data = device.getDataQueue().get(block=False)
                     output.append(data)
-                except QueueEmptyException:
+                except Empty:
                     break
             if len(output) > 0:
                 self._dataQueue.put(output, block=True)
@@ -66,7 +66,7 @@ class DataCollectionWorker:
                         data: JSONObject = self._devices[i].getDataQueue(
                         ).get(block=False)
                         output.append(data)
-                    except QueueEmptyException:
+                    except Empty:
                         continue
                 if len(output) > 0:
                     self._dataQueue.put(output, block=True)
@@ -79,14 +79,14 @@ class DataCollectionWorker:
                 data: List[JSONObject] = self._dataQueue.get(
                     block=True, timeout=self._consumeTimeout)
                 output.append(data)
-            except QueueEmptyException:
+            except Empty:
                 pass
 
             while True:
                 try:
                     data = self._dataQueue.get(block=False)
                     output.append(data)
-                except QueueEmptyException:
+                except Empty:
                     break
 
             for chunk in output:
@@ -95,7 +95,7 @@ class DataCollectionWorker:
     def addOutputHook(self, hook: Callable) -> None:
         self._outputHooks.add(hook)
 
-    def _callOutputHooks(self, data: JSONObject) -> None:
+    def _callOutputHooks(self, data: List[JSONObject]) -> None:
         for hook in self._outputHooks:
             hook(data)
 

@@ -1,6 +1,6 @@
 from math import ceil
 from multiprocessing import Event
-from multiprocessing import SimpleQueue as Queue
+from multiprocessing import Queue
 from threading import Lock, Timer
 from time import sleep
 from typing import Callable, Iterable, List, Optional, Set
@@ -27,7 +27,9 @@ class DataCollector:
         self._runLock = Lock()
         self._onEnd: Optional[Callable] = onEnd
         self._onError: Optional[Callable[Exception], None] = onError
-        self._outputHooks: Set[Callable] = set()
+        # this should be a set, but causes issues in < v3.8: 
+        # https://stackoverflow.com/questions/13264511/typeerror-unhashable-type-dict
+        self._outputHooks: List[Callable] = [] 
         self._running: bool = False
         self._stopEvent: Event = Event()
         self._stopTimer: Optional[Timer] = None
@@ -38,10 +40,9 @@ class DataCollector:
     def __del__(self) -> None:
         self.stopCollection()
 
-
     # output hooks cannot be added during a collection episode
     def addOutputHook(self, hook: Callable) -> None:
-        self._outputHooks.add(hook)
+        self._outputHooks.append(hook)
 
     def clearOutputHooks(self) -> None:
         self._outputHooks.clear()
@@ -69,7 +70,7 @@ class DataCollector:
 
     def isRunning(self) -> bool:
         return self._running
-        
+
     # output hooks cannot be removed during a collection episode
     def removeOutputHook(self, hook: Callable) -> None:
         self._outputHooks.remove(hook)
