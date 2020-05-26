@@ -10,6 +10,9 @@ import redCircleImg from "../images/red_circle.png";
 import { LineChart, Line, XAxis, YAxis, Legend, Label } from 'recharts';
 
 const dataCollectionBaseURL = 'http://localhost:5000/chariot/api/v1.0/data';
+const socketEndpoint = 'http://localhost:5000';
+
+var socket = socketIOClient(socketEndpoint);
 
 class DataCollectionEpisodeStatus extends Component {
   constructor(props) {
@@ -17,34 +20,37 @@ class DataCollectionEpisodeStatus extends Component {
     this.state = {
       chosenNetwork: this.props.location.runProps['Network Name'],
       configId: this.props.location.runProps["configId"],
-      data: [
-        {timeInSeconds: '1', uv: 4000, pv: 2400, amt: 2400},
-        {timeInSeconds: '2', uv: 3000, pv: 1000, amt: 2210},
-        {timeInSeconds: '3', uv: 2000, pv: 9800, amt: 2290},
-        {timeInSeconds: '4', uv: 2780, pv: 3908, amt: 2000},
-        {timeInSeconds: '5', uv: 1890, pv: 4800, amt: 2181},
-        {timeInSeconds: '6', uv: 2390, pv: 3800, amt: 2500},
-        {timeInSeconds: '7', uv: 3490, pv: 4300, amt: 2100},
-        {timeInSeconds: '8', uv: 3400, pv: 4000, amt: 2200},
-        {timeInSeconds: '9', uv: 1700, pv: 3000, amt: 2000},
-        {timeInSeconds: '10', uv: 1800, pv: 4100, amt: 2600},
-        {timeInSeconds: '11', uv: 2300, pv: 3400, amt: 2800},
-        {timeInSeconds: '12', uv: 2560, pv: 3790, amt: 2900},
-      ]
+      fakeData: [
+        {timeInSeconds: '1', uv: 4000},
+        {timeInSeconds: '2', uv: 3000},
+        {timeInSeconds: '3', uv: 2000},
+        {timeInSeconds: '4', uv: 2780},
+        {timeInSeconds: '5', uv: 1890},
+        {timeInSeconds: '6', uv: 2390},
+        {timeInSeconds: '7', uv: 3490},
+        {timeInSeconds: '8', uv: 3400},
+        {timeInSeconds: '9', uv: 1700},
+        {timeInSeconds: '10', uv: 1800},
+        {timeInSeconds: '11', uv: 2300},
+        {timeInSeconds: '12', uv: 2560}
+      ],
+      data: []
     }
   }
+
+
+  
 
 
   generateVisualizer() {
     console.log(this.state.data);
     return (
-      <LineChart width={600} height={300} data={this.state.data}>
+      <LineChart width={600} height={300} data={this.state.fakeData}>
         <XAxis label={{value: "Time (in seconds)", position: "insideBottomRight", dy: 10}} dataKey="timeInSeconds"/>
         <YAxis label={{value: "Device Data", position: "insideLeft", angle: -90}}/>
         <Tooltip/>
         <Legend/>
-        <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{r: 8}}/>
-        <Line type="monotone" dataKey="uv" stroke="#82ca9d"/>
+        <Line type="monotone" dataKey="uv" stroke="#8884d8" activeDot={{r: 8}}/>
     </LineChart>
     );
   }
