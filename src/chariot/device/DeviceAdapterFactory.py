@@ -6,6 +6,7 @@ from chariot.utility.JSONTypes import JSONDict
 from chariot.device.adapter import DeviceAdapter, ImpinjR420Adapter, ImpinjXArrayAdapter
 from chariot.device.configuration import DeviceConfiguration
 from chariot.utility.exceptions import ItemNotSupported, ErrorStrings
+from test.testutils import TestDeviceAdapter
 
 
 class _DeviceAdapterFactory(AbstractFactory):
@@ -13,6 +14,7 @@ class _DeviceAdapterFactory(AbstractFactory):
         self.instanceMap: Dict[str, Type[DeviceAdapter]] = {
             'ImpinjXArray': ImpinjXArrayAdapter,
             'ImpinjSpeedwayR420': ImpinjR420Adapter,
+            'TestDevice': TestDeviceAdapter
         }
         self.instanceName: str = 'device'
         self.typeField: str = 'deviceType'
