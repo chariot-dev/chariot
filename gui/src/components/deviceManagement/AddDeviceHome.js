@@ -51,7 +51,7 @@ class AddDeviceHome extends Component {
 
   // Gets supported device types when page initially loads in order to dynamically fill in select-menu
   componentDidMount() {
-    fetch(getSupportedDeviceTypesBaseUrl + "/network/device/supportedDevices")
+    fetch(getSupportedDeviceTypesBaseUrl + "network/device/supportedDevices")
     .then(res => res.json())
     .then(
       // On success
@@ -67,10 +67,10 @@ class AddDeviceHome extends Component {
         console.log(error.message);
 
 
-    
+
         /*
           Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
-        */ 
+        */
       }
     )
   }
@@ -91,11 +91,11 @@ class AddDeviceHome extends Component {
 
   /*
     Updates textfield state values as they are entered by the user.
-  */  
+  */
   handleChange(event) {
     var updatedNewDeviceTypeGeneralVals = this.state.newDeviceTypeGeneralVals; // Store from current state
     updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json
-    
+
     this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }); // Update the state
   }
 
@@ -106,7 +106,7 @@ class AddDeviceHome extends Component {
   handleDeviceTypeChange(event) {
     console.log("------------------- changed -------------------");
     var lastDeviceType = this.state.newDeviceTypeGeneralVals['Device Type'];
-    
+
     if (lastDeviceType !== event.target.value) { // If device type was changed
       var updatedNewDeviceTypeGeneralVals = this.state.newDeviceTypeGeneralVals; // Store from current state
       updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json with the new device type
@@ -131,7 +131,7 @@ class AddDeviceHome extends Component {
             // Store the device's config file to the state
             this.setState({newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals});
             this.setState({showDeviceSpecificSettings: true}); // Will cause render to update device-specific section
-          },  
+          },
           // If post was unsuccessful, update state and display error modal
           (error) => {
             console.log(error.message);
@@ -151,7 +151,7 @@ class AddDeviceHome extends Component {
       this.setState({
         isSubmitted: !this.state.isSubmitted,
         confirmIsOpen: !this.state.confirmIsOpen
-      }); 
+      });
     });
   }
 
@@ -249,12 +249,12 @@ class AddDeviceHome extends Component {
       (error) => {
       // Once error message is set, then launch the error modal
       this.setState({
-        errorMessage: error.message 
+        errorMessage: error.message
       }, () => {
         this.setState({ errorIsOpen: !this.state.errorIsOpen });
       });
       }
-    )  
+    )
   }
 
 
@@ -272,9 +272,9 @@ class AddDeviceHome extends Component {
 
 
 
-  /* 
+  /*
     Called when the user either submits the registration form by clicking "Next"
-    in the AddDeviceVars component or "No" on the confirmation modal. Will change the 
+    in the AddDeviceVars component or "No" on the confirmation modal. Will change the
     "isSubmitted" prop to true->false or false->true. Also will update the viewability
     status of the confirmation modal
   */
@@ -282,7 +282,7 @@ class AddDeviceHome extends Component {
     this.setState({
       isSubmitted: !this.state.isSubmitted,
       confirmIsOpen: !this.state.confirmIsOpen
-    });    
+    });
     event.preventDefault();
   }
 
@@ -303,14 +303,14 @@ class AddDeviceHome extends Component {
 
     return confirmationDataJson;
   }
-  
+
 
 
   /*
     Returns three separate objects with their unique keys. The first object
     is the Device Creation screen itself. This screen contains the fields that
-    the user will have to fill in, in order to create a device. It also contains 
-    AddDeviceVars component, which contains the "Next" button that will lead the 
+    the user will have to fill in, in order to create a device. It also contains
+    AddDeviceVars component, which contains the "Next" button that will lead the
     user to the other two objects, the confirmation and sucess modals.
   */
   render() {
@@ -344,9 +344,9 @@ class AddDeviceHome extends Component {
 
 
       <Modal show={this.state.confirmIsOpen} key="newDeviceConfirmModal">
-        
+
         <ConfirmationModalBody
-          confirmationQuestion={('Before ').concat(this.state.newDeviceTypeGeneralVals['Device Nickname'], ' is added to ', this.props.location.networkProps['Network Name'], ' please confirm that the information below is correct.')} 
+          confirmationQuestion={('Before ').concat(this.state.newDeviceTypeGeneralVals['Device Nickname'], ' is added to ', this.props.location.networkProps['Network Name'], ' please confirm that the information below is correct.')}
           confirmationData = {this.parseConfirmationData()}
           >
         </ConfirmationModalBody>
@@ -384,5 +384,5 @@ class AddDeviceHome extends Component {
     ]
   }
 }
- 
+
 export default AddDeviceHome;
