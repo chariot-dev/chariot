@@ -2,7 +2,9 @@ import flask
 from flask import jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO
+import requests
 from typing import Dict, List
+from chariot.api.DataCollectionRunner import DataCollectionRunner
 from chariot.device import DeviceAdapterFactory, DeviceConfigurationFactory
 from chariot.device.adapter import DeviceAdapter
 from chariot.configuration import Configuration
@@ -22,8 +24,11 @@ from chariot.collection import DataCollector, DataCollectionManager
 from chariot.utility.JSONTypes import JSONObject
 
 app = flask.Flask(__name__)
+app.config['DEBUG'] = True
+app.config['THREADED'] = True
+socketio: SocketIO = SocketIO()
+socketio.init_app(app)
 CORS(app)  # This will enable CORS for all routes
-socketio: SocketIO = SocketIO(app, cors_allowed_origins='*', message_queue='redis://')
 
 apiBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
@@ -31,6 +36,7 @@ defaultSuccessCode: int = 200
 
 runningCollectors: Dict[str, bool] = {}
 mockServer = MockServer()
+runner = DataCollectionRunner()
 
 
 # -- useful utility methods --
@@ -54,18 +60,14 @@ def buildSuccessfulRequest(data, code):
 
 
 def externalEmit(data: List[JSONObject]) -> None:
-    # this is a quick and dirty method - definitely inefficient to instantiate a new server
-    # every time, but for now this works when calling from an external process
-    externalSocketio: SocketIO = SocketIO(message_queue='redis://')
-    externalSocketio.emit('data', data)
+    # print(data)
+    # sys.stdout.flush()
+    requests.post(f'http://localhost:5000{apiBaseUrl}/data/emit', json=data)
 
 
 def removeRunningCollector(configId: str) -> None:
     if configId in runningCollectors:
         del runningCollectors[configId]
-
-    if not any(runningCollectors.values()):
-        mockServer.stop()
 
 
 # --- This section of api endpoints deals with netowrks  --- #
@@ -371,7 +373,6 @@ def createDataCollector():
     configMap["configId"] = configId
     configMap[TypeStrings.Network_Type.value] = network
     configMap[TypeStrings.Database_Type.value] = db
-    configMap["runTime"] = 100
 
     collectionConfig: DataCollectionConfiguration = DataCollectionConfiguration(configMap)
 
@@ -413,23 +414,12 @@ def startDataCollection():
         response.status_code = 400
         return response
 
-    # For a test device, the MockServer must be started in order to get generated data
-    devices = dataCollector.getNetwork().getDevices()
-    hasTestDevice = False
-    for device in devices.values():
-        if device.getDeviceType() == 'TestDeviceAdapter':
-            if not mockServer.isRunning():
-                mockServer.start()
-            hasTestDevice = True
-            break
-
     # automatically output data via socket
     dataCollector.addOutputHook(externalEmit)
     # if it is timed, this will make sure it is no longer flagged as running when it stops
     dataCollector.setEndHandler(removeRunningCollector)
-
-    runningCollectors[configId] = hasTestDevice
-    dataCollector.startCollection()
+    runningCollectors[configId] = True
+    runner.runTask(dataCollector)
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
@@ -442,16 +432,18 @@ def endDataCollection():
         response.status_code = 400
         return response
 
-    dataCollector: DataCollector = DataCollectionManager.getCollector(configId)
-    dataCollector.stopCollection()
+    runner.stopTask()
     del runningCollectors[configId]
-
-    # if no running collectors are using the MockServer, shut it down
-    if not any(runningCollectors.values()) and mockServer.isRunning():
-        mockServer.stop()
 
     # inform socket subscribers that data collection has ended
     socketio.emit('end')
+    return buildSuccessfulRequest(None, defaultSuccessCode)
+
+# TODO: disable cors for this endpoint - should only be accessed internally
+@app.route(apiBaseUrl + '/data/emit', methods=['POST'])
+def emitData():
+    data: JSONObject = request.get_json()
+    socketio.emit('data', data)
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
@@ -492,4 +484,5 @@ def handleDatabaseNotConnected(error):
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    runner.start()
+    app.run()

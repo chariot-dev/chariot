@@ -3,6 +3,9 @@ from multiprocessing import Event
 from time import sleep
 from typing import Callable, Dict, List, Optional, Set
 from queue import Queue, Empty
+from chariot.database.configuration import DatabaseConfiguration
+from chariot.database import DatabaseWriterFactory
+from chariot.database.writer import DatabaseWriter
 from chariot.device.adapter import DeviceAdapter
 from chariot.utility.concurrency import HandledThread
 from chariot.utility.JSONTypes import JSONObject
@@ -15,8 +18,14 @@ class DataCollectionWorker:
     PRODUCERS_PER_CONSUMER: int = 2
     THREAD_JOIN_TIMEOUT: float = 1.0
 
-    def __init__(self, devices: List[DeviceAdapter], minPollDelay: float = 0.01):
+    def __init__(self, devices: List[DeviceAdapter], dbConfig: Optional[DatabaseConfiguration] = None,
+         minPollDelay: float = 0.2):
         self._devices = devices
+        self._dbConfig: Optional[DatabaseConfiguration] = None
+        self._dbWriter: Optional[DatabaseWriter] = None
+        if self._dbConfig is not None:
+            self._dbConfig = DatabaseConfiguration(dbConfig.toDict())
+            self._dbWriter = DatabaseWriterFactory.getInstance(self._dbConfig)
         self._dataQueue: Queue = Queue()
         self._errorQueue: Queue = Queue()
         self._consumerThreads: List[HandledThread] = []
@@ -25,12 +34,9 @@ class DataCollectionWorker:
         self._consumeTimeout: float = max(self._minPollDelay, self.DEFAULT_TIMEOUT)
         self._running: bool = False
         self._producerThreads: Dict[str, HandledThread] = {}
-        self._outputHooks: Set[Callable] = set()
+        self._outputHooks: List[Callable] = []
         self._outputThread: Optional[HandledThread] = None
         self._stopThread: Optional[HandledThread] = None
-
-    def __del__(self) -> None:
-        self.stop()
 
     def _consumeDataFromDevice(self, deviceIdx: int) -> None:
         device: DeviceAdapter = self._devices[deviceIdx]
@@ -93,7 +99,7 @@ class DataCollectionWorker:
                 self._callOutputHooks(chunk)
 
     def addOutputHook(self, hook: Callable) -> None:
-        self._outputHooks.add(hook)
+        self._outputHooks.append(hook)
 
     def _callOutputHooks(self, data: List[JSONObject]) -> None:
         for hook in self._outputHooks:
@@ -112,6 +118,8 @@ class DataCollectionWorker:
         self._outputHooks.remove(hook)
 
     def start(self, stopEvent: Event) -> None:
+        if stopEvent.is_set():
+            stopEvent.clear()
         if self._running:
             raise AssertionError
 
@@ -143,6 +151,11 @@ class DataCollectionWorker:
             self._consumerThreads.append(HandledThread(name=f'Consumer-0', target=self._consumeDataFromDevices,
                                                        args=(self._errorQueue, 0, 1,)))
         self._running = True
+        
+        if self._dbWriter is not None:
+            self._dbWriter.connect()
+            self.addOutputHook(self._dbWriter.insertMany)
+
         for consumer in self._consumerThreads:
             consumer.start()
         for producer in self._producerThreads.values():
@@ -174,5 +187,9 @@ class DataCollectionWorker:
                 anyThreadsAlive |= consumer.is_alive()
             self._outputThread.join(self.THREAD_JOIN_TIMEOUT)
             anyThreadsAlive |= self._outputThread.is_alive()
+
+        if self._dbWriter is not None:
+            self._dbWriter.disconnect()
+
         self._consumerThreads.clear()
         self._producerThreads.clear()

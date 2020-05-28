@@ -41,7 +41,7 @@ class MockServer:
     def start(self) -> None:
         if not self._running:
             self._appProcess = Process(name='Mock-Server-Process', target=self.run,
-                kwargs={'debug': True, 'port': self.port, 'use_reloader': False, 'threaded': True})
+                kwargs={'debug': False, 'port': self.port, 'use_reloader': False, 'threaded': True})
             self._appProcess.start()
             serverRunning: bool = False
             # hack to wait until the flask server is up and ready to receive requests

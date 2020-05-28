@@ -1,5 +1,4 @@
 import abc
-from multiprocessing import Lock as ProcessLock
 from threading import Lock
 from typing import Dict, List, Optional, Type
 from time import time
@@ -94,6 +93,9 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
             raise AssertionError('The database writer was already locked')
         self._modLock = lock
         self._lockReason = reason
+
+    def toDict(self) -> JSONObject:
+        return self._config.toDict()
 
     def updateConfig(self, config: JSONObject) -> None:
         # if there is a modification lock in place and it is locked,

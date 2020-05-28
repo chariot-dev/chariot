@@ -1,6 +1,5 @@
 from math import ceil
-from multiprocessing import Event
-from multiprocessing import Queue
+from multiprocessing import Event, Queue
 from threading import Lock, Timer
 from time import sleep
 from typing import Callable, Iterable, List, Optional, Set
@@ -36,9 +35,6 @@ class DataCollector:
         self._workers: List[DataCollectionWorker] = []
         self._workerProcesses: List[HandledProcess] = []
         self._minPollDelay: float = 0.01
-
-    def __del__(self) -> None:
-        self.stopCollection()
 
     # output hooks cannot be added during a collection episode
     def addOutputHook(self, hook: Callable) -> None:
@@ -90,7 +86,8 @@ class DataCollector:
         if self._running:
             # not sure whether to raise an error here
             return
-
+        if self._stopEvent.is_set():
+            self._stopEvent.clear()
         network: Network = self._config.network
         self._devices = [device for device in network.getDevices().values()]
         if len(self._devices) == 0:
@@ -102,8 +99,6 @@ class DataCollector:
         minDevicePoll: float = min(devicePolls)
         self._minPollDelay = max(self._minPollDelay, minDevicePoll)
 
-        self._config.database.connect()
-
         numDevices = len(self._devices)
         numWorkers = ceil(numDevices / self.MAX_DEVICES_PER_WORKER)
         avgDevicesPerWorker: int = int(round(numDevices / numWorkers))
@@ -112,8 +107,15 @@ class DataCollector:
         for i in range(0, numDevices, avgDevicesPerWorker):
             startIdx: int = i
             endIdx: int = min(startIdx + avgDevicesPerWorker, numDevices)
-            worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx], self._minPollDelay)
-            worker.addOutputHook(self._config.database.insertMany)
+            
+            worker: DataCollectionWorker = None
+            if self._config.database.__class__.__name__ == 'TestDatabaseWriter':
+                worker = DataCollectionWorker(self._devices[startIdx:endIdx])
+                self._config.database.connect()
+                worker.addOutputHook(self._config.database.insertMany)
+            else:
+                worker = DataCollectionWorker(self._devices[startIdx:endIdx],
+                    self._config.database.getConfiguration(), self._minPollDelay)
             for hook in self._outputHooks:
                 worker.addOutputHook(hook)
 
@@ -127,6 +129,7 @@ class DataCollector:
         network.lock(self._runLock, 'a data collection episode')
         self._config.database.lock(self._runLock, 'a data collection episode')
         self._errorHandler.start()
+
         for workerProcess in self._workerProcesses:
             workerProcess.start()
             sleep(self.PROCESS_CREATION_DELAY)  # seems to be necessary to avoid random bad forks
