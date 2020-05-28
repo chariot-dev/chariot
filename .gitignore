@@ -23,6 +23,9 @@ __pycache__/
 .coverage
 
 # Test folder
-/src/testing
+/src/test
 
+# yarn
 node_modules/
+gui/node_modules/
+gui/package.json
