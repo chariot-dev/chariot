@@ -2,6 +2,7 @@ import flask
 from flask import jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from threading import Lock
 import requests
 from typing import Dict, List
 from chariot.api.DataCollectionRunner import DataCollectionRunner
@@ -29,6 +30,7 @@ app.config['THREADED'] = True
 socketio: SocketIO = SocketIO()
 socketio.init_app(app)
 CORS(app)  # This will enable CORS for all routes
+runLock: Lock = Lock()
 
 apiBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
@@ -108,6 +110,12 @@ def modifyNetwork():
     requestContent = request.get_json()
     hasNewName = False
     networkName: str = parser.getNameInPayload(requestContent)
+    network = NetworkManager.getNetwork(networkName)
+    locked, reason = network.isLocked()
+    if locked:
+        response = jsonify(toDict(f'The network cannot be modified because it is being used by {reason}'))
+        response.status_code = 400
+        return response
 
     # check if a new network name is specified in the payload, if so capture old name so its deleted from collection
     if parser.getNewNetworkNameStr() in requestContent:
@@ -131,8 +139,14 @@ def modifyNetwork():
 @app.route(apiBaseUrl + '/network', methods=['DELETE'])
 def deleteNetwork():
     networkToDelete = parser.getNameInURL(request)
-    NetworkManager.deleteNetwork(networkToDelete)
+    network = NetworkManager.getNetwork(networkToDelete)
+    locked, reason = network.isLocked()
+    if locked:
+        response = jsonify(toDict(f'The network cannot be deleted because it is being used by {reason}'))
+        response.status_code = 400
+        return response
 
+    NetworkManager.deleteNetwork(networkToDelete)
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
@@ -207,6 +221,12 @@ def modifyDevice():
     requestContent = request.get_json()
     newDeviceName: str = None
     networkName = parser.getNameInPayload(requestContent)
+    network = NetworkManager.getNetwork(networkName)
+    locked, reason = network.isLocked()
+    if locked:
+        response = jsonify(toDict(f'The device cannot be modified because its network is being used by {reason}'))
+        response.status_code = 400
+        return response
     deviceName: str = parser.getDeviceNameInPayload(requestContent)
 
     # check if a new device name is specified in the payload, if so capture old name so its deleted from collection
@@ -232,6 +252,11 @@ def deleteDevice():
     # ensure that a network is specified in the payload
     networkName = parser.getNameInURL(request)
     network: Network = NetworkManager.getNetwork(networkName)
+    locked, reason = network.isLocked()
+    if locked:
+        response = jsonify(toDict(f'The device cannot be deleted because its network is being used by {reason}'))
+        response.status_code = 400
+        return response
 
     deviceName = parser.getDeviceNameInURL(request)
 
@@ -294,7 +319,12 @@ def modifyDatabaseConfiguration():
     requestContent = request.get_json()
     hasNewName = False
     dbId: str = parser.getDbNameInPayload(requestContent)
-
+    database = DatabaseManager.getDbWriter(dbId)
+    locked, reason = database.isLocked()
+    if locked:
+        response = jsonify(toDict(f'The database configuration cannot be modified because it is being used by {reason}'))
+        response.status_code = 400
+        return response
     # check if a new dbId is specified in the payload, if so capture old name so its deleted from collection
     if parser.getNewDbIdStr() in requestContent:
         hasNewName = True
@@ -317,8 +347,14 @@ def modifyDatabaseConfiguration():
 @app.route(apiBaseUrl + '/database', methods=['DELETE'])
 def deleteDatabaseConfiguration():
     dbId = parser.getDbNameInURL(request)
-    DatabaseManager.deleteDbWriter(dbId)
+    database: DatabaseWriter = DatabaseManager.getDbWriter(dbId)
+    locked, reason = database.isLocked()
+    if locked:
+        response = jsonify(toDict(f'The database configuration cannot be deleted because it is being used by {reason}'))
+        response.status_code = 400
+        return response
 
+    DatabaseManager.deleteDbWriter(dbId)
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 
@@ -418,6 +454,10 @@ def startDataCollection():
     dataCollector.addOutputHook(externalEmit)
     # if it is timed, this will make sure it is no longer flagged as running when it stops
     dataCollector.setEndHandler(removeRunningCollector)
+    lockReason: str = 'a data collection episode'
+    runLock.acquire()
+    dataCollector.getNetwork().lock(runLock, lockReason)
+    dataCollector.getDatabase().lock(runLock, lockReason)
     runningCollectors[configId] = True
     runner.runTask(dataCollector)
     return buildSuccessfulRequest(None, defaultSuccessCode)
@@ -434,7 +474,7 @@ def endDataCollection():
 
     runner.stopTask()
     del runningCollectors[configId]
-
+    runLock.release()
     # inform socket subscribers that data collection has ended
     socketio.emit('end')
     return buildSuccessfulRequest(None, defaultSuccessCode)

@@ -1,5 +1,5 @@
 from threading import Lock
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from chariot.device.adapter import DeviceAdapter
 from chariot.network.configuration.NetworkConfiguration import NetworkConfiguration
 from chariot.utility.JSONTypes import JSONObject
@@ -53,6 +53,9 @@ class Network(Manager):
             raise AssertionError('The network was already locked')
         self._modLock = lock
         self._lockReason = reason
+
+    def isLocked(self) -> Tuple[bool, Optional[str]]:
+        return (self._modLock is not None, self._lockReason)
 
     def toDict(self):
         network: Dict[str, str] = self._config.toDict()

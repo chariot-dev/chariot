@@ -1,6 +1,6 @@
 from math import ceil
 from multiprocessing import Event, Queue
-from threading import Lock, Timer
+from threading import Timer
 from time import sleep
 from typing import Callable, Iterable, List, Optional, Set
 from chariot.collection.configuration import DataCollectionConfiguration
@@ -23,7 +23,6 @@ class DataCollector:
         self._devices: List[DeviceAdapter] = []
         self._errorHandler: HandledThread = HandledThread(name='Error-Handler', target=self._handleErrors)
         self._errorQueue: Queue = Queue()
-        self._runLock = Lock()
         self._onEnd: Optional[Callable] = onEnd
         self._onError: Optional[Callable[Exception], None] = onError
         # this should be a set, but causes issues in < v3.8: 
@@ -38,6 +37,8 @@ class DataCollector:
 
     # output hooks cannot be added during a collection episode
     def addOutputHook(self, hook: Callable) -> None:
+        if not callable(hook):
+            raise AssertionError
         self._outputHooks.append(hook)
 
     def clearOutputHooks(self) -> None:
@@ -71,14 +72,14 @@ class DataCollector:
     def removeOutputHook(self, hook: Callable) -> None:
         self._outputHooks.remove(hook)
 
-    def setErrorHandler(self, handler: Callable[[Exception], None]) -> None:
-        if not callable(handler):
+    def setErrorHandler(self, handler: Optional[Callable]) -> None:
+        if handler is not None and not callable(handler):
             raise AssertionError
         self._onError = handler
 
     # if it was a timed collection episode, execute this once it's done
-    def setEndHandler(self, handler: Callable) -> None:
-        if not callable(handler):
+    def setEndHandler(self, handler: Optional[Callable]) -> None:
+        if handler is not None and not callable(handler):
             raise AssertionError
         self._onEnd = handler
 
@@ -125,14 +126,11 @@ class DataCollector:
             self._workerProcesses.append(workerProcess)
 
         self._running = True
-        self._runLock.acquire()
-        network.lock(self._runLock, 'a data collection episode')
-        self._config.database.lock(self._runLock, 'a data collection episode')
         self._errorHandler.start()
 
         for workerProcess in self._workerProcesses:
             workerProcess.start()
-            sleep(self.PROCESS_CREATION_DELAY)  # seems to be necessary to avoid random bad forks
+
         if hasattr(self._config, 'runTime'):
             self._stopTimer = Timer(float(self._config.runTime / 1000), self._stopCollection, args=(True,))
             self._stopTimer.start()
@@ -156,7 +154,6 @@ class DataCollector:
         self._workerProcesses.clear()
         self._workers.clear()
         self._devices.clear()
-        self._runLock.release()
 
         if not calledFromTimer and self._stopTimer:
             if self._stopTimer.is_alive():
@@ -169,7 +166,7 @@ class DataCollector:
             self._onEnd()
 
     def stopCollection(self, *args) -> None:
-        return self._stopCollection(False)
+        return self._stopCollection(*args)
 
     def updateConfig(self, config: JSONObject) -> None:
         if self._running:

@@ -86,6 +86,9 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def isConnected(self) -> bool:
         return self.connected
 
+    def isLocked(self) -> Tuple[bool, Optional[str]]:
+        return (self._modLock is not None, self._lockReason)
+
     # this method locks the dbwriter from modification e.g during a collection episode for as long as the lock
     # passed in is active
     def lock(self, lock: Lock, reason: Optional[str] = None):

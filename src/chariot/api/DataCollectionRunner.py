@@ -61,6 +61,8 @@ class DataCollectionRunner:
                 collector = DataCollector(DataCollectionConfiguration(collectorConfig))
                 for hook in task['hooks']:
                     collector.addOutputHook(hook)
+                collector.setErrorHandler(task['onEnd'])
+                collector.setEndHandler(task['onError'])
                 mockServer: Optional[MockServer] = None
                 if hasTestDevice:
                     mockServer = MockServer()
@@ -98,6 +100,8 @@ class DataCollectionRunner:
             del task['collector']['network']
             del task['collector']['database']
             task['hooks'] = self._instance._outputHooks
+            task['onEnd'] = self._instance._onEnd
+            task['onError'] = self._instance._onError
             self._taskQueue.put(task)
 
     def start(self) -> None:
