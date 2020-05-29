@@ -28,7 +28,7 @@ app = flask.Flask(__name__)
 app.config['DEBUG'] = True
 app.config['THREADED'] = True
 socketio: SocketIO = SocketIO()
-socketio.init_app(app)
+socketio.init_app(app, cors_allowed_origins='*')
 CORS(app)  # This will enable CORS for all routes
 runLock: Lock = Lock()
 
@@ -483,6 +483,7 @@ def endDataCollection():
 @app.route(apiBaseUrl + '/data/emit', methods=['POST'])
 def emitData():
     data: JSONObject = request.get_json()
+    print(data)
     socketio.emit('data', data)
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
