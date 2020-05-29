@@ -25,7 +25,7 @@ from chariot.collection import DataCollector, DataCollectionManager
 from chariot.utility.JSONTypes import JSONObject
 
 app = flask.Flask(__name__)
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
 app.config['THREADED'] = True
 socketio: SocketIO = SocketIO()
 socketio.init_app(app, cors_allowed_origins='*')
@@ -525,5 +525,7 @@ def handleDatabaseNotConnected(error):
 
 
 if __name__ == '__main__':
+    mockServer = MockServer()
+    mockServer.start()
     runner.start()
     app.run()
