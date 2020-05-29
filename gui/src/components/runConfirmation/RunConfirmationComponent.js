@@ -36,38 +36,37 @@ class RunConfirmationComponent extends Component {
       body: JSON.stringify(data)
     };
 
-      // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
-      fetch(dataCollectionBaseURL, requestOptions)
-          .then(res => res.json())
-          .then(
-              // If post was successful, then the dataCollector has been created, proceed to visualizer
-              (result) => {
-                  console.log(result);
-                  },
-              // If post was unsuccessful, update state and display error modal
-              (error) => {
-                  console.log(error.message);
-              }
-          )
-          .then(
-            () => {
-                fetch(dataCollectionBaseURL + '/start?configId=' + this.state.configurationSettings["configId"])
-                .then(res => res.json())
-                .then(
-                  // On success
-                  (result) => {
-                    console.log("started the data collection episode");
-                    console.log(result)
-                  },
-                  // On error
-                  (error) => {
-                    console.log(error.message);
-                  }
-                )
+    // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
+    fetch(dataCollectionBaseURL, requestOptions)
+        .then(res => res.json())
+        .then(
+            // If post was successful, then the dataCollector has been created, proceed to visualizer
+            (result) => {
+                console.log(result);
+                },
+            // If post was unsuccessful, update state and display error modal
+            (error) => {
+                console.log(error.message);
             }
-          )
-
+        )
+        .then(
+          () => {
+              fetch(dataCollectionBaseURL + '/start?configId=' + this.state.configurationSettings["configId"])
+              .then(res => res.json())
+              .then(
+                // On success
+                (result) => {
+                  console.log(result)
+                },
+                // On error
+                (error) => {
+                  console.log(error.message);
+                }
+              )
+          }
+        )
   };
+
 
   // Update state when text field is updated
   handleChange(event) {

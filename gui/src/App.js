@@ -24,15 +24,7 @@ import RunConfirmationComponent from "./components/runConfirmation/RunConfirmati
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 
-const socketEndpoint = 'http://localhost:5000';
-
-var socket = socketIOClient(socketEndpoint);
-
 function App() {
-  socket.on("data", data => console.log(data));
-
-  socket.on("end", end => console.log(end));
-
   return (
     <Router>
       <div className="chariot-bg overflow-case">

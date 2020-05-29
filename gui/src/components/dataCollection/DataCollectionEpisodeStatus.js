@@ -10,9 +10,6 @@ import socketIOClient from 'socket.io-client';
 import { LineChart, Line, XAxis, YAxis, Legend, Label } from 'recharts';
 
 const dataCollectionBaseURL = 'http://localhost:5000/chariot/api/v1.0/data';
-const socketEndpoint = 'http://localhost:5000';
-
-var socket = socketIOClient(socketEndpoint);
 
 class DataCollectionEpisodeStatus extends Component {
   constructor(props) {
@@ -20,6 +17,7 @@ class DataCollectionEpisodeStatus extends Component {
     this.state = {
       chosenNetwork: this.props.location.runProps['Network Name'],
       configId: this.props.location.runProps["configId"],
+      socketEndpoint: 'http://localhost:5000',
       fakeData: [
         {timeInSeconds: '1', uv: 4000},
         {timeInSeconds: '2', uv: 3000},
@@ -34,23 +32,57 @@ class DataCollectionEpisodeStatus extends Component {
         {timeInSeconds: '11', uv: 2300},
         {timeInSeconds: '12', uv: 2560}
       ],
-      data: []
+      timeInSeconds: 1,
+      socketData: [],
+      response: false
     }
+  }
+/*
+  componentDidMount() {
+    const { socketEndpoint } = this.state;
+    const socket = socketIOClient(socketEndpoint);
+
+    socket.on("data", data => {
+      var tempSocketData = this.state.socketData;
+      var dataValue = data[0].freeform.data;
+      var curSocketData = {'timeInSeconds': this.state.timeInSeconds, 'dataValue': dataValue};
+      tempSocketData.push(curSocketData);
+
+      this.setState({ timeInSeconds: this.state.timeInSeconds + 1});
+      this.setState({ socketData: tempSocketData });
+    })
+  }
+*/
+  componentDidMount() {
+    const { socketEndpoint } = this.state;
+    const socket = socketIOClient(socketEndpoint);
+
+    socket.on("data", this.handleSocketData); // Socket event listener
   }
 
 
-  
+  handleSocketData = (data) => {
+    console.log(data);
+    this.setState({ response: true });
+
+    var tempSocketData = [... this.state.socketData];
+    var dataValue = data[0].freeform.data;
+    var curSocketData = {'timeInSeconds': this.state.timeInSeconds, 'dataValue': dataValue};
+    tempSocketData.push(curSocketData);
+
+    this.setState({ timeInSeconds: this.state.timeInSeconds + 1});
+    this.setState({ socketData: tempSocketData });
+  }
 
 
   generateVisualizer() {
-    console.log(this.state.data);
     return (
-      <LineChart width={600} height={300} data={this.state.fakeData}>
+      <LineChart width={600} height={300} data={this.state.socketData}>
         <XAxis label={{value: "Time (in seconds)", position: "insideBottomRight", dy: 10}} dataKey="timeInSeconds"/>
         <YAxis label={{value: "Device Data", position: "insideLeft", angle: -90}}/>
         <Tooltip/>
         <Legend/>
-        <Line type="monotone" dataKey="uv" stroke="#8884d8" activeDot={{r: 8}}/>
+        <Line type="monotone" dataKey="dataValue" stroke="#8884d8" activeDot={{r: 8}}/>
     </LineChart>
     );
   }
@@ -86,12 +118,16 @@ class DataCollectionEpisodeStatus extends Component {
 
 
   render() {
+    console.log(this.state.socketData);
+
+    const {response} = this.state;
+
     return [
       <div className="container">
         <h1>Data Collection Episode</h1>
         <p>Data collection episode for {this.state.chosenNetwork}.</p>
 
-        {this.generateVisualizer()}
+        {this.state.socketData.length > 4 ? this.generateVisualizer() : <p>Waiting for data...</p>}
 
         <Button variant="danger" className="float-right" onClick={this.endDataCollection}>End Data Collection</Button>
 
