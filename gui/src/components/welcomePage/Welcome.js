@@ -49,15 +49,6 @@ class Welcome extends Component {
           View, create, delete, modify, or manage your existing databases.
         </div>
 
-        <br></br>
-
-        {/* Data analysis portion of welcome page. Contains the link to go to 'Data Analysis' screen and description of what that entails */}
-        <div>
-          <Link to="/dataAnalysisMain">Perform Data Analysis</Link>
-          <br></br>
-          Select a storage unit and perform data analysis.
-        </div>
-
         {/* Button to go to screen that will allow user to configure settings to begin a data collection episode */}
         <Link to="/chooseNetwork">
           <Button className="footer-button" variant="primary">Configure Data Collection</Button>

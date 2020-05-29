@@ -13,7 +13,6 @@ import ManageDatabaseConfiguration from './components/databaseManagement/ManageD
 import ChooseNetwork from "./components/networkManagement/ChooseNetwork";
 import DatabaseConnection from './components/databaseManagement/DatabaseConnection';
 import ChooseDatabaseConfig from './components/databaseManagement/ChooseDatabaseConfig';
-import DataAnalysisMain from "./components/dataAnalysis/DataAnalysisMain";
 import AddDeviceHome from "./components/deviceManagement/AddDeviceHome";
 import DataCollectionEpisodeStatus from "./components/dataCollection/DataCollectionEpisodeStatus";
 import ManageNetworkConfiguration from "./components/networkManagement/ManageNetworkConfiguration";
@@ -39,7 +38,6 @@ function App() {
           <Route path="/chooseNetwork" component={ChooseNetwork} />
           <Route path="/databaseConnection" component={DatabaseConnection} />
           <Route path="/chooseDatabaseConfig" component={ChooseDatabaseConfig} />
-          <Route path="/dataAnalysisMain" component={DataAnalysisMain} />
           <Route path="/addDeviceHome" component={AddDeviceHome} />
           <Route path="/dataCollectionEpisodeStatus" component={DataCollectionEpisodeStatus} />
           <Route path="/manageExistingNetwork/:networkName" exact component={ManageNetworkConfiguration} />

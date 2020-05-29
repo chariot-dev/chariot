@@ -117,7 +117,7 @@ class DeleteDatabase extends Component {
           Select a database configuration to delete.
         </p>
         
-        {this.state.existingDatabaseConfigurations ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingDatabaseConfigurations} withLinks={false} type="deleteDatabase" deleteDatabaseConfiguration={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingDatabaseConfigurations.length > 0 ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingDatabaseConfigurations} withLinks={false} type="deleteDatabase" deleteDatabaseConfiguration={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : <p>No existing database configurations were found.</p>}
 
         <Link to="/databaseManager">
           <Button variant="primary" className="float-left footer-button">Back</Button>

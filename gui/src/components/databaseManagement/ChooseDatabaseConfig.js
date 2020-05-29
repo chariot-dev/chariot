@@ -111,8 +111,8 @@ class ChooseDatabaseConfig extends Component {
           Select a database to begin data collection process. If you haven't created a database configuration yet, please create one.
         </p>
 
-        {this.state.existingConfigs ? 
-          <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} chosenNetwork={this.state.chosenNetwork} withLinks={false} type="chooseDatabase" testDatabaseConnection={this.testDatabaseConnection}></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingConfigs.length > 0 ? 
+          <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} chosenNetwork={this.state.chosenNetwork} withLinks={false} type="chooseDatabase" testDatabaseConnection={this.testDatabaseConnection}></NetworkDeviceCellScreenTemplate> : <p>No existing databasee configurations were found.</p>}
 
         <Link to={{pathname: "/chooseNetwork"}}>
           <Button variant="primary" className="float-left footer-button">Back</Button>

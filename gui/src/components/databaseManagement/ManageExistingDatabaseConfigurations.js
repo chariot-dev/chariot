@@ -47,7 +47,7 @@ class ManageExistingDatabaseConfigurations extends Component {
           Select a database to modify its existing configuration settings.
         </p>
         
-        {this.state.existingDatabaseConfigurations ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingDatabaseConfigurations} withLinks={true} type="manageDatabase"></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingDatabaseConfigurations.length > 0 ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingDatabaseConfigurations} withLinks={true} type="manageDatabase"></NetworkDeviceCellScreenTemplate> : <p>No existing database configurations were found.</p>}
         
         <Link to="/databaseManager">
           <Button variant="primary" className="float-left footer-button">Back</Button> 

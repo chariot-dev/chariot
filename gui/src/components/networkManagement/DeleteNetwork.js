@@ -120,7 +120,7 @@ class DeleteNetwork extends Component {
           Select a network to delete. Deleting a network will also delete its corresponding devices.
         </p>
 
-        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="delete" deleteNetwork={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingNetworks.length > 0 ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="delete" deleteNetwork={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : <p>No existing networks were found.</p>}
         
         <Link to="/networkManager">
           <Button variant="primary" className="float-left footer-button">Back</Button>
