@@ -77,16 +77,10 @@ class ManageDeviceConfiguration extends Component {
     .then((result) => {
       var settings = result[this.state.originalDeviceProperties["deviceType"]]["settings"];
 
-      console.log( result[this.state.originalDeviceProperties["deviceType"]]["settings"] );
-      console.log(settings);
-      console.log(settings.length);
-
       var configurationFields = [];
       var deviceTypeIndex;
 
       this.setState({ deviceConfiguration : result });
-
-      console.log(this.state.newDeviceProperties);
 
       //combine originalDeviceProperties with result to have an object containing fields and their values
       for(var i = 0 ; i < settings.length; i++) {
@@ -131,17 +125,17 @@ class ManageDeviceConfiguration extends Component {
       //do not allow modification of deviceType
       settings.splice(deviceTypeIndex, 1);
 
-      for(var i = 0 ; i < settings.length; i++) {
-        var curFieldAlias = settings[i].alias;
-        var curFieldIsRequired = settings[i].required;
-        var valueType = settings[i].inputType;
-        var curFieldTitle = settings[i].title;
+      for(var j = 0 ; j < settings.length; j++) {
+        var fieldAlias = settings[j].alias;
+        var fieldIsRequired = settings[j].required;
+        var valueType = settings[j].inputType;
+        var fieldTitle = settings[j].title;
 
         configurationFields.push(
-            <div className="form-group" key={settings[i].title + " Field" + i}>
-              {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
-              {curFieldTitle}: <input type={valueType} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'}
-                                      id={curFieldAlias} name={curFieldTitle} defaultValue={settings[i].currentValue} onChange={this.handleChange}/>
+            <div className="form-group" key={settings[j].title + " Field" + j}>
+              {fieldIsRequired ? <div className="requiredStar">*</div> : ""}
+              {fieldTitle}: <input type={valueType} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'}
+                                      id={fieldAlias} name={fieldTitle} defaultValue={settings[j].currentValue} onChange={this.handleChange}/>
             </div>
         );
       }
@@ -176,11 +170,11 @@ class ManageDeviceConfiguration extends Component {
 
       delete this.state.newDeviceProperties[uniqueDeviceId];
 
-      console.log(originalName);
-      console.log(newName);
+      var tempNewDeviceProperties = this.state.newDeviceProperties;
+      tempNewDeviceProperties["deviceId"] = originalName;
+      tempNewDeviceProperties["newDeviceId"] = newName;
 
-      this.state.newDeviceProperties["deviceId"] = originalName;
-      this.state.newDeviceProperties["newDeviceId"] = newName;
+      this.setState ({ newDeviceProperties : tempNewDeviceProperties });
     }
 
     //add network name to payload to specify device on network
@@ -258,9 +252,6 @@ class ManageDeviceConfiguration extends Component {
 
 
   render() {
-    console.log(this.state.newDeviceProperties);
-    console.log(Object.keys(this.state.newDeviceProperties).length);
-
     return [
       <div className="container" key="manageDeviceConfigurationScreen">
         <h1>{this.state.originalDeviceName} - Device Configuration</h1>

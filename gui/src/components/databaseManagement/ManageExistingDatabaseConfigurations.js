@@ -21,7 +21,6 @@ class ManageExistingDatabaseConfigurations extends Component {
     .then(
       // On success
       (receivedDBConfigs) => {
-        console.log(receivedDBConfigs);
         var dbConfigJson = receivedDBConfigs; // Response is a JSON OBJECT for this one, not JSON ARRAY like the others
         var updatedDatabaseConfigurationsJsonArray = this.state.existingDatabaseConfigurations;
 

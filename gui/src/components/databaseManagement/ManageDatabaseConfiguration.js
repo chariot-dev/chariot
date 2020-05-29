@@ -109,8 +109,6 @@ class ManageDatabaseConfiguration extends Component {
       temp['dbId'] = this.state.originalDatabaseId;
       this.setState({ newDatabaseProperties: temp });
     }
-
-    console.log(this.state.newDatabaseProperties);
   }
 
 
@@ -121,11 +119,6 @@ class ManageDatabaseConfiguration extends Component {
   
 
   updateDatabaseConfiguration = () => {
-    console.log(this.state.originalDatabaseId);
-    console.log(this.state.newDatabaseProperties['newDbId']);
-    console.log('==================');
-    console.log(this.state.newDatabaseProperties);
-
     var data = this.state.newDatabaseProperties;
 
     // According to api, don't include these fields if not necessary

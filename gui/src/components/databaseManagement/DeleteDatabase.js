@@ -42,7 +42,6 @@ class DeleteDatabase extends Component {
     .then(
       // On success
       (receivedDBConfigs) => {
-        console.log(receivedDBConfigs);
         var dbConfigJson = receivedDBConfigs; // Response is a JSON OBJECT for this one, not JSON ARRAY like the others
         var updatedDatabaseConfigurationsJsonArray = this.state.existingDatabaseConfigurations;
 
@@ -78,8 +77,6 @@ class DeleteDatabase extends Component {
 
 
   deleteDatabaseConfiguration = () => {
-    console.log("Delete the db");
-
     // Delete request options
     const requestOptions = {
       method: 'DELETE',
@@ -113,7 +110,6 @@ class DeleteDatabase extends Component {
 
 
   render() {
-    console.log(this.state);
     return [
       <div className="container" key="deleteDatabaseConfigurationScreen">
         <h1>Delete an Existing Database Configuration</h1>

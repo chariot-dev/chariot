@@ -3,7 +3,6 @@ import {Link} from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
@@ -57,7 +56,8 @@ class DatabaseConnection extends Component {
     var databaseOptionsElement = [];
 
     for (var k = 0; k < this.state.supportedDatabaseTypes.length; k++) {
-      databaseOptionsElement.push(<option>{this.state.supportedDatabaseTypes[k]}</option>);
+      var curDatabaseOption = this.state.supportedDatabaseTypes[k];
+      databaseOptionsElement.push(<option key={curDatabaseOption}>{curDatabaseOption}</option>);
     }
     return databaseOptionsElement;
   }
@@ -110,19 +110,18 @@ class DatabaseConnection extends Component {
   createDatabaseFields = () => {
     var config = this.state.databaseConfig[this.state['Database Type']].settings;
     var databaseSpecificForm = [];
-    console.log(config);
     
     for (var i = 0; i < config.length; i++) {
       var curFieldAlias = config[i].alias;
       // don't want the user to fill out the 'Type' on GUI, so removing it from here
       if (curFieldAlias !== 'type') {
-        var curFieldDescription = config[i].description;
+        //var curFieldDescription = config[i].description;
         var curFieldType = config[i].inputType;
         var curFieldTitle = config[i].title;
         var curFieldIsRequired = config[i].required;
 
         databaseSpecificForm.push(
-          <div className="form-group" key={curFieldAlias}>
+          <div className="form-group" key={curFieldTitle}>
             {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
             {curFieldTitle}
             <input type={curFieldType}  required={curFieldIsRequired} className={curFieldType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={curFieldTitle} onChange={this.handleChange}/>
@@ -141,8 +140,6 @@ class DatabaseConnection extends Component {
 
   testConfigurationConnection = () => {
     var formData = this.parseFromTextFields();
-
-    console.log(formData);
     
     // Post request options
     const requestOptions = {
@@ -228,7 +225,6 @@ class DatabaseConnection extends Component {
 
 
   render() {
-    console.log(this.state);
     return [
       <div className="container" key="databaseConnectionScreen">
         <h1>Add Database Connection</h1>

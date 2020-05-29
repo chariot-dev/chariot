@@ -98,15 +98,12 @@ class AddDeviceHome extends Component {
 
       // State is update asynchronousyly, so run function after state is updated
       this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }, function () {
-        console.log(this.state.newDeviceTypeGeneralVals);
-
         // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
         fetch(getDeviceConfigBaseUrl + "?deviceId=" + this.state.newDeviceTypeGeneralVals['Device Type'])
         .then(res => res.json())
         .then(
           // If post was successful, update state and display success modal
           (result) => {
-            console.log(result);
             var responseJson = result;
             updatedNewDeviceTypeGeneralVals['newDeviceTypeConfig'] = responseJson;
 

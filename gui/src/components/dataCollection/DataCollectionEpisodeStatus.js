@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import { Table, Tooltip } from 'react-bootstrap';
-import {Link} from 'react-router-dom';
+//import {Link} from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import socketIOClient from 'socket.io-client';
 
-import greenCircleImg from "../images/green_circle.png";
-import yellowCircleImg from "../images/yellow_circle.png";
-import redCircleImg from "../images/red_circle.png";
+//import greenCircleImg from "../images/green_circle.png";
+//import yellowCircleImg from "../images/yellow_circle.png";
+//import redCircleImg from "../images/red_circle.png";
 import { LineChart, Line, XAxis, YAxis, Legend, Label } from 'recharts';
 
 const dataCollectionBaseURL = 'http://localhost:5000/chariot/api/v1.0/data';

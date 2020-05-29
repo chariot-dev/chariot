@@ -85,7 +85,6 @@ class NetworkDeviceCellScreenTemplate extends Component {
           break;
         // For ChooseDatabaseConfig
         case "chooseDatabase":
-          console.log(this.state.dataJson)
           curNetworkName = this.state.dataJson["chosenNetwork"];
           curDatabaseId = this.state.dataJson[i]["dbId"];
           curDatabaseHost = this.state.dataJson[i]["host"];
@@ -107,7 +106,6 @@ class NetworkDeviceCellScreenTemplate extends Component {
           )     
           break;
         case "deleteDatabase":
-          console.log(this.state.dataJson);
           curNetworkName = this.state.dataJson["chosenNetwork"];
           curDatabaseId = this.state.dataJson[i]["dbId"];
           curDatabaseHost = this.state.dataJson[i]["host"];
@@ -121,7 +119,6 @@ class NetworkDeviceCellScreenTemplate extends Component {
           )
           break;
           case "manageDatabase":
-            console.log(this.state.dataJson);
             curNetworkName = this.state.dataJson["chosenNetwork"];
             curDatabaseId = this.state.dataJson[i]["dbId"];
             curDatabaseHost = this.state.dataJson[i]["host"];

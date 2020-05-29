@@ -18,8 +18,6 @@ class AddDeviceVars extends Component {
     var deviceSettings = deviceConfig["settings"];
     var initializedNewDeviceTypeConfigVals = {};
 
-    console.log(deviceSettings.length);
-
     for (var i = 0; i < deviceSettings.length; i++) {
       var fieldJsonObj = {};
       var curFieldTitle;
@@ -42,8 +40,6 @@ class AddDeviceVars extends Component {
           fieldJsonObj["inputType"] = curFieldType;
 
           initializedNewDeviceTypeConfigVals[curFieldTitle] = (fieldJsonObj);
-
-          console.log(curFieldTitle);
         }
       }
       else {
@@ -66,12 +62,8 @@ class AddDeviceVars extends Component {
           }
 
           initializedNewDeviceTypeConfigVals[curFieldTitle] = (fieldJsonObj);
-
-          console.log(curFieldTitle);
         }
       }
-
-      console.log(initializedNewDeviceTypeConfigVals);
     }
 
     // Setting the initial state
@@ -85,8 +77,6 @@ class AddDeviceVars extends Component {
       newDeviceTypeConfigVals: initializedNewDeviceTypeConfigVals,
       isSubmitted: false
     }
-
-    console.log(initializedNewDeviceTypeConfigVals);
 
     this.handleChange = this.handleChange.bind(this);
     this.sendSpecificToForm = this.sendSpecificToForm.bind(this);
@@ -117,7 +107,7 @@ class AddDeviceVars extends Component {
       var valueType = deviceSettings[key].inputType;
 
       deviceSpecificForm.push(
-        <div className="form-group" key={curFieldAlias}>
+        <div className="form-group" key={key}>
           {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
           {valueType === "checkbox" ? null : key}
           <input type={valueType}  required={curFieldIsRequired} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={key} onChange={this.handleChange}/>
