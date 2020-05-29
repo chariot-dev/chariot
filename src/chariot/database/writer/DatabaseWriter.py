@@ -1,6 +1,6 @@
 import abc
 from threading import Lock
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional, Type, Tuple
 from time import time
 from chariot.database.configuration import DatabaseConfiguration
 from chariot.utility.JSONTypes import JSONObject
