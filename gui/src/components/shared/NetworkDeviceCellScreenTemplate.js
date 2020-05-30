@@ -38,6 +38,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
       var curNetworkName = this.state.dataJson[i]["NetworkName"];
       var curNetworkDevices = this.state.dataJson[i]["Devices"];
       var curNetworkDescription = this.state.dataJson[i]["Description"];
+      let curDevices;
 
       var buttonElement = [];
 
@@ -86,6 +87,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
         // For ChooseDatabaseConfig
         case "chooseDatabase":
           curNetworkName = this.state.dataJson["chosenNetwork"];
+          curDevices = this.state.dataJson["chosenNetworkDevices"];
           curDatabaseId = this.state.dataJson[i]["dbId"];
           curDatabaseHost = this.state.dataJson[i]["host"];
           curDatabaseName = this.state.dataJson[i]["databaseName"];
@@ -93,7 +95,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
           buttonElement.push(         
             <Link 
               key={"chooseDatabaseButton" + i} 
-              to={{pathname:'/runConfirmationComponent', networkProps:{'Network Name': curNetworkName, 'Database ID': curDatabaseId, 'Database Name': curDatabaseName, 'Database Type': curDatabaseType}}}>
+              to={{pathname:'/runConfirmationComponent', networkProps:{'Network Name': curNetworkName, 'Devices': curDevices, 'Database ID': curDatabaseId, 'Database Name': curDatabaseName, 'Database Type': curDatabaseType}}}>
               <Button className="float-right" variant="success" size="sm">
                 Choose Database
               </Button>

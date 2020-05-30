@@ -16,14 +16,16 @@ class DataCollectionEpisodeStatus extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      chosenNetwork: this.props.location.runProps['Network Name'],
+      chosenNetwork: this.props.location.runProps["Network Name"],
+      devices: this.props.location.runProps["Devices"],
       configId: this.props.location.runProps["configId"],
-      socketEndpoint: 'http://localhost:5000',
+      socketEndpoint: "http://localhost:5000",
       dataValNum: 1, // Count of number of data points
       socketData: [], // Contains the socket data the recharts will use to make the visualizer
       response: false, // Have not recived data from socket yet
       successIsOpen: false,
-      showHomeButton: false
+      showHomeButton: false,
+      linesElement: []
     }
 
     this.toggleSuccessModal = this.toggleSuccessModal.bind(this);
@@ -33,37 +35,100 @@ class DataCollectionEpisodeStatus extends Component {
   componentDidMount() {
     const { socketEndpoint } = this.state;
     const socket = socketIOClient(socketEndpoint); // Create the socket
-
     socket.on("data", this.handleSocketData); // Socket event listener, call handleSocketData() on 'data'
+
+    // Give each device a different color line
+    var tempLinesElement = [];
+    for (var i = 0; i < this.state.devices.length; i++) {
+      var lineColor = "";
+
+      switch(i){ // Get a color for the line
+        case 0:
+          lineColor = "blue";
+          break;
+        case 1:
+          lineColor = "red";
+          break;
+        case 2:
+          lineColor = "green";
+          break;
+        case 3:
+          lineColor = "purple";
+          break;
+        case 4:
+          lineColor = "orange";
+          break;
+        case 5:
+          lineColor = "yellow";
+          break;
+        default: // Can't go on forever, so generate random color from here
+          var letters = '0123456789ABCDEF';
+          var color = '#';
+          for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+          }
+          lineColor = color;
+          break;
+      }
+
+      tempLinesElement.push(<Line dataKey={this.state.devices[i]} type="monotone" stroke={lineColor} activeDot={{r: 5}} isAnimationActive={false}/>)
+    }
+
+    this.setState({ linesElement: [... tempLinesElement]});
   }
 
 
   handleSocketData = (data) => {
-    this.setState({ response: true }); // Have now received data from socket, so set to true to display the visualizer
+    this.setState({ response: true }, function() {// Have now received data from socket, so set to true to display the visualizer
+      var curDataInterval = {"dataValNum": this.state.dataValNum};
+      var devicesWithNoData = [... this.state.devices]; // Keep track of what device data wasn't received through this get of the socket
 
-    var tempSocketData = [... this.state.socketData]; // ... to spread out the enumerable properties, statement is to save current data
-    var dataValue = data[0].freeform.data; // The data value
-    var curSocketData = {'dataValNum': this.state.dataValNum, 'Data Value': dataValue};
-    tempSocketData.push(curSocketData); // Add new data point to saved data
+      // Save the data from the socket get
+      for (var i = 0; i < data.length; i++) {
+        var curDeviceName = data[i].device_name;
+        var curDeviceData = data[i].freeform.data;
 
-    // Update state in order to rerender visualizer
-    this.setState({ dataValNum: this.state.dataValNum + 1});
-    this.setState({ socketData: tempSocketData });
-  }
+        curDataInterval[curDeviceName] = curDeviceData;
+        
+        var index = devicesWithNoData.indexOf(curDeviceName);
+        devicesWithNoData.splice(index, 1);
+      }
+
+      this.setState({ dataValNum: this.state.dataValNum + 1 }, function() {   
+        // Fill in the values for the device that didn't have data from this socket get
+        for (var j = 0; j < devicesWithNoData.length; j++) {
+          var curDeviceWithNoData = devicesWithNoData[j];
+
+          if (!this.state.socketData[this.state.dataValNum - 3]) {
+            curDataInterval[curDeviceWithNoData] = 0;
+          }
+          else {
+            curDataInterval[curDeviceWithNoData] = this.state.socketData[this.state.dataValNum - 3][curDeviceWithNoData];
+          }
+        }
+
+        var tempSocketData = [... this.state.socketData];
+        tempSocketData.push(curDataInterval);
+
+        this.setState({ socketData: tempSocketData });
+      });
+    });
+  } 
 
 
   // Returns the visualizer
   generateVisualizer() {
     return (
-      <LineChart width={1000} height={300} data={this.state.socketData}>
+      <LineChart width={1000} height={400} data={this.state.socketData}>
         <XAxis dataKey="dataValNum" stroke="black" label={{value: "Data Value Number", position: "insideBottomRight", dy: 10}}/>
         <YAxis stroke="black" label={{value: "Device Data", position: "insideLeft", angle: -90}}/>
         <Tooltip/>
         <Legend/>
-        <Line dataKey="Data Value" type="monotone" stroke="#8884d8" activeDot={{r: 6}} isAnimationActive={false}/>
+        {this.state.linesElement}
     </LineChart>
     );
   }
+
 
   endDataCollection = () => {
     fetch(dataCollectionBaseURL + '/stop?configId=' + this.state.configId)

@@ -17,6 +17,7 @@ class ChooseDatabaseConfig extends Component {
     
     this.state = {
       chosenNetwork: this.props.location.networkProps["Network Name"],
+      chosenNetworkDevices: this.props.location.networkProps["Devices"],
       existingConfigs: [],
       testSuccessIsOpen: false,
       testErrorIsOpen: false,
@@ -44,6 +45,7 @@ class ChooseDatabaseConfig extends Component {
 
         // Add the chosen network to the database config
         updatedDbJsonArray['chosenNetwork'] = this.state.chosenNetwork; 
+        updatedDbJsonArray['chosenNetworkDevices'] = this.state.chosenNetworkDevices; 
 
         this.setState({ existingConfigs: updatedDbJsonArray });
       },
@@ -103,7 +105,6 @@ class ChooseDatabaseConfig extends Component {
   }
 
   render() {
-
     return [
       <div className="container">
         <h1>Choose a Database</h1>
@@ -112,7 +113,7 @@ class ChooseDatabaseConfig extends Component {
         </p>
 
         {this.state.existingConfigs.length > 0 ? 
-          <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} chosenNetwork={this.state.chosenNetwork} withLinks={false} type="chooseDatabase" testDatabaseConnection={this.testDatabaseConnection}></NetworkDeviceCellScreenTemplate> : <p>No existing databasee configurations were found.</p>}
+          <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} withLinks={false} type="chooseDatabase" testDatabaseConnection={this.testDatabaseConnection}></NetworkDeviceCellScreenTemplate> : <p>No existing databasee configurations were found.</p>}
 
         <Link to={{pathname: "/chooseNetwork"}}>
           <Button variant="primary" className="float-left footer-button">Back</Button>

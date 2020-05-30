@@ -11,6 +11,7 @@ class RunConfirmationComponent extends Component {
 
     this.state = {
         "Network Name": this.props.location.networkProps["Network Name"],
+        "Devices": this.props.location.networkProps["Devices"],
         "Database ID": this.props.location.networkProps["Database ID"],
         "Database Name": this.props.location.networkProps["Database Name"],
         "Database Type": this.props.location.networkProps["Database Type"],
@@ -21,14 +22,12 @@ class RunConfirmationComponent extends Component {
   }
 
   startDataCollection = () => {
-
-      var data = {
-          "dbId" : this.state["Database ID"],
-          "networkName" : this.state["Network Name"],
-          "configId": this.state.configurationSettings["configId"],
-          "runTime": parseInt(this.state.configurationSettings["runTime"])
-      };
-
+    var data = {
+        "dbId" : this.state["Database ID"],
+        "networkName" : this.state["Network Name"],
+        "configId": this.state.configurationSettings["configId"],
+        "runTime": parseInt(this.state.configurationSettings["runTime"])
+    };
 
     const requestOptions = {
       method: 'POST',
@@ -42,8 +41,8 @@ class RunConfirmationComponent extends Component {
         .then(
             // If post was successful, then the dataCollector has been created, proceed to visualizer
             (result) => {
-                console.log(result);
-                },
+              console.log(result);
+            },
             // If post was unsuccessful, update state and display error modal
             (error) => {
                 console.log(error.message);
@@ -108,7 +107,7 @@ class RunConfirmationComponent extends Component {
                 <Link to="/chooseNetwork">
                     <Button variant="primary" className="float-left footer-button">Back</Button>
                 </Link>
-                <Link to={{ pathname: "/dataCollectionEpisodeStatus", runProps:{"Network Name": this.state["Network Name"], "configId": this.state.configurationSettings["configId"]} }}>
+                <Link to={{ pathname: "/dataCollectionEpisodeStatus", runProps:{"Network Name": this.state["Network Name"], "Devices": this.state["Devices"], "configId": this.state.configurationSettings["configId"]} }}>
                     <Button type="submit" variant="primary" className="float-right footer-button" onClick={this.startDataCollection}>Begin Collection</Button>
                 </Link>
             </form>
