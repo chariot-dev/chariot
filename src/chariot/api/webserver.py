@@ -62,8 +62,6 @@ def buildSuccessfulRequest(data, code):
 
 
 def externalEmit(data: List[JSONObject]) -> None:
-    # print(data)
-    # sys.stdout.flush()
     requests.post(f'http://localhost:5000{apiBaseUrl}/data/emit', json=data)
 
 
@@ -483,7 +481,6 @@ def endDataCollection():
 @app.route(apiBaseUrl + '/data/emit', methods=['POST'])
 def emitData():
     data: JSONObject = request.get_json()
-    print(data)
     socketio.emit('data', data)
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
