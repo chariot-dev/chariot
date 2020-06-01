@@ -149,7 +149,7 @@ class DataCollectionWorker:
                 self._consumerThreads.append(consumer)
         else:
             self._consumerThreads.append(HandledThread(name=f'Consumer-0', target=self._consumeDataFromDevices,
-                                                       args=(self._errorQueue, 0, numDevices,)))
+                                                       args=(self._errorQueue, 0, totalDevices,)))
         self._running = True
         
         if self._dbWriter is not None:
