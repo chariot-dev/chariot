@@ -21,10 +21,9 @@ class DataCollectionWorker:
     def __init__(self, devices: List[DeviceAdapter], dbConfig: Optional[DatabaseConfiguration] = None,
          minPollDelay: float = 0.2):
         self._devices = devices
-        self._dbConfig: Optional[DatabaseConfiguration] = None
+        self._dbConfig: Optional[DatabaseConfiguration] = dbConfig
         self._dbWriter: Optional[DatabaseWriter] = None
         if self._dbConfig is not None:
-            self._dbConfig = DatabaseConfiguration(dbConfig.toDict())
             self._dbWriter = DatabaseWriterFactory.getInstance(self._dbConfig)
         self._dataQueue: Queue = Queue()
         self._errorQueue: Queue = Queue()

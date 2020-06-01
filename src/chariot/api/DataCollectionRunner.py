@@ -96,7 +96,7 @@ class DataCollectionRunner:
             task: Dict[str, JSONObject] = {}
             task['network'] = self._instance.getNetwork().toDict()
             task['database'] = self._instance.getDatabase().getConfiguration().toDict()
-            task['collector'] = self._instance.getConfiguration().toDict().copy()
+            task['collector'] = self._instance.getConfiguration().toDict()
             del task['collector']['network']
             del task['collector']['database']
             task['hooks'] = self._instance._outputHooks
