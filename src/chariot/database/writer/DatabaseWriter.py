@@ -1,7 +1,6 @@
 import abc
-from multiprocessing import Lock as ProcessLock
 from threading import Lock
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional, Type, Tuple
 from time import time
 from chariot.database.configuration import DatabaseConfiguration
 from chariot.utility.JSONTypes import JSONObject
@@ -19,7 +18,6 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         self.connected: bool = False
         self._modLock: Optional[Lock] = None
         self._lockReason: Optional[str] = None
-        self._writeLock: ProcessLock = ProcessLock()
 
     def __del__(self):
         self.disconnect()
@@ -64,8 +62,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
             raise AssertionError
         self.validateRecord(record)
         record['insertion_time'] = int(round(time() * 1000))
-        with self._writeLock:
-            self._insertOne(record)
+        self._insertOne(record)
 
     @abc.abstractmethod
     def _insertOne(self, records: List[Dict[str, JSONObject]]):
@@ -80,8 +77,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         for record in records:
             self.validateRecord(record)
             record['insertion_time'] = int(round(time() * 1000))
-        with self._writeLock:
-            self._insertMany(records)
+        self._insertMany(records)
 
     @abc.abstractmethod
     def _insertMany(self, records: List[Dict[str, JSONObject]]):
@@ -90,6 +86,9 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def isConnected(self) -> bool:
         return self.connected
 
+    def isLocked(self) -> Tuple[bool, Optional[str]]:
+        return (self._modLock is not None, self._lockReason)
+
     # this method locks the dbwriter from modification e.g during a collection episode for as long as the lock
     # passed in is active
     def lock(self, lock: Lock, reason: Optional[str] = None):
@@ -97,6 +96,9 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
             raise AssertionError('The database writer was already locked')
         self._modLock = lock
         self._lockReason = reason
+
+    def toDict(self) -> JSONObject:
+        return self._config.toDict()
 
     def updateConfig(self, config: JSONObject) -> None:
         # if there is a modification lock in place and it is locked,

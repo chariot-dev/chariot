@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -13,7 +13,7 @@ const deleteDeviceBaseUrl = BaseURL + 'network/device';
 const getDeviceTypeConfiguration = BaseURL + 'network/device/config';
 const uniqueDeviceId = "deviceId";
 
-class ManageDeviceConfiguration extends React.Component {
+class ManageDeviceConfiguration extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -66,28 +66,22 @@ class ManageDeviceConfiguration extends React.Component {
         // Initialize all to-be-saved properties to be the original, in the event not all properties are modified so can still be saved
         this.setState({newDeviceProperties: properties});
 
-
+        // Make another api call to get the device type's template configuration
         return fetch(getDeviceTypeConfiguration + '?deviceId=' + this.state.originalDeviceProperties["deviceType"])
       },
       // On error
       (error) => {
         console.log(error.message);
-    
-        /*
-          Have an error modal for being unable to get device fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
       }
     )
     .then(result => result.json())
     .then((result) => {
       var settings = result[this.state.originalDeviceProperties["deviceType"]]["settings"];
+
       var configurationFields = [];
       var deviceTypeIndex;
 
       this.setState({ deviceConfiguration : result });
-
-      console.log(settings);
-      console.log(this.state.newDeviceProperties);
 
       //combine originalDeviceProperties with result to have an object containing fields and their values
       for(var i = 0 ; i < settings.length; i++) {
@@ -103,6 +97,7 @@ class ManageDeviceConfiguration extends React.Component {
           //do not allow modification of deviceType
           deviceTypeIndex = i;
         }
+
         if (settings[i].settingsList) {
           for (var k = 0; k < settings[i].settingsList.length; k++) {
             var fieldJsonObj = {};
@@ -118,14 +113,12 @@ class ManageDeviceConfiguration extends React.Component {
             fieldJsonObj["required"] = curFieldIsRequired;
             fieldJsonObj["inputType"] = curFieldType;
             fieldJsonObj["title"] = curFieldTitle;
-            if (currentAlias in this.state.originalDeviceProperties &&
+            if (curFieldTitle in this.state.originalDeviceProperties &&
                 this.state.originalDeviceProperties[currentAlias] != null) {
               //combine the two
               settings[i].currentValue = this.state.originalDeviceProperties[currentAlias]
             }
             settings.push(fieldJsonObj);
-
-            console.log(curFieldTitle);
           }
         }
       }
@@ -133,17 +126,17 @@ class ManageDeviceConfiguration extends React.Component {
       //do not allow modification of deviceType
       settings.splice(deviceTypeIndex, 1);
 
-      for(var i = 0 ; i < settings.length; i++) {
-        var curFieldAlias = settings[i].alias;
-        var curFieldIsRequired = settings[i].required;
-        var valueType = settings[i].inputType;
-        var curFieldTitle = settings[i].title;
+      for(var j = 0 ; j < settings.length; j++) {
+        var fieldAlias = settings[j].alias;
+        var fieldIsRequired = settings[j].required;
+        var valueType = settings[j].inputType;
+        var fieldTitle = settings[j].title;
 
         configurationFields.push(
-            <div className="form-group" key={settings[i].title + " Field"}>
-              {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
-              {curFieldTitle}: <input type={valueType} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'}
-                                      id={curFieldAlias} name={curFieldTitle} defaultValue={settings[i].currentValue} onChange={this.handleChange}/>
+            <div className="form-group" key={settings[j].title + " Field" + j}>
+              {fieldIsRequired ? <div className="requiredStar">*</div> : ""}
+              {fieldTitle}: <input type={valueType} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'}
+                                      id={fieldAlias} name={fieldTitle} defaultValue={settings[j].currentValue} onChange={this.handleChange}/>
             </div>
         );
       }
@@ -166,22 +159,23 @@ class ManageDeviceConfiguration extends React.Component {
   modifyDevice = () => {
     var data = {};
 
-    // ======= When creating fields, no reference to field type, so some fields are would be sent as strings when they need to be ints. Also antenna beeds array. Need to fix ========
-
     if (this.state.originalDeviceName === this.state.newDeviceProperties[uniqueDeviceId]) {
       // if the device name is the same, can just use newDeviceProperties as data (remove fields with null)
       data = this.state.newDeviceProperties;
     }
     else {
       // if the device is not the same, then use the old name as "deviceId" and the new name as "newDeviceId"
-      var originalName = this.state.originalDeviceProperties[uniqueDeviceId];
+      var originalName = this.state.originalDeviceName;
       var newName = this.state.newDeviceProperties[uniqueDeviceId];
       data = this.state.newDeviceProperties;
 
       delete this.state.newDeviceProperties[uniqueDeviceId];
 
-      this.state.newDeviceProperties["deviceId"] = originalName;
-      this.state.newDeviceProperties["newDeviceId"] = newName;
+      var tempNewDeviceProperties = this.state.newDeviceProperties;
+      tempNewDeviceProperties["deviceId"] = originalName;
+      tempNewDeviceProperties["newDeviceId"] = newName;
+
+      this.setState ({ newDeviceProperties : tempNewDeviceProperties });
     }
 
     //add network name to payload to specify device on network
@@ -217,11 +211,6 @@ class ManageDeviceConfiguration extends React.Component {
       // If put was unsuccessful, update state and display error modal
       (error) => {
         console.log(error.message);
-
-      
-        /*
-          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
       }
     )
   }
@@ -249,11 +238,6 @@ class ManageDeviceConfiguration extends React.Component {
       // On error
       (error) => {
         console.log(error.message);
-
-    
-        /*
-          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
       }
     )
   }
@@ -269,9 +253,6 @@ class ManageDeviceConfiguration extends React.Component {
 
 
   render() {
-    console.log(this.state.newDeviceProperties);
-    console.log(Object.keys(this.state.newDeviceProperties).length);
-
     return [
       <div className="container" key="manageDeviceConfigurationScreen">
         <h1>{this.state.originalDeviceName} - Device Configuration</h1>
@@ -304,7 +285,7 @@ class ManageDeviceConfiguration extends React.Component {
       </Modal>,
 
       <Modal show={this.state.saveSuccessIsOpen} key="deviceSaveSuccessModal">
-        <SuccessModalBody successMessage= {this.state.newDeviceProperties['Device Name'] + ' has successfully been modified.'}>
+        <SuccessModalBody successMessage= {this.state.newDeviceProperties['deviceId'] + ' has successfully been modified.'}>
         </SuccessModalBody>
         <Modal.Footer>
           <Link to="/welcome">

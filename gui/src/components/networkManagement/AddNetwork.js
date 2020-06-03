@@ -34,8 +34,8 @@ class AddNetwork extends Component {
       errorMessage: ''
     }
 
-
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
+    this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
   
@@ -46,14 +46,14 @@ class AddNetwork extends Component {
     this.setState({ networkProperties: updatedNetworkProperties }); // Update the state
   }
 
-
   toggleConfirmationModal(event) {
-    this.setState({
-      confirmIsOpen: !this.state.confirmIsOpen
-    });
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
     event.preventDefault();
   }
 
+  hideConfirmationModal(event) {
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });   
+  }
 
   toggleErrorModal = () => {
     this.setState({
@@ -64,14 +64,12 @@ class AddNetwork extends Component {
     });
   }
 
-
   createNetworkAndToggleSuccessModal = () => {
     // Post request's body
     var data = {
       "networkName": this.state.networkProperties["Network Name"],
       "description": this.state.networkProperties["Network Description"]
     }
-
 
     // Post request options
     const requestOptions = {
@@ -80,19 +78,14 @@ class AddNetwork extends Component {
       body: JSON.stringify(data)
     };
 
-
     // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
     fetch(postCreateNetworkBaseUrl, requestOptions)
     .then(res => res.json())
     .then(
       // If post was successful, update state and display success modal
       () => {
-        this.setState({
-          confirmIsOpen: false
-        });
-        this.setState({
-          successIsOpen: !this.state.successIsOpen
-        });
+        this.setState({ confirmIsOpen: false });
+        this.setState({ successIsOpen: !this.state.successIsOpen });
       },
       // If post was unsuccessful, update state and display error modal
       (error) => {
@@ -100,12 +93,12 @@ class AddNetwork extends Component {
         this.setState({
           errorMessage: error.message 
         }, () => {
+          this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
           this.setState({ errorIsOpen: !this.state.errorIsOpen });
         });
       }
     )
   }
-
 
   render() {
     return [
@@ -119,7 +112,6 @@ class AddNetwork extends Component {
               Network Name: <input required className="form-control" id="networkNameInput" name="Network Name" onChange={this.handleChange}/>
             </div>
             <div className="form-group">
-              <div className="requiredStar">*</div>
               Network Description: <textarea required className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
             </div>
             <Link to="/networkManager">
@@ -129,8 +121,7 @@ class AddNetwork extends Component {
         </form>
       </div>,
 
-
-      <Modal show={this.state.confirmIsOpen} key="addNetworkConfirmation">
+      <Modal show={this.state.confirmIsOpen} onHide={this.hideConfirmationModal} key="addNetworkConfirmation">
           <ConfirmationModalBody
             confirmationQuestion='Is this information for your network correct?'
             confirmationData = {this.state.networkProperties}
@@ -143,27 +134,23 @@ class AddNetwork extends Component {
         </Modal.Footer>
       </Modal>,
 
-
       <Modal show={this.state.successIsOpen} key="addNetworkSuccessModal">
         <SuccessModalBody successMessage="Your network was succesfully added! Would you like to add a device to this network as well?">
         </SuccessModalBody>
-
 
         <Modal.Footer>
           <Link to="/networkManager">
             <Button variant="primary" className="float-left">No</Button>
           </Link>
-          <Link to={{pathname:'/addDeviceHome', networkProps:{'Network Name': this.state.networkProperties['Network Name']} }}>
+          <Link to={{ pathname:'/addDeviceHome', networkProps:{'Network Name': this.state.networkProperties['Network Name']} }}>
             <Button variant="primary" className="float-right">Yes</Button>
           </Link>
         </Modal.Footer>
       </Modal>,
 
-
       <Modal show={this.state.errorIsOpen} key="addNetworkErrorModal">
         <ErrorModalBody errorMessage={this.state.errorMessage + ". Please ensure that the server is running, the inputted values are valid, and try again." }>
         </ErrorModalBody>
-
 
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.toggleErrorModal}>OK</Button>
@@ -172,8 +159,6 @@ class AddNetwork extends Component {
     ]
   }
 
-
 }
-
 
 export default AddNetwork;

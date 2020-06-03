@@ -57,9 +57,6 @@ class ManageExistingNetworks extends Component {
 
 
   render() {
-    console.log(this.state.existingNetworks);
-
-
     return (
       <div className="container">
         <h1>Manage Existing Networks</h1>
@@ -68,7 +65,7 @@ class ManageExistingNetworks extends Component {
         </p>
         
         {/* {this.state.existingNetworks ? this.createNetworkLinks() : null} */}
-        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={true} type="manage"></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingNetworks.length > 0 ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={true} type="manage"></NetworkDeviceCellScreenTemplate> : <p>No existing networks were found.</p>}
 
 
         <Link to="/networkManager">

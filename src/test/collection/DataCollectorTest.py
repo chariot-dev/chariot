@@ -58,16 +58,8 @@ class DataCollectorTest(MockDeviceTester):
         self.instance.startCollection()
         assert self.instance.isRunning() == True
      
-        # these objects should be locked from modificaiton while episode is running
-        # as for devices, changes won't be reflected anyway since they are cloned into a separate process
-        # basically means a snapshot of what they were is taken upon starting a collection episode
-        # this doesn't prevent them from being modified elsewhere, we have no control over the device's native API
-        with pytest.raises(AssertionError):
-            network.updateConfig({})
-
-        with pytest.raises(AssertionError):
-            database.updateConfig({})
-
+        # this object should be locked from modificaiton while episode is running
+        # this is better enforced by the web API, but why not
         with pytest.raises(AssertionError):
             self.instance.updateConfig({})
 
@@ -93,7 +85,5 @@ class DataCollectorTest(MockDeviceTester):
         database.cleanup()
         assert len(dataDict.keys()) == self.NUM_DEVICES
 
-        # these should no longer fail as the lock has been released
-        network.updateConfig({})
-        database.updateConfig({})
+        # this should no longer fail as the lock has been released
         self.instance.updateConfig({})

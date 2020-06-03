@@ -11,11 +11,11 @@ from test.testutils import TestDatabaseWriter
 
 
 class DataCollectionManagerTest:
-    instance: Optional[DataCollectionManager] = None
+    instance = DataCollectionManager
     collector: Optional[DataCollector] = None
 
     def setup_method(self):
-        self.instance = DataCollectionManager()
+        self.instance.collection = {}
         self.collector = self.makeCollector('Test Collector 1')
 
     def makeCollector(self, collectorName: str) -> DataCollector:

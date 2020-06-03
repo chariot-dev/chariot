@@ -3,7 +3,6 @@ import {Link} from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
@@ -27,8 +26,9 @@ class DatabaseConnection extends Component {
       testSuccessIsOpen: false,
       testErrorIsOpen: false,
       testErrorMessage: ''
-    }
 
+    };
+    
     this.handleChange = this.handleChange.bind(this);
     this.handleDatabaseTypeChange = this.handleDatabaseTypeChange.bind(this);
     this.hideTestSuccessModal = this.hideTestSuccessModal.bind(this);
@@ -58,16 +58,16 @@ class DatabaseConnection extends Component {
     var databaseOptionsElement = [];
 
     for (var k = 0; k < this.state.supportedDatabaseTypes.length; k++) {
-      databaseOptionsElement.push(<option>{this.state.supportedDatabaseTypes[k]}</option>);
+      var curDatabaseOption = this.state.supportedDatabaseTypes[k];
+      databaseOptionsElement.push(<option key={curDatabaseOption}>{curDatabaseOption}</option>);
     }
-
     return databaseOptionsElement;
   }
 
   handleChange(event) {
     var updatedDatabaseProperties = this.state.databaseProperties; // Store from current state
     updatedDatabaseProperties[event.target.name] = event.target.value; // Update the json
-
+    
     this.setState({ databaseProperties: updatedDatabaseProperties }); // Update the state
   }
 
@@ -85,7 +85,6 @@ class DatabaseConnection extends Component {
   As the database type the user selects changes, update that in the state.
   */
   handleDatabaseTypeChange(event) {
-    console.log("------- changed --------");
     var lastDatabaseType = this.state['Database Type'];
 
     if (lastDatabaseType !== event.target.value) { // If database type was changed
@@ -106,26 +105,25 @@ class DatabaseConnection extends Component {
         )
       });
 
-      this.setState({ showDatabaseSpecificSettings: false}); // Reset to false after render to get ready for next render (if use changes database type)
+      this.setState({ showDatabaseSpecificSettings: false}); // Reset to false after render to get ready for next render (if user changes database type)
     }
   }
 
   createDatabaseFields = () => {
     var config = this.state.databaseConfig[this.state['Database Type']].settings;
     var databaseSpecificForm = [];
-    console.log(config);
-
+    
     for (var i = 0; i < config.length; i++) {
       var curFieldAlias = config[i].alias;
       // don't want the user to fill out the 'Type' on GUI, so removing it from here
       if (curFieldAlias !== 'type') {
-        var curFieldDescription = config[i].description;
+        //var curFieldDescription = config[i].description;
         var curFieldType = config[i].inputType;
         var curFieldTitle = config[i].title;
         var curFieldIsRequired = config[i].required;
 
         databaseSpecificForm.push(
-          <div className="form-group" key={curFieldAlias}>
+          <div className="form-group" key={curFieldTitle}>
             {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
             {curFieldTitle}
             <input type={curFieldType}  required={curFieldIsRequired} className={curFieldType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={curFieldTitle} onChange={this.handleChange}/>
@@ -144,7 +142,7 @@ class DatabaseConnection extends Component {
 
   testConfigurationConnection = () => {
     var formData = this.parseFromTextFields();
-
+    
     // Post request options
     const requestOptions = {
       method: 'POST',
@@ -165,12 +163,12 @@ class DatabaseConnection extends Component {
         }
     })
     .then(
-      //
+      // 
       (resJson) => {
         if (resJson) { // If the response exists (coming from 400 error)
           this.setState({ testErrorMessage: resJson.message }, () => { // Set the error message
             this.setState({ testErrorIsOpen: true }); // Then set test error modal to true
-          });
+          }); 
         }
     })
   }
@@ -229,10 +227,9 @@ class DatabaseConnection extends Component {
 
 
   render() {
-    console.log(this.state);
     return [
       <div className="container" key="databaseConnectionScreen">
-        <h1>Database Connection</h1>
+        <h1>Add Database Connection</h1>
         <p className="screenInfo">Please fill in the following fields to connect to the database that will store the data.</p>
 
         <div className="form-group">
@@ -252,8 +249,7 @@ class DatabaseConnection extends Component {
         <Link to="/chooseNetwork">
             <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
-
-        <Button variant="success" className="footer-button button-mid-bottom" onClick={this.testConfigurationConnection}>Test Connection</Button>
+        <Button variant="success" className="footer-button button-mid-bottom" onClick={this.testConfigurationConnection}>Test Connection </Button>
 
       </div>,
 
@@ -262,14 +258,21 @@ class DatabaseConnection extends Component {
         </SuccessModalBody>
 
         <Modal.Footer>
-          <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"]} }}>
-            <Button variant="primary" className="float-right">Continue</Button>
-          </Link>
+          {/* Either go to "Choose a Database Screen" (Configure data collection) or back to "Database Manager" (Add a db)*/}
+          {this.state["Network Name"] ? 
+            <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"]} }}>
+              <Button variant="primary" className="float-right">Continue</Button>
+            </Link> :
+            <Link to={{pathname:'/databaseManager'}}>
+              <Button variant="primary" className="float-right">Continue</Button>
+            </Link>
+          }
+          
         </Modal.Footer>
       </Modal>,
 
       <Modal show={this.state.testSuccessIsOpen} key="testDatabaseConfigSuccessModal">
-        <SuccessModalBody successMessage="Chariot connected to the database succesfully!">
+        <SuccessModalBody successMessage="Chariot connected to the database succesfully! To create the database configuration, please close this window and then click 'Create'.">
         </SuccessModalBody>
 
         <Modal.Footer>
@@ -292,6 +295,7 @@ class DatabaseConnection extends Component {
         <ErrorModalBody errorMessage='Could not get database configuration due to an error. Please try again.'>
         </ErrorModalBody>
 
+
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.toggleErrorModal}>OK</Button>
         </Modal.Footer>
@@ -299,8 +303,6 @@ class DatabaseConnection extends Component {
 
     ]
   }
-
-
 
 
 }

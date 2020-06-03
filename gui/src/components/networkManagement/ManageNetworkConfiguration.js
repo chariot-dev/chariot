@@ -6,6 +6,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+
 import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
@@ -27,7 +28,7 @@ class ManageNetworkConfiguration extends React.Component {
       successIsOpen: false,
       errorIsOpen: false,
       errorMessage: ""
-    }    
+    }
 
 
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
@@ -40,7 +41,7 @@ class ManageNetworkConfiguration extends React.Component {
   handleChange(event) {
     var updatedNetworkProperties = this.state.newNetworkProperties; // Store from current state
     updatedNetworkProperties[event.target.name] = event.target.value; // Update the json
-    
+
     this.setState({ newNetworkProperties: updatedNetworkProperties }); // Update the state
   }
 
@@ -62,7 +63,7 @@ class ManageNetworkConfiguration extends React.Component {
     .then(
       // On success
       (result) => {
-        var responseJsonArray = result; // Response is a dictionary 
+        var responseJsonArray = result; // Response is a dictionary
 
 
         var properties = {};
@@ -70,8 +71,8 @@ class ManageNetworkConfiguration extends React.Component {
         properties["Network Description"] = responseJsonArray["description"];
 
 
-        this.setState({originalNetworkProperties: properties});    
-        
+        this.setState({originalNetworkProperties: properties});
+
         // Initialize all to-be-saved properties to be the original, in the event not all properties are modified so can still be saved
         this.setState({newNetworkProperties: properties});
       },
@@ -80,10 +81,10 @@ class ManageNetworkConfiguration extends React.Component {
         console.log(error.message);
 
 
-    
+
         /*
           Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
+        */
       }
     )
   }
@@ -106,7 +107,7 @@ class ManageNetworkConfiguration extends React.Component {
         "networkName": this.state.originalNetworkName,
         "newNetworkName": this.state.newNetworkProperties["Network Name"],
         "description": this.state.newNetworkProperties["Network Description"]
-      }     
+      }
     }
 
 
@@ -121,7 +122,7 @@ class ManageNetworkConfiguration extends React.Component {
     .then(
       () => {
         this.setState({ confirmIsOpen: false });
-        this.setState({ successIsOpen: !this.state.successIsOpen }); 
+        this.setState({ successIsOpen: !this.state.successIsOpen });
       },
       // If put was unsuccessful, update state and display error modal
       (error) => {
@@ -131,16 +132,8 @@ class ManageNetworkConfiguration extends React.Component {
 
           this.setState({ errorMessage: returnedErrorMessage }, function () {
             console.log(this.state.errorMessage);
-
-
-            /*
-              Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-            */ 
           });
-        });      
-        /*
-          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
+        });
       }
     )
   }
@@ -184,7 +177,7 @@ class ManageNetworkConfiguration extends React.Component {
           confirmationData = {this.state.newNetworkProperties}
           >
         </ConfirmationModalBody>
-        
+
       <Modal.Footer>
         <Button variant="primary" className="float-left" onClick={this.toggleConfirmationModal}>No</Button>
         <Button variant="primary" className="float-right" onClick={this.updateNetworkConfiguration}>Yes</Button>
