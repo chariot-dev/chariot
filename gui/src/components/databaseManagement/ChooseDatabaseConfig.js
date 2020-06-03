@@ -42,7 +42,7 @@ class ChooseDatabaseConfig extends Component {
         for (var key of Object.keys(responseJson)) {
           updatedDbJsonArray.push(responseJson[key]);
         }
-
+        
         // Add the chosen network to the database config
         updatedDbJsonArray['chosenNetwork'] = this.state.chosenNetwork; 
         updatedDbJsonArray['chosenNetworkDevices'] = this.state.chosenNetworkDevices; 
@@ -113,13 +113,13 @@ class ChooseDatabaseConfig extends Component {
         </p>
 
         {this.state.existingConfigs.length > 0 ? 
-          <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} withLinks={false} type="chooseDatabase" testDatabaseConnection={this.testDatabaseConnection}></NetworkDeviceCellScreenTemplate> : <p>No existing databasee configurations were found.</p>}
+          <NetworkDeviceCellScreenTemplate dataJson={this.state.existingConfigs} withLinks={false} type="chooseDatabase" testDatabaseConnection={this.testDatabaseConnection}></NetworkDeviceCellScreenTemplate> : <p>No existing database configurations were found.</p>}
 
         <Link to={{pathname: "/chooseNetwork"}}>
           <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
 
-        <Link to={{ pathname: "/databaseConnection", "Network Name": this.state.chosenNetwork }}>
+        <Link to={{ pathname: "/databaseConnection", networkProps: {"Network Name": this.state.chosenNetwork, "Devices": this.state.chosenNetworkDevices} }}>
           <Button variant="success" className="float-right footer-button">Create</Button>
         </Link>
       </div>,

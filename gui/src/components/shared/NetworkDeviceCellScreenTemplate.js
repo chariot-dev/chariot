@@ -72,11 +72,11 @@ class NetworkDeviceCellScreenTemplate extends Component {
         // For ChooseNetwork
         case "chooseNetwork":
           deviceTags = []; // Reset list of devices for network-to-be-displayed
+          curNetworkDevices = this.state.dataJson[i]["Devices"];
           curNetworkName = this.state.dataJson[i]["NetworkName"];
           curNetworkDescription = this.state.dataJson[i]["Description"];
     
           buttonElement.push(
-
             <Link key={"chooseNetworkButton" + i} to={{pathname:'/chooseDatabaseConfig', networkProps:{'Network Name': curNetworkName, 'Devices': curNetworkDevices}}}> 
               <Button className="float-right" variant="success" size="sm">
                 Choose Network
@@ -92,6 +92,7 @@ class NetworkDeviceCellScreenTemplate extends Component {
           curDatabaseHost = this.state.dataJson[i]["host"];
           curDatabaseName = this.state.dataJson[i]["databaseName"];
           curDatabaseType =  this.state.dataJson[i]["type"];
+
           buttonElement.push(         
             <Link 
               key={"chooseDatabaseButton" + i} 
