@@ -13,8 +13,8 @@ class DatabaseConnection extends Component {
     super(props);
 
     this.state = {
-      "Network Name": this.props.location.networkProps["Network Name"],
-      "Devices": this.props.location.networkProps["Devices"],
+      "Network Name": null,
+      "Devices": null,
       supportedDatabaseTypes: [],
       'Database Type' : '',
       databaseConfig : {},
@@ -25,7 +25,6 @@ class DatabaseConnection extends Component {
       testSuccessIsOpen: false,
       testErrorIsOpen: false,
       testErrorMessage: ''
-
     };
     
     this.handleChange = this.handleChange.bind(this);
@@ -36,6 +35,11 @@ class DatabaseConnection extends Component {
 
   // Gets supported database types when page initially loads in order to dynamically fill in select-menu
   componentDidMount() {
+    if (this.props.location.networkProps) {
+      this.setState({ "Network Name": this.props.location.networkProps["Network Name"] });
+      this.setState({ "Devices": this.props.location.networkProps["Devices"] });
+    }
+    
     fetch(databaseBaseUrl + "/supportedDatabases")
     .then(res => res.json())
     .then(
@@ -224,6 +228,8 @@ class DatabaseConnection extends Component {
 
 
   render() {
+    console.log(this.state);
+    
     return [
       <div className="container" key="databaseConnectionScreen">
         <h1>Add Database Connection</h1>
