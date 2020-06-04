@@ -1,4 +1,3 @@
-from threading import Lock
 from typing import Dict, List, Optional, Tuple
 from chariot.device.adapter import DeviceAdapter
 from chariot.network.configuration.NetworkConfiguration import NetworkConfiguration
@@ -10,7 +9,7 @@ class Network(Manager):
     def __init__(self, config: NetworkConfiguration):
         self._config: NetworkConfiguration = config
         self.collection: Dict[str, DeviceAdapter] = {}
-        self._modLock: Optional[Lock] = None
+        self._modLocked: bool = False
         self._lockReason: Optional[str] = None
 
     def getDevices(self) -> Dict[str, DeviceAdapter]:
@@ -46,16 +45,17 @@ class Network(Manager):
 
         return devices
 
-    # this method locks the network from modification e.g during a collection episode for as long as the lock
-    # passed in is active
-    def lock(self, lock: Lock, reason: Optional[str] = None):
-        if self._modLock and self._modLock.locked():
-            raise AssertionError('The network was already locked')
-        self._modLock = lock
+    def lock(self, reason: Optional[str] = None):
+        if self._modLocked:
+            message: str = 'This network is currently locked'
+            if self._lockReason is not None:
+                message += f'. It is being used by {self._lockReason}'
+            raise AssertionError(message)
+        self._modLocked = True
         self._lockReason = reason
 
     def isLocked(self) -> Tuple[bool, Optional[str]]:
-        return (self._modLock is not None, self._lockReason)
+        return (self._modLocked, self._lockReason)
 
     def toDict(self):
         network: Dict[str, str] = self._config.toDict()
@@ -67,15 +67,15 @@ class Network(Manager):
 
         return network
 
+    def unlock(self):
+        self._modLocked = False
+
     def updateConfig(self, config: JSONObject) -> None:
-        # if there is a modification lock in place and it is locked,
-        if self._modLock and self._modLock.locked():
+        if self._modLocked:
             message: str = 'This network is currently locked from modification'
             if self._lockReason is not None:
                 message += f'. It is being used by {self._lockReason}'
             raise AssertionError(message)
-        elif self._modLock:
-            self._modLock = None
         self._config.updateConfig(config)
 
     # importDeviceConfig

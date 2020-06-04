@@ -1,5 +1,4 @@
 import abc
-from threading import Lock
 from typing import Dict, List, Optional, Type, Tuple
 from time import time
 from chariot.database.configuration import DatabaseConfiguration
@@ -16,7 +15,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     def __init__(self, config: Type[DatabaseConfiguration]):
         self._config: Type[DatabaseConfiguration] = config
         self.connected: bool = False
-        self._modLock: Optional[Lock] = None
+        self._modLocked: bool = False
         self._lockReason: Optional[str] = None
 
     def __del__(self):
@@ -87,28 +86,29 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         return self.connected
 
     def isLocked(self) -> Tuple[bool, Optional[str]]:
-        return (self._modLock is not None, self._lockReason)
+        return (self._modLocked is not None, self._lockReason)
 
-    # this method locks the dbwriter from modification e.g during a collection episode for as long as the lock
-    # passed in is active
-    def lock(self, lock: Lock, reason: Optional[str] = None):
-        if self._modLock and self._modLock.locked():
-            raise AssertionError('The database writer was already locked')
-        self._modLock = lock
+    def lock(self, reason: Optional[str] = None):
+        if self._modLocked:
+            message: str = 'This database writer is currently locked'
+            if self._lockReason is not None:
+                message += f'. It is being used by {self._lockReason}'
+            raise AssertionError(message)
+        self._modLocked = True
         self._lockReason = reason
 
     def toDict(self) -> JSONObject:
         return self._config.toDict()
 
+    def unlock(self):
+        self._modLockeded = False
+
     def updateConfig(self, config: JSONObject) -> None:
-        # if there is a modification lock in place and it is locked,
-        if self._modLock and self._modLock.locked():
+        if self._modLocked:
             message: str = 'This database writer is currently locked from modification'
             if self._lockReason is not None:
                 message += f'. It is being used by {self._lockReason}'
             raise AssertionError(message)
-        elif self._modLock:
-            self._modLock = None
         self._config.updateConfig(config)
 
     def validateRecord(self, record: Dict[str, JSONObject]):

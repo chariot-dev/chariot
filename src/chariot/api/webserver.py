@@ -2,7 +2,6 @@ import flask
 from flask import jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO
-from threading import Lock
 import requests
 from typing import Dict, List
 from chariot.api.DataCollectionRunner import DataCollectionRunner
@@ -30,7 +29,6 @@ app.config['THREADED'] = True
 socketio: SocketIO = SocketIO()
 socketio.init_app(app, cors_allowed_origins='*')
 CORS(app)  # This will enable CORS for all routes
-runLock: Lock = Lock()
 
 apiBaseUrl: str = '/chariot/api/v1.0'
 parser: PayloadParser = PayloadParser()
@@ -453,9 +451,8 @@ def startDataCollection():
     # if it is timed, this will make sure it is no longer flagged as running when it stops
     dataCollector.setEndHandler(removeRunningCollector)
     lockReason: str = 'a data collection episode'
-    runLock.acquire()
-    dataCollector.getNetwork().lock(runLock, lockReason)
-    dataCollector.getDatabase().lock(runLock, lockReason)
+    dataCollector.getNetwork().lock(lockReason)
+    dataCollector.getDatabase().lock(lockReason)
     runningCollectors[configId] = True
     runner.runTask(dataCollector)
     return buildSuccessfulRequest(None, defaultSuccessCode)
@@ -472,9 +469,12 @@ def endDataCollection():
 
     runner.stopTask()
     del runningCollectors[configId]
-    runLock.release()
+
     # inform socket subscribers that data collection has ended
     socketio.emit('end')
+    dataCollector: DataCollector = DataCollectionManager.getCollector(configId)
+    dataCollector.getNetwork().unlock()
+    dataCollector.getDatabase().unlock()
     return buildSuccessfulRequest(None, defaultSuccessCode)
 
 # TODO: disable cors for this endpoint - should only be accessed internally
