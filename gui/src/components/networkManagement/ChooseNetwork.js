@@ -50,7 +50,7 @@ class ChooseNetwork extends Component {
       <div className="container">
         <h1>Choose a Network</h1>
         <p className="screenInfo">
-          Select a network to begin data collection process.
+          Select a network that has devices to begin data collection process.
         </p>
 
         {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="chooseNetwork"></NetworkDeviceCellScreenTemplate> : <p>No existing networks were found.</p>}

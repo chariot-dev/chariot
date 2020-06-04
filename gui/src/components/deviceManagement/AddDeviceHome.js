@@ -269,7 +269,7 @@ class AddDeviceHome extends Component {
         </form>
 
         <Link to="/networkManager">
-          <Button variant="primary" className="float-left footer-button">Back</Button>
+          <Button variant="primary" className="float-left footer-button">Cancel</Button>
         </Link>
       </div>,
 

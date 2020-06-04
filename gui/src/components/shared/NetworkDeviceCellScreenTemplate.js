@@ -77,8 +77,9 @@ class NetworkDeviceCellScreenTemplate extends Component {
           curNetworkDescription = this.state.dataJson[i]["Description"];
     
           buttonElement.push(
+            // Disable button if network has no devices
             <Link key={"chooseNetworkButton" + i} to={{pathname:'/chooseDatabaseConfig', networkProps:{'Network Name': curNetworkName, 'Devices': curNetworkDevices}}}> 
-              <Button className="float-right" variant="success" size="sm">
+              <Button disabled={curNetworkDevices.length > 0 ? false : true} className="float-right" variant="success" size="sm">
                 Choose Network
               </Button>
             </Link>

@@ -153,8 +153,6 @@ class ManageDatabaseConfiguration extends Component {
   }
 
   render() {
-    console.log(this.state);
-
     return [
       <div className="container" key="newDeviceScreen">
          <h1>{this.state.originalDatabaseId} - Database Configuration</h1>
