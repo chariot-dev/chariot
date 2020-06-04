@@ -86,7 +86,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         return self.connected
 
     def isLocked(self) -> Tuple[bool, Optional[str]]:
-        return (self._modLocked is not None, self._lockReason)
+        return (self._modLocked, self._lockReason)
 
     def lock(self, reason: Optional[str] = None):
         if self._modLocked:
