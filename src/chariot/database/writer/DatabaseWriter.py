@@ -101,7 +101,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
         return self._config.toDict()
 
     def unlock(self):
-        self._modLockeded = False
+        self._modLocked = False
 
     def updateConfig(self, config: JSONObject) -> None:
         if self._modLocked:
