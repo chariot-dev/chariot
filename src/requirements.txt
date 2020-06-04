@@ -45,7 +45,6 @@ pytest-timeout==1.3.4
 python-engineio==3.12.1
 python-socketio==4.5.1
 PyYAML==5.3
-redis==3.5.2
 requests==2.23.0
 six==1.14.0
 sllurp==0.5.1
