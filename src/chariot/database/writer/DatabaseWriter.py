@@ -92,7 +92,7 @@ class DatabaseWriter(metaclass=abc.ABCMeta):
     # this method locks the dbwriter from modification e.g during a collection episode for as long as the lock
     # passed in is active
     def lock(self, lock: Lock, reason: Optional[str] = None):
-        if self._modLock is not None:
+        if self._modLock and self._modLock.locked():
             raise AssertionError('The database writer was already locked')
         self._modLock = lock
         self._lockReason = reason
