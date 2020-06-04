@@ -13,7 +13,8 @@ class DatabaseConnection extends Component {
     super(props);
 
     this.state = {
-      "Network Name": this.props.location["Network Name"],
+      "Network Name": this.props.location.networkProps["Network Name"],
+      "Devices": this.props.location.networkProps["Devices"],
       supportedDatabaseTypes: [],
       'Database Type' : '',
       databaseConfig : {},
@@ -97,7 +98,6 @@ class DatabaseConnection extends Component {
             });
           },
           (error) => {
-            console.log(error);
             this.setState({ errorIsOpen: true});
           }
         )
@@ -258,7 +258,7 @@ class DatabaseConnection extends Component {
         <Modal.Footer>
           {/* Either go to "Choose a Database Screen" (Configure data collection) or back to "Database Manager" (Add a db)*/}
           {this.state["Network Name"] ? 
-            <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"]} }}>
+            <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"], "Devices": this.state["Devices"]} }}>
               <Button variant="primary" className="float-right">Continue</Button>
             </Link> :
             <Link to={{pathname:'/databaseManager'}}>

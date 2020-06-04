@@ -45,7 +45,7 @@ class RunConfirmationComponent extends Component {
             },
             // If post was unsuccessful, update state and display error modal
             (error) => {
-                console.log(error.message);
+              console.log(error.message);
             }
         )
         .then(
