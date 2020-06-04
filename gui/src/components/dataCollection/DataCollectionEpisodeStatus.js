@@ -25,10 +25,13 @@ class DataCollectionEpisodeStatus extends Component {
       response: false, // Have not recived data from socket yet
       successIsOpen: false,
       showHomeButton: false,
-      linesElement: []
+      linesElement: [],
+      linesElementColorAr: [],
+      selectedLine: "all"
     }
 
     this.toggleSuccessModal = this.toggleSuccessModal.bind(this);
+    this.selectLine = this.selectLine.bind(this);
   }
 
 
@@ -39,6 +42,8 @@ class DataCollectionEpisodeStatus extends Component {
 
     // Give each device a different color line
     var tempLinesElement = [];
+    var tempLinesElementColorAr = [];;
+
     for (var i = 0; i < this.state.devices.length; i++) {
       var lineColor = "";
 
@@ -70,11 +75,18 @@ class DataCollectionEpisodeStatus extends Component {
           lineColor = color;
           break;
       }
-
-      tempLinesElement.push(<Line dataKey={this.state.devices[i]} type="monotone" stroke={lineColor} activeDot={{r: 5}} isAnimationActive={false}/>)
+      tempLinesElementColorAr.push(lineColor);
+      tempLinesElement.push(<Line 
+                              dataKey={this.state.selectedLine === 'all' || this.state.selectedLine === this.state.devices[i] ? this.state.devices[i] : 'none'} 
+                              type="monotone" 
+                              stroke={lineColor} 
+                              activeDot={{r: 5}} 
+                              isAnimationActive={false}
+                            />)
     }
 
     this.setState({ linesElement: [... tempLinesElement]});
+    this.setState({ linesElementColorAr: [... tempLinesElementColorAr]});   
   }
 
 
@@ -115,15 +127,38 @@ class DataCollectionEpisodeStatus extends Component {
     });
   } 
 
+  selectLine(event) {
+     // If the same line in the legend is selected consecutively, show all lines again, otherwise, show the selected line
+     // The trim() makes it so that the name is still displayed correctly in the legend
+    let lineSelected = this.state.selectedLine === event.dataKey ? 'all' : event.dataKey.trim();
+
+    this.setState({
+      selectedLine: lineSelected,
+    },() => {
+      var updatedLinesElement = [];
+      for (var i = 0; i < this.state.devices.length; i++) {
+        updatedLinesElement.push(<Line 
+                                dataKey={this.state.selectedLine === 'all' || this.state.selectedLine === this.state.devices[i] ? this.state.devices[i] : this.state.devices[i] + ' '} 
+                                type="monotone" 
+                                stroke={this.state.linesElementColorAr[i]} 
+                                activeDot={{r: 5}} 
+                                isAnimationActive={false}
+                              />)
+      }
+  
+      this.setState({ linesElement: [... updatedLinesElement]});
+    });
+  }
+
 
   // Returns the visualizer
   generateVisualizer() {
     return (
-      <LineChart width={1000} height={400} data={this.state.socketData}>
+      <LineChart width={1050} height={450} data={this.state.socketData}>
         <XAxis dataKey="dataValNum" stroke="black" label={{value: "Data Value Number", position: "insideBottomRight", dy: 10}}/>
         <YAxis stroke="black" label={{value: "Device Data", position: "insideLeft", angle: -90}}/>
         <Tooltip/>
-        <Legend/>
+        <Legend onClick={this.selectLine}/>
         {this.state.linesElement}
     </LineChart>
     );
@@ -159,7 +194,7 @@ class DataCollectionEpisodeStatus extends Component {
     return [
       <div className="container">
         <h1>Data Collection Episode</h1>
-        <p>Data collection episode for {this.state.chosenNetwork}.</p>
+        <p>Data collection episode for {this.state.chosenNetwork}. To view device data individually, click on the desired device's name in the legend. To view all, click on that device name again.</p>
 
         {response ? this.generateVisualizer() : <p>Waiting for data...</p>}
 

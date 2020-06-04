@@ -161,7 +161,6 @@ class DatabaseConnection extends Component {
         }
     })
     .then(
-      // 
       (resJson) => {
         if (resJson) { // If the response exists (coming from 400 error)
           this.setState({ testErrorMessage: resJson.message }, () => { // Set the error message

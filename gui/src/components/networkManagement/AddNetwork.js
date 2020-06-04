@@ -110,7 +110,7 @@ class AddNetwork extends Component {
               Network Name: <input required className="form-control" id="networkNameInput" name="Network Name" onChange={this.handleChange}/>
             </div>
             <div className="form-group">
-              Network Description: <textarea required className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
+              Network Description: <textarea className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
             </div>
             <Link to="/networkManager">
               <Button variant="primary" className="float-left footer-button">Back</Button>
