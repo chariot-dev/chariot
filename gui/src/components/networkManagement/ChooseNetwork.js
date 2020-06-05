@@ -41,11 +41,6 @@ class ChooseNetwork extends Component {
       // On error
       (error) => {
         console.log(error.message);
-
-   
-       /*
-         Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
-       */ 
       }
     )
   }
@@ -55,10 +50,10 @@ class ChooseNetwork extends Component {
       <div className="container">
         <h1>Choose a Network</h1>
         <p className="screenInfo">
-          Select a network to begin data collection process.
+          Select a network that has devices to begin data collection process.
         </p>
 
-        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="chooseNetwork"></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="chooseNetwork"></NetworkDeviceCellScreenTemplate> : <p>No existing networks were found.</p>}
 
         <Link to="/welcome">
           <Button variant="primary" className="float-left footer-button">Back</Button>

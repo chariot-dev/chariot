@@ -7,13 +7,15 @@ from chariot.utility.exceptions.ChariotExceptions import ItemNotSupported
 from chariot.database.writer import DatabaseWriter, MongoDatabaseWriter, MySQLDatabaseWriter
 from chariot.database.configuration import DatabaseConfiguration
 from chariot.utility import AbstractFactory
+from test.testutils import TestDatabaseWriter
 
 
 class _DatabaseWriterFactory(AbstractFactory):
     def __init__(self):
         self.instanceMap: Dict[str, Type[DatabaseWriter]] = {
             'MongoDB': MongoDatabaseWriter,
-            'MySQL': MySQLDatabaseWriter
+            'MySQL': MySQLDatabaseWriter,
+            'TestDB': TestDatabaseWriter,
         }
         self.instanceName: str = 'database'
         self.typeField: str = 'type'

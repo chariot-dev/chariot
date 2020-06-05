@@ -13,6 +13,7 @@ class TestDatabaseWriter(DatabaseWriter):
         super().__init__(config)
         self.client: Optional[Connection] = None
         self.clientPath: Optional[str] = None
+        self._writeLock: Lock = Lock()
 
     def __del__(self):
         self.cleanup()
@@ -42,11 +43,12 @@ class TestDatabaseWriter(DatabaseWriter):
         pass
 
     def _insertMany(self, records: List[Dict[str, JSONObject]]) -> None:
-        with self.client:
-            self.client.executemany(
-                f'INSERT INTO {self._config.tableName} (device_name, insertion_time, production_time, freeform) VALUES (?,?,?,?)',
-                ((record['device_name'], record['insertion_time'], record['production_time'], self._pickleFreeform(record['freeform'])) for record in records)
-            )
+        with self._writeLock:
+            with self.client:
+                self.client.executemany(
+                    f'INSERT INTO {self._config.tableName} (device_name, insertion_time, production_time, freeform) VALUES (?,?,?,?)',
+                    ((record['device_name'], record['insertion_time'], record['production_time'], self._pickleFreeform(record['freeform'])) for record in records)
+                )
 
     def _pickleFreeform(self, freeform: JSONObject):
         return memoryview(pickle.dumps(freeform))

@@ -4,7 +4,7 @@ from chariot.utility import Manager
 from chariot.utility.JSONTypes import JSONObject
 
 
-class DataCollectionManager(Manager):
+class _DataCollectionManager(Manager):
     # This class is intended to work with an instance of NetworkManager. The NetworkManager
     # is responsible for housing multiple user-defined networks. Once a network has been selected
     # for data collection, this class interacts with the NetworkManager to start and stop data collection
@@ -33,3 +33,9 @@ class DataCollectionManager(Manager):
 
     def replaceCollector(self, collectorName: str, newName: str) -> None:
         self._modifyNameInCollection(collectorName, newName)
+
+
+# return a singleton instance
+DataCollectionManager = _DataCollectionManager()
+
+__all__ = ['DataCollectionManager']

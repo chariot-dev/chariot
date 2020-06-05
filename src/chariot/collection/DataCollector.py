@@ -1,11 +1,11 @@
 from math import ceil
-from multiprocessing import Event
-from multiprocessing import SimpleQueue as Queue
-from threading import Lock, Timer
+from multiprocessing import Event, Queue
+from threading import Timer
 from time import sleep
-from typing import Callable, Iterable, List, Optional
+from typing import Callable, Iterable, List, Optional, Set
 from chariot.collection.configuration import DataCollectionConfiguration
 from chariot.collection import DataCollectionWorker
+from chariot.database import DatabaseConfigurationFactory
 from chariot.database.writer import DatabaseWriter
 from chariot.device.adapter import DeviceAdapter
 from chariot.network import Network
@@ -24,9 +24,11 @@ class DataCollector:
         self._devices: List[DeviceAdapter] = []
         self._errorHandler: HandledThread = HandledThread(name='Error-Handler', target=self._handleErrors)
         self._errorQueue: Queue = Queue()
-        self._runLock = Lock()
         self._onEnd: Optional[Callable] = onEnd
         self._onError: Optional[Callable[Exception], None] = onError
+        # this should be a set, but causes issues in < v3.8: 
+        # https://stackoverflow.com/questions/13264511/typeerror-unhashable-type-dict
+        self._outputHooks: List[Callable] = [] 
         self._running: bool = False
         self._stopEvent: Event = Event()
         self._stopTimer: Optional[Timer] = None
@@ -34,8 +36,14 @@ class DataCollector:
         self._workerProcesses: List[HandledProcess] = []
         self._minPollDelay: float = 0.01
 
-    def __del__(self) -> None:
-        self.stopCollection()
+    # output hooks cannot be added during a collection episode
+    def addOutputHook(self, hook: Callable) -> None:
+        if not callable(hook):
+            raise AssertionError
+        self._outputHooks.append(hook)
+
+    def clearOutputHooks(self) -> None:
+        self._outputHooks.clear()
 
     def getConfiguration(self) -> DataCollectionConfiguration:
         return self._config
@@ -61,14 +69,18 @@ class DataCollector:
     def isRunning(self) -> bool:
         return self._running
 
-    def setErrorHandler(self, handler: Callable[[Exception], None]) -> None:
-        if not callable(handler):
+    # output hooks cannot be removed during a collection episode
+    def removeOutputHook(self, hook: Callable) -> None:
+        self._outputHooks.remove(hook)
+
+    def setErrorHandler(self, handler: Optional[Callable]) -> None:
+        if handler is not None and not callable(handler):
             raise AssertionError
         self._onError = handler
 
     # if it was a timed collection episode, execute this once it's done
-    def setEndHandler(self, handler: Callable) -> None:
-        if not callable(handler):
+    def setEndHandler(self, handler: Optional[Callable]) -> None:
+        if handler is not None and not callable(handler):
             raise AssertionError
         self._onEnd = handler
 
@@ -76,7 +88,8 @@ class DataCollector:
         if self._running:
             # not sure whether to raise an error here
             return
-
+        if self._stopEvent.is_set():
+            self._stopEvent.clear()
         network: Network = self._config.network
         self._devices = [device for device in network.getDevices().values()]
         if len(self._devices) == 0:
@@ -88,8 +101,6 @@ class DataCollector:
         minDevicePoll: float = min(devicePolls)
         self._minPollDelay = max(self._minPollDelay, minDevicePoll)
 
-        self._config.database.connect()
-
         numDevices = len(self._devices)
         numWorkers = ceil(numDevices / self.MAX_DEVICES_PER_WORKER)
         avgDevicesPerWorker: int = int(round(numDevices / numWorkers))
@@ -98,23 +109,29 @@ class DataCollector:
         for i in range(0, numDevices, avgDevicesPerWorker):
             startIdx: int = i
             endIdx: int = min(startIdx + avgDevicesPerWorker, numDevices)
-            worker: DataCollectionWorker = DataCollectionWorker(self._devices[startIdx:endIdx], self._minPollDelay)
-            # output hooks are called when data is received and chunked - this is where we would add the socket.send
-            # for the DataOutputAdapter
-            worker.addOutputHook(self._config.database.insertMany)
+            
+            worker: DataCollectionWorker = None
+            if self._config.database.__class__.__name__ == 'TestDatabaseWriter':
+                worker = DataCollectionWorker(self._devices[startIdx:endIdx])
+                self._config.database.connect()
+                worker.addOutputHook(self._config.database.insertMany)
+            else:
+                worker = DataCollectionWorker(self._devices[startIdx:endIdx],
+                    DatabaseConfigurationFactory.getInstance(self._config.database.getConfiguration().toDict()), self._minPollDelay)
+            for hook in self._outputHooks:
+                worker.addOutputHook(hook)
+
             self._workers.append(worker)
             workerProcess: HandledProcess = HandledProcess(
                 target=worker.start, name=f'DataCollectionWorker-{(i//8 + 1)}', args=(self._errorQueue, self._stopEvent))
             self._workerProcesses.append(workerProcess)
 
         self._running = True
-        self._runLock.acquire()
-        network.lock(self._runLock, 'a data collection episode')
-        self._config.database.lock(self._runLock, 'a data collection episode')
         self._errorHandler.start()
+
         for workerProcess in self._workerProcesses:
             workerProcess.start()
-            sleep(self.PROCESS_CREATION_DELAY)  # seems to be necessary to avoid random bad forks
+
         if hasattr(self._config, 'runTime'):
             self._stopTimer = Timer(float(self._config.runTime / 1000), self._stopCollection, args=(True,))
             self._stopTimer.start()
@@ -138,7 +155,6 @@ class DataCollector:
         self._workerProcesses.clear()
         self._workers.clear()
         self._devices.clear()
-        self._runLock.release()
 
         if not calledFromTimer and self._stopTimer:
             if self._stopTimer.is_alive():
@@ -151,7 +167,7 @@ class DataCollector:
             self._onEnd()
 
     def stopCollection(self, *args) -> None:
-        return self._stopCollection(False)
+        return self._stopCollection(*args)
 
     def updateConfig(self, config: JSONObject) -> None:
         if self._running:

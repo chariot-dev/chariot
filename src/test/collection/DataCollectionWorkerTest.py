@@ -3,7 +3,7 @@ from multiprocessing import Event
 from time import sleep
 from threading import Thread
 from typing import Dict, List, Optional
-from queue import SimpleQueue as Queue
+from queue import Queue
 from chariot.collection import DataCollectionWorker
 from chariot.utility.JSONTypes import JSONObject
 from test.testutils import MockDeviceTester, MockServer, TestDeviceAdapter, TestDeviceConfiguration

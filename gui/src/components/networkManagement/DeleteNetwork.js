@@ -15,6 +15,7 @@ import Modal from 'react-bootstrap/Modal';
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 
 import SuccessModalBody from '../shared/SuccessModalBody';
+import ErrorModalBody from '../shared/ErrorModalBody';
 
 const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
 const deleteNetworkBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
@@ -26,10 +27,14 @@ class DeleteNetwork extends Component {
       existingNetworks: [],
       confirmIsOpen: false,
       selectedNetworkToDelete: null,
-      successIsOpen: false
+      successIsOpen: false,
+      errorIsOpen: false,
+      errorMessage: ""
     }
 
+    this.hideErrorModal = this.hideErrorModal.bind(this);
     this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
+
   } 
 
   componentDidMount() {
@@ -51,11 +56,6 @@ class DeleteNetwork extends Component {
       // On error
       (error) => {
         console.log(error.message);
-
-  
-        /*
-          Have an error modal for being unable to get device types. Once button on the modal is clicked, Chariot goes back to welcome screen
-        */ 
       }
     )
   }
@@ -64,14 +64,16 @@ class DeleteNetwork extends Component {
   deleteConfirmation(selectedNetwork) {
     this.setState({confirmIsOpen: true});
     this.setState({selectedNetworkToDelete: selectedNetwork});
-    console.log(selectedNetwork)
   }
 
 
   hideConfirmationModal(event) {
-    this.setState({
-      confirmIsOpen: !this.state.confirmIsOpen
-    });    
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });    
+    event.preventDefault();
+  }
+
+  hideErrorModal(event) {
+    this.setState({ errorIsOpen: !this.state.errorIsOpen });    
     event.preventDefault();
   }
 
@@ -86,22 +88,25 @@ class DeleteNetwork extends Component {
     fetch(deleteNetworkBaseUrl + "?networkName=" + this.state.selectedNetworkToDelete, requestOptions)
     // On success
     .then(
-      () => {
-        this.setState({
-          confirmIsOpen: false
-        });
-        this.setState({
-          successIsOpen: !this.state.successIsOpen
-        });
-      },
+      (res) => {
+        if (res.status === 400) { // If not 200, something went wrong, so go to the next then()
+          return res.json();
+        }
+        else { // If a 400 wasn't returned, then the api call was successful
+          this.setState({ confirmIsOpen: false });
+          this.setState({ successIsOpen: !this.state.successIsOpen });
+          return; // Since going to then(), return null since no need to parse response
+        }
+      })
       // On error
-      (error) => {
-        console.log(error.message);
-
-    
-        /*
-          Have an error modal for being unable to get network fields. Once button on the error modal is clicked, Chariot goes back to welcome screen
-        */ 
+      .then(
+        (resJson) => {
+          if (resJson) { // If the response exists (coming from 400 error)
+            this.setState({ confirmIsOpen: false });
+            this.setState({ errorMessage: resJson.message }, () => { // Set the error message
+              this.setState({ errorIsOpen: true }); // Then set test error modal to true
+            }); 
+          }
       }
     )
   }
@@ -115,9 +120,7 @@ class DeleteNetwork extends Component {
           Select a network to delete. Deleting a network will also delete its corresponding devices.
         </p>
 
-        {/* {this.state.existingNetworkNames ? this.createNetworkLinks() : null} */}
-
-        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="delete" deleteNetwork={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingNetworks.length > 0 ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="delete" deleteNetwork={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : <p>No existing networks were found.</p>}
         
         <Link to="/networkManager">
           <Button variant="primary" className="float-left footer-button">Back</Button>
@@ -143,6 +146,16 @@ class DeleteNetwork extends Component {
           <Link to="/welcome">
             <Button variant="primary" className="float-right">Continue</Button>
           </Link>
+        </Modal.Footer>
+      </Modal>,
+
+      <Modal show={this.state.errorIsOpen} key="networkDeletionErrorModal">
+
+        <ErrorModalBody errorMessage={this.state.errorMessage}>
+        </ErrorModalBody>
+
+        <Modal.Footer>
+          <Button variant="primary" className="float-left" onClick={this.hideErrorModal}>OK</Button>
         </Modal.Footer>
       </Modal>
     ]

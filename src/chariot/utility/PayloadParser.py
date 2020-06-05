@@ -84,3 +84,16 @@ class PayloadParser:
                 ErrorStrings.ERR_Specify_Identifier.value.format(TypeStrings.Database_Identifier.value)
             )
         return dbId
+
+    def getDataCollectorInPayload(self, requestContent) -> str:
+        dataConfigId: str = requestContent.get(TypeStrings.DataCollection_Identifier.value)
+        return dataConfigId
+
+    def getDataCollectorInURL(self, requestContent) -> str:
+        dataConfigId: str = requestContent.args[TypeStrings.DataCollection_Identifier.value]
+        if not dataConfigId:
+            raise NoIdentifierError(
+                ErrorStrings.ERR_Specify_Identifier.value.format(TypeStrings.DataCollection_Identifier.value)
+            )
+
+        return dataConfigId

@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from time import time
 from typing import Dict, Type
-from queue import SimpleQueue as Queue
+from queue import Queue
 from chariot.device.configuration import DeviceConfiguration
 from chariot.utility.JSONTypes import JSONObject
 
