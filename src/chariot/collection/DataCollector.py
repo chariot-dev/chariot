@@ -5,7 +5,7 @@ from time import sleep
 from typing import Callable, Iterable, List, Optional, Set
 from chariot.collection.configuration import DataCollectionConfiguration
 from chariot.collection import DataCollectionWorker
-from chariot.database.configuration import DatabaseConfiguration
+from chariot.database import DatabaseConfigurationFactory
 from chariot.database.writer import DatabaseWriter
 from chariot.device.adapter import DeviceAdapter
 from chariot.network import Network
@@ -117,7 +117,7 @@ class DataCollector:
                 worker.addOutputHook(self._config.database.insertMany)
             else:
                 worker = DataCollectionWorker(self._devices[startIdx:endIdx],
-                    DatabaseConfiguration(self._config.database.getConfiguration().toDict()), self._minPollDelay)
+                    DatabaseConfigurationFactory.getInstance(self._config.database.getConfiguration().toDict()), self._minPollDelay)
             for hook in self._outputHooks:
                 worker.addOutputHook(hook)
 
