@@ -3,7 +3,6 @@
 
   This component the represents the screen where the user will initially configure the name
   and description of their network.
-
 */
 
 import React, { Component } from 'react';
@@ -36,11 +35,11 @@ class AddNetwork extends Component {
     this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
-  
+
   handleChange(event) {
     var updatedNetworkProperties = this.state.networkProperties; // Store from current state
     updatedNetworkProperties[event.target.name] = event.target.value; // Update the json
-    
+
     this.setState({ networkProperties: updatedNetworkProperties }); // Update the state
   }
 
@@ -50,7 +49,7 @@ class AddNetwork extends Component {
   }
 
   hideConfirmationModal(event) {
-    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });   
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
   }
 
   toggleErrorModal = () => {
@@ -78,54 +77,54 @@ class AddNetwork extends Component {
 
     // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
     fetch(postCreateNetworkBaseUrl, requestOptions)
-    .then(res => res.json())
-    .then(
-      // If post was successful, update state and display success modal
-      () => {
-        this.setState({ confirmIsOpen: false });
-        this.setState({ successIsOpen: !this.state.successIsOpen });
-      },
-      // If post was unsuccessful, update state and display error modal
-      (error) => {
-        // Once error message is set, then launch the error modal
-        this.setState({
-          errorMessage: error.message 
-        }, () => {
-          this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
-          this.setState({ errorIsOpen: !this.state.errorIsOpen });
-        });
-      }
-    )
+      .then(res => res.json())
+      .then(
+        // If post was successful, update state and display success modal
+        () => {
+          this.setState({ confirmIsOpen: false });
+          this.setState({ successIsOpen: !this.state.successIsOpen });
+        },
+        // If post was unsuccessful, update state and display error modal
+        (error) => {
+          // Once error message is set, then launch the error modal
+          this.setState({
+            errorMessage: error.message
+          }, () => {
+            this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
+            this.setState({ errorIsOpen: !this.state.errorIsOpen });
+          });
+        }
+      )
   }
 
   render() {
     return [
       <div className="container" key="addNetworkForm">
         <h1>Add a New Network</h1>
-          <p className="screenInfo">Please fill in the fields below to create a network. Then, click "Next".</p>
-          
-          <form id="createNetworkForm" onSubmit={this.toggleConfirmationModal}>
-            <div className="form-group">
-              <div className="requiredStar">*</div>
-              Network Name: <input required className="form-control" id="networkNameInput" name="Network Name" onChange={this.handleChange}/>
-            </div>
-            <div className="form-group">
-              Network Description: <textarea className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
-            </div>
-            <Link to="/networkManager">
-              <Button variant="primary" className="float-left footer-button">Back</Button>
-            </Link>
-            <Button variant="primary" className="float-right footer-button" type="submit">Next</Button>
+        <p className="screenInfo">Please fill in the fields below to create a network. Then, click "Next".</p>
+
+        <form id="createNetworkForm" onSubmit={this.toggleConfirmationModal}>
+          <div className="form-group">
+            <div className="requiredStar">*</div>
+              Network Name: <input required className="form-control" id="networkNameInput" name="Network Name" onChange={this.handleChange} />
+          </div>
+          <div className="form-group">
+            Network Description: <textarea className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
+          </div>
+          <Link to="/networkManager">
+            <Button variant="primary" className="float-left footer-button">Back</Button>
+          </Link>
+          <Button variant="primary" className="float-right footer-button" type="submit">Next</Button>
         </form>
       </div>,
 
       <Modal show={this.state.confirmIsOpen} onHide={this.hideConfirmationModal} key="addNetworkConfirmation">
-          <ConfirmationModalBody
-            confirmationQuestion='Is this information for your network correct?'
-            confirmationData = {this.state.networkProperties}
-            >
-          </ConfirmationModalBody>
-          
+        <ConfirmationModalBody
+          confirmationQuestion='Is this information for your network correct?'
+          confirmationData={this.state.networkProperties}
+        >
+        </ConfirmationModalBody>
+
         <Modal.Footer>
           <Button variant="primary" className="float-left" onClick={this.toggleConfirmationModal}>No</Button>
           <Button variant="primary" className="float-right" onClick={this.createNetworkAndToggleSuccessModal}>Yes</Button>
@@ -140,14 +139,14 @@ class AddNetwork extends Component {
           <Link to="/networkManager">
             <Button variant="primary" className="float-left">No</Button>
           </Link>
-          <Link to={{ pathname:'/addDeviceHome', networkProps:{'Network Name': this.state.networkProperties['Network Name']} }}>
+          <Link to={{ pathname: '/addDeviceHome', networkProps: { 'Network Name': this.state.networkProperties['Network Name'] } }}>
             <Button variant="primary" className="float-right">Yes</Button>
           </Link>
         </Modal.Footer>
       </Modal>,
 
       <Modal show={this.state.errorIsOpen} key="addNetworkErrorModal">
-        <ErrorModalBody errorMessage={this.state.errorMessage + ". Please ensure that the server is running, the inputted values are valid, and try again." }>
+        <ErrorModalBody errorMessage={this.state.errorMessage + ". Please ensure that the server is running, the inputted values are valid, and try again."}>
         </ErrorModalBody>
 
         <Modal.Footer>

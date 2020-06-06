@@ -49,21 +49,21 @@ class AddDeviceHome extends Component {
   // Gets supported device types when page initially loads in order to dynamically fill in select-menu
   componentDidMount() {
     fetch(getSupportedDeviceTypesBaseUrl + "/network/device/supportedDevices")
-    .then(res => res.json())
-    .then(
-      // On success
-      (result) => {
-        var tempSupportedDeviceTypes = [];
-        for (var key in result) {
-          tempSupportedDeviceTypes.push(key);
+      .then(res => res.json())
+      .then(
+        // On success
+        (result) => {
+          var tempSupportedDeviceTypes = [];
+          for (var key in result) {
+            tempSupportedDeviceTypes.push(key);
+          }
+          this.setState({ supportedDeviceTypes: tempSupportedDeviceTypes });
+        },
+        // On error
+        (error) => {
+          console.log(error.message);
         }
-        this.setState({supportedDeviceTypes: tempSupportedDeviceTypes});
-      },
-      // On error
-      (error) => {
-        console.log(error.message);
-      }
-    )
+      )
   }
 
   getSupportedDeviceTypeOptions = () => {
@@ -78,11 +78,11 @@ class AddDeviceHome extends Component {
 
   /*
     Updates textfield state values as they are entered by the user.
-  */  
+  */
   handleChange(event) {
     var updatedNewDeviceTypeGeneralVals = this.state.newDeviceTypeGeneralVals; // Store from current state
     updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json
-    
+
     this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }); // Update the state
   }
 
@@ -91,7 +91,7 @@ class AddDeviceHome extends Component {
   */
   handleDeviceTypeChange(event) {
     var lastDeviceType = this.state.newDeviceTypeGeneralVals['Device Type'];
-    
+
     if (lastDeviceType !== event.target.value) { // If device type was changed
       var updatedNewDeviceTypeGeneralVals = this.state.newDeviceTypeGeneralVals; // Store from current state
       updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json with the new device type
@@ -100,35 +100,35 @@ class AddDeviceHome extends Component {
       this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }, function () {
         // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
         fetch(getDeviceConfigBaseUrl + "?deviceId=" + this.state.newDeviceTypeGeneralVals['Device Type'])
-        .then(res => res.json())
-        .then(
-          // If post was successful, update state and display success modal
-          (result) => {
-            var responseJson = result;
-            updatedNewDeviceTypeGeneralVals['newDeviceTypeConfig'] = responseJson;
+          .then(res => res.json())
+          .then(
+            // If post was successful, update state and display success modal
+            (result) => {
+              var responseJson = result;
+              updatedNewDeviceTypeGeneralVals['newDeviceTypeConfig'] = responseJson;
 
-            // Store the device's config file to the state
-            this.setState({newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals});
-            this.setState({showDeviceSpecificSettings: true}); // Will cause render to update device-specific section
-          },  
-          // If post was unsuccessful, update state and display error modal
-          (error) => {
-            console.log(error.message);
-          }
-        )
+              // Store the device's config file to the state
+              this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals });
+              this.setState({ showDeviceSpecificSettings: true }); // Will cause render to update device-specific section
+            },
+            // If post was unsuccessful, update state and display error modal
+            (error) => {
+              console.log(error.message);
+            }
+          )
 
-        this.setState({ showDeviceSpecificSettings: false}); // Reset to false after render to get ready for next render (if user changes device type)
+        this.setState({ showDeviceSpecificSettings: false }); // Reset to false after render to get ready for next render (if user changes device type)
       });
     }
   }
 
   handleNewDeviceCreation = (submittedDeviceSpecificState) => {
-    this.setState ({ deviceState: submittedDeviceSpecificState }, () => {
+    this.setState({ deviceState: submittedDeviceSpecificState }, () => {
       // Update state to launch confirmation modal
       this.setState({
         isSubmitted: !this.state.isSubmitted,
         confirmIsOpen: !this.state.confirmIsOpen
-      }); 
+      });
     });
   }
 
@@ -137,7 +137,7 @@ class AddDeviceHome extends Component {
     information that they entered is correct. Also makes the POST request to the
     server to create the new device.
   */
- toggleSuccessModal = () => {
+  toggleSuccessModal = () => {
     var data = {};
     data["networkName"] = this.props.location.networkProps["Network Name"];
     data["deviceType"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Type'];
@@ -151,24 +151,24 @@ class AddDeviceHome extends Component {
         var fieldType = this.state.deviceState.newDeviceTypeConfigVals[key].inputType;
 
         if (fieldType === "number") {
-            fieldVal = parseInt(fieldVal)
+          fieldVal = parseInt(fieldVal)
         }
         else if (fieldType === "checkbox") {
-            fieldVal = document.getElementById(curFieldId).checked;
+          fieldVal = document.getElementById(curFieldId).checked;
         }
         else if (fieldType === "numberArray") {
-            var inputValues = fieldVal.split(" ");
+          var inputValues = fieldVal.split(" ");
 
-            //again need to verify that all values will be ints
-            var arr = [];
+          //again need to verify that all values will be ints
+          var arr = [];
 
-            inputValues.forEach(function (item) {
-                arr.push(parseInt(item))
-            });
+          inputValues.forEach(function (item) {
+            arr.push(parseInt(item))
+          });
 
-            fieldVal = arr;
+          fieldVal = arr;
         }
-        
+
         data[curFieldId] = fieldVal;
       }
     }
@@ -184,27 +184,27 @@ class AddDeviceHome extends Component {
 
     // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
     fetch(postDeviceCreationBaseUrl, requestOptions)
-    .then(res => res.json())
-    .then(
-      // If post was successful, update state and display success modal
-      () => {
-      this.setState({
-        confirmIsOpen: false
-      });
-      this.setState({
-        successIsOpen: !this.state.successIsOpen
-      });
-      },
-      // If post was unsuccessful, update state and display error modal
-      (error) => {
-      // Once error message is set, then launch the error modal
-      this.setState({
-        errorMessage: error.message 
-      }, () => {
-        this.setState({ errorIsOpen: !this.state.errorIsOpen });
-      });
-      }
-    )  
+      .then(res => res.json())
+      .then(
+        // If post was successful, update state and display success modal
+        () => {
+          this.setState({
+            confirmIsOpen: false
+          });
+          this.setState({
+            successIsOpen: !this.state.successIsOpen
+          });
+        },
+        // If post was unsuccessful, update state and display error modal
+        (error) => {
+          // Once error message is set, then launch the error modal
+          this.setState({
+            errorMessage: error.message
+          }, () => {
+            this.setState({ errorIsOpen: !this.state.errorIsOpen });
+          });
+        }
+      )
   }
 
 
@@ -224,7 +224,7 @@ class AddDeviceHome extends Component {
     this.setState({
       isSubmitted: !this.state.isSubmitted,
       confirmIsOpen: !this.state.confirmIsOpen
-    });    
+    });
     event.preventDefault();
   }
 
@@ -239,7 +239,7 @@ class AddDeviceHome extends Component {
 
     return confirmationDataJson;
   }
-  
+
 
   /*
     Returns three separate objects with their unique keys. The first object
@@ -258,14 +258,14 @@ class AddDeviceHome extends Component {
         <form id="createDeviceForm">
 
           <div className="form-group">
-              <select required className="form-control" id="Device Type Select" name="Device Type" onChange={this.handleDeviceTypeChange}>
-                <option selected disabled hidden value="">Select a Device Type</option>
-                {this.getSupportedDeviceTypeOptions()}
-              </select>
+            <select required className="form-control" id="Device Type Select" name="Device Type" onChange={this.handleDeviceTypeChange}>
+              <option selected disabled hidden value="">Select a Device Type</option>
+              {this.getSupportedDeviceTypeOptions()}
+            </select>
           </div>
 
-            {/* onFormSubmit() callback. Pass in as prop basically. */}
-            {this.state.showDeviceSpecificSettings ? <AddDeviceVars params={this.state} onFormSubmit={this.handleNewDeviceCreation}></AddDeviceVars> : null}
+          {/* onFormSubmit() callback. Pass in as prop basically. */}
+          {this.state.showDeviceSpecificSettings ? <AddDeviceVars params={this.state} onFormSubmit={this.handleNewDeviceCreation}></AddDeviceVars> : null}
         </form>
 
         <Link to="/networkManager">
@@ -274,11 +274,11 @@ class AddDeviceHome extends Component {
       </div>,
 
       <Modal show={this.state.confirmIsOpen} key="newDeviceConfirmModal">
-        
+
         <ConfirmationModalBody
-          confirmationQuestion={('Before ').concat(this.state.newDeviceTypeGeneralVals['Device Nickname'], ' is added to ', this.props.location.networkProps['Network Name'], ' please confirm that the information below is correct.')} 
-          confirmationData = {this.parseConfirmationData()}
-          >
+          confirmationQuestion={('Before ').concat(this.state.newDeviceTypeGeneralVals['Device Nickname'], ' is added to ', this.props.location.networkProps['Network Name'], ' please confirm that the information below is correct.')}
+          confirmationData={this.parseConfirmationData()}
+        >
         </ConfirmationModalBody>
 
         <Modal.Footer>
@@ -309,5 +309,5 @@ class AddDeviceHome extends Component {
     ]
   }
 }
- 
+
 export default AddDeviceHome; 
