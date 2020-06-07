@@ -67,12 +67,13 @@ class RunConfirmationComponent extends Component {
             // Set the error message
             this.setState({ errorIsOpen: true }); // Then set test error modal to true
           });
-        } else {
+        }
+        else {
           // Success, so make API to start data collection then send to visualizer
           fetch(
             dataCollectionBaseURL +
-              "/start?configId=" +
-              this.state.configurationSettings["configId"]
+            "/start?configId=" +
+            this.state.configurationSettings["configId"]
           )
             .then((res) => res.json())
             .then(

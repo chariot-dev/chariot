@@ -174,8 +174,6 @@ class AddDeviceHome extends Component {
     }
 
     // Post request options
-
-    console.log(data)
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
