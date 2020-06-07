@@ -95,6 +95,8 @@ class ChooseDatabaseConfig extends Component {
     fetch(databaseTestUrl, requestOptions)
       .then(
         (res) => {
+          console.log(res);
+          console.log(res.status);
           if (res.status === 400) { // If 400 error was returned from the api call
             return res.json(); // Return the response to the next then()
           }
@@ -102,6 +104,10 @@ class ChooseDatabaseConfig extends Component {
             this.setState({ testSuccessIsOpen: true }); // Set to true so test connection success modal appears
             return; // Since going to then(), return null since no need to parse response
           }
+        }).catch(() => { // On error. Usually, only gets here if error is 500
+          this.setState({ testErrorMessage: "Connection to database was unsuccessful. Please confirm that the configuration was correct and try again." }, () => { // Set the error message
+            this.setState({ testErrorIsOpen: true }); // Then set test error modal to true
+          });
         })
       .then(
         (resJson) => {

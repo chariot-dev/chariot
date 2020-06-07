@@ -158,13 +158,19 @@ class DatabaseConnection extends Component {
     fetch(databaseBaseUrl + "/test", requestOptions)
       .then(
         (res) => {
-          if (res.status === 400) { // If 400 error was returned from the api call
+          console.log(res);
+          console.log(res.status);
+          if (res.status !== 200) { // If not 200, then an error was returned from the api call
             return res.json(); // Return the response to the next then()
           }
-          else { // If a 400 wasn't returned, then the api call was successful
+          else { // If an error wasn't returned, then the api call was successful
             this.setState({ testSuccessIsOpen: true }); // Set to true so test connection success modal appears
             return; // Since going to then(), return null since no need to parse response
           }
+        }).catch((res) => { // On error. Usually, only gets here if error is 500
+          this.setState({ testErrorMessage: "Please ensure all required fields have been filled and are valid, and then try again." }, () => { // Set the error message
+            this.setState({ testErrorIsOpen: true }); // Then set test error modal to true
+          });
         })
       .then(
         (resJson) => {
