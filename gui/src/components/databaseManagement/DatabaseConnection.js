@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
@@ -16,8 +16,8 @@ class DatabaseConnection extends Component {
       "Network Name": null,
       "Devices": null,
       supportedDatabaseTypes: [],
-      'Database Type' : '',
-      databaseConfig : {},
+      'Database Type': '',
+      databaseConfig: {},
       databaseProperties: {},
       showDatabaseSpecificSettings: false,
       successIsOpen: false,
@@ -26,7 +26,7 @@ class DatabaseConnection extends Component {
       testErrorIsOpen: false,
       testErrorMessage: ''
     };
-    
+
     this.handleChange = this.handleChange.bind(this);
     this.handleDatabaseTypeChange = this.handleDatabaseTypeChange.bind(this);
     this.hideTestSuccessModal = this.hideTestSuccessModal.bind(this);
@@ -39,21 +39,21 @@ class DatabaseConnection extends Component {
       this.setState({ "Network Name": this.props.location.networkProps["Network Name"] });
       this.setState({ "Devices": this.props.location.networkProps["Devices"] });
     }
-    
+
     fetch(databaseBaseUrl + "/supportedDatabases")
-    .then(res => res.json())
-    .then(
-      (result) => {
-        var tempSupportedDatabaseTypes = [];
-        for (var key in result) {
-          tempSupportedDatabaseTypes.push(key);
+      .then(res => res.json())
+      .then(
+        (result) => {
+          var tempSupportedDatabaseTypes = [];
+          for (var key in result) {
+            tempSupportedDatabaseTypes.push(key);
+          }
+          this.setState({ supportedDatabaseTypes: tempSupportedDatabaseTypes });
+        },
+        (error) => {
+          console.log(error.message);
         }
-        this.setState({supportedDatabaseTypes: tempSupportedDatabaseTypes});
-      },
-      (error) => {
-        console.log(error.message);
-      }
-    )
+      )
   }
 
   // Create the option elements for the select-menu
@@ -70,7 +70,7 @@ class DatabaseConnection extends Component {
   handleChange(event) {
     var updatedDatabaseProperties = this.state.databaseProperties; // Store from current state
     updatedDatabaseProperties[event.target.name] = event.target.value; // Update the json
-    
+
     this.setState({ databaseProperties: updatedDatabaseProperties }); // Update the state
   }
 
@@ -80,7 +80,7 @@ class DatabaseConnection extends Component {
   }
 
   hideTestErrorModal(event) {
-    this.setState({ testErrorIsOpen: false});
+    this.setState({ testErrorIsOpen: false });
     event.preventDefault();
   }
 
@@ -91,30 +91,30 @@ class DatabaseConnection extends Component {
     var lastDatabaseType = this.state['Database Type'];
 
     if (lastDatabaseType !== event.target.value) { // If database type was changed
-      this.setState({'Database Type': event.target.value }, function () { // Update state, then get config for the db type
+      this.setState({ 'Database Type': event.target.value }, function () { // Update state, then get config for the db type
         fetch(databaseBaseUrl + "/config?dbId=" + this.state['Database Type'])
-        .then(res => res.json())
-        .then(
-          (result) => {
-            // Update state so can have reference to the config
-            this.setState({databaseConfig: result}, function () {
-              this.setState({ showDatabaseSpecificSettings: true});
-            });
-          },
-          (error) => {
-            this.setState({ errorIsOpen: true});
-          }
-        )
+          .then(res => res.json())
+          .then(
+            (result) => {
+              // Update state so can have reference to the config
+              this.setState({ databaseConfig: result }, function () {
+                this.setState({ showDatabaseSpecificSettings: true });
+              });
+            },
+            (error) => {
+              this.setState({ errorIsOpen: true });
+            }
+          )
       });
 
-      this.setState({ showDatabaseSpecificSettings: false}); // Reset to false after render to get ready for next render (if user changes database type)
+      this.setState({ showDatabaseSpecificSettings: false }); // Reset to false after render to get ready for next render (if user changes database type)
     }
   }
 
   createDatabaseFields = () => {
     var config = this.state.databaseConfig[this.state['Database Type']].settings;
     var databaseSpecificForm = [];
-    
+
     for (var i = 0; i < config.length; i++) {
       var curFieldAlias = config[i].alias;
       // don't want the user to fill out the 'Type' on GUI, so removing it from here
@@ -128,7 +128,7 @@ class DatabaseConnection extends Component {
           <div className="form-group" key={curFieldTitle}>
             {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
             {curFieldTitle}
-            <input type={curFieldType}  required={curFieldIsRequired} className={curFieldType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={curFieldTitle} onChange={this.handleChange}/>
+            <input type={curFieldType} required={curFieldIsRequired} className={curFieldType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={curFieldTitle} onChange={this.handleChange} />
           </div>
         );
       }
@@ -144,7 +144,9 @@ class DatabaseConnection extends Component {
 
   testConfigurationConnection = () => {
     var formData = this.parseFromTextFields();
-    
+
+    console.log(formData);
+
     // Post request options
     const requestOptions = {
       method: 'POST',
@@ -154,24 +156,24 @@ class DatabaseConnection extends Component {
 
     // fetch request to test database connection
     fetch(databaseBaseUrl + "/test", requestOptions)
-    .then(
-      (res) => {
-        if (res.status === 400) { // If 400 error was returned from the api call
-          return res.json(); // Return the response to the next then()
-        }
-        else { // If a 400 wasn't returned, then the api call was successful
-          this.setState({ testSuccessIsOpen: true }); // Set to true so test connection success modal appears
-          return; // Since going to then(), return null since no need to parse response
-        }
-    })
-    .then(
-      (resJson) => {
-        if (resJson) { // If the response exists (coming from 400 error)
-          this.setState({ testErrorMessage: resJson.message }, () => { // Set the error message
-            this.setState({ testErrorIsOpen: true }); // Then set test error modal to true
-          }); 
-        }
-    })
+      .then(
+        (res) => {
+          if (res.status === 400) { // If 400 error was returned from the api call
+            return res.json(); // Return the response to the next then()
+          }
+          else { // If a 400 wasn't returned, then the api call was successful
+            this.setState({ testSuccessIsOpen: true }); // Set to true so test connection success modal appears
+            return; // Since going to then(), return null since no need to parse response
+          }
+        })
+      .then(
+        (resJson) => {
+          if (resJson) { // If the response exists (coming from 400 error)
+            this.setState({ testErrorMessage: resJson.message }, () => { // Set the error message
+              this.setState({ testErrorIsOpen: true }); // Then set test error modal to true
+            });
+          }
+        })
   }
 
   //When the create button is clicked, take the values from the text fields and create a database configuration
@@ -185,21 +187,21 @@ class DatabaseConnection extends Component {
     };
 
     fetch(databaseBaseUrl, requestOptions)
-    .then(res => res.json())
-    .then(
-      // If post was successful, update state and display success modal
-      () => {
-        this.setState({ confirmIsOpen: false });
-        this.setState({ successIsOpen: !this.state.successIsOpen });
-      },
-      // If post was unsuccessful, update state and display error modal
-      (error) => {
-        // Once error message is set, then launch the error modal
-        this.setState({ errorMessage: error.message }, () => {
-          this.setState({ errorIsOpen: !this.state.errorIsOpen });
-        });
-      }
-    )
+      .then(res => res.json())
+      .then(
+        // If post was successful, update state and display success modal
+        () => {
+          this.setState({ confirmIsOpen: false });
+          this.setState({ successIsOpen: !this.state.successIsOpen });
+        },
+        // If post was unsuccessful, update state and display error modal
+        (error) => {
+          // Once error message is set, then launch the error modal
+          this.setState({ errorMessage: error.message }, () => {
+            this.setState({ errorIsOpen: !this.state.errorIsOpen });
+          });
+        }
+      )
   };
 
   //Utility method meant to return values from each text field that is filled by user
@@ -228,19 +230,17 @@ class DatabaseConnection extends Component {
 
 
   render() {
-    console.log(this.state);
-    
     return [
       <div className="container" key="databaseConnectionScreen">
         <h1>Add Database Connection</h1>
         <p className="screenInfo">Please fill in the following fields to connect to the database that will store the data.</p>
 
         <div className="form-group">
-              <select required className="form-control" id="Database Type Select" name="Database Type" onChange={this.handleDatabaseTypeChange}>
-                <option selected disabled hidden value="">Select a Database Type</option>
-                {this.getSupportedDatabaseTypeOptions()}
-              </select>
-          </div>
+          <select required className="form-control" id="Database Type Select" name="Database Type" onChange={this.handleDatabaseTypeChange}>
+            <option selected disabled hidden value="">Select a Database Type</option>
+            {this.getSupportedDatabaseTypeOptions()}
+          </select>
+        </div>
 
 
         <form>
@@ -250,7 +250,7 @@ class DatabaseConnection extends Component {
 
 
         <Link to="/chooseNetwork">
-            <Button variant="primary" className="float-left footer-button">Back</Button>
+          <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
         <Button variant="success" className="footer-button button-mid-bottom" onClick={this.testConfigurationConnection}>Test Connection </Button>
 
@@ -262,15 +262,15 @@ class DatabaseConnection extends Component {
 
         <Modal.Footer>
           {/* Either go to "Choose a Database Screen" (Configure data collection) or back to "Database Manager" (Add a db)*/}
-          {this.state["Network Name"] ? 
-            <Link to={{pathname:'/chooseDatabaseConfig', networkProps: {"Network Name": this.state["Network Name"], "Devices": this.state["Devices"]} }}>
+          {this.state["Network Name"] ?
+            <Link to={{ pathname: '/chooseDatabaseConfig', networkProps: { "Network Name": this.state["Network Name"], "Devices": this.state["Devices"] } }}>
               <Button variant="primary" className="float-right">Continue</Button>
             </Link> :
-            <Link to={{pathname:'/databaseManager'}}>
+            <Link to={{ pathname: '/databaseManager' }}>
               <Button variant="primary" className="float-right">Continue</Button>
             </Link>
           }
-          
+
         </Modal.Footer>
       </Modal>,
 

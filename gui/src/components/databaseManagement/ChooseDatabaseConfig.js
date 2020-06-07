@@ -82,6 +82,8 @@ class ChooseDatabaseConfig extends Component {
       data["password"] = curDatabasePassword;
     }
 
+    console.log(data);
+
     // Post request options
     const requestOptions = {
       method: 'POST',
