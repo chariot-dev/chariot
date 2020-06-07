@@ -21,7 +21,6 @@ import ManageDeviceConfiguration from "./components/deviceManagement/ManageDevic
 import RunConfirmationComponent from "./components/runConfirmation/RunConfirmationComponent";
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import socketIOClient from 'socket.io-client';
 
 function App() {
   return (

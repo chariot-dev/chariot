@@ -168,15 +168,6 @@ class RunConfirmationComponent extends Component {
               Back
             </Button>
           </Link>
-          {/*
-            <Link to={{ pathname: "/dataCollectionEpisodeStatus", runProps:{"Network Name": this.state["Network Name"], "Devices": this.state["Devices"], "configId": this.state.configurationSettings["configId"]} }}>
-                <Button type="submit" variant="primary" className="float-right footer-button" onClick={this.startDataCollection}>Begin Collection</Button>
-            </Link>
-            */}
-          {/*
-            <Link to={{ pathname: "/dataCollectionEpisodeStatus", runProps:{"Network Name": this.state["Network Name"], "Devices": this.state["Devices"], "configId": this.state.configurationSettings["configId"]} }}>
-            </Link>  
-            */}
           <Button
             variant="primary"
             className="float-right footer-button"

@@ -23,7 +23,9 @@ class ManageDatabaseConfiguration extends Component {
     }
 
     this.handleChange = this.handleChange.bind(this);
+    this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
+    this.forceSuccessModalInteraction = this.forceSuccessModalInteraction.bind(this);
   }
 
 
@@ -94,6 +96,13 @@ class ManageDatabaseConfiguration extends Component {
     return databaseModificationForm;
   }
 
+  hideConfirmationModal(event) {
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
+  }
+
+  forceSuccessModalInteraction(event) {
+    return; // Do nothing because need user to click "continue"
+  }
 
   handleChange(event) {
     var updatedDatabaseProperties = this.state.newDatabaseProperties; // Store from current state
@@ -104,7 +113,7 @@ class ManageDatabaseConfiguration extends Component {
     this.setState({ newDatabaseProperties: updatedDatabaseProperties });
 
     if (this.state.newDatabaseProperties['dbId'] !== this.state.originalDatabaseId) {
-      var temp = [... this.state.newDatabaseProperties];
+      var temp = [...this.state.newDatabaseProperties];
       temp['newDbId'] = this.state.newDatabaseProperties['dbId'];
       temp['dbId'] = this.state.originalDatabaseId;
       this.setState({ newDatabaseProperties: temp });
@@ -170,7 +179,7 @@ class ManageDatabaseConfiguration extends Component {
 
       </div>,
 
-      <Modal show={this.state.confirmIsOpen} key="modifyDatabaseConfigurationConfirmationModal">
+      <Modal show={this.state.confirmIsOpen} onHide={this.hideConfirmationModal} key="modifyDatabaseConfigurationConfirmationModal">
         <ConfirmationModalBody
           confirmationQuestion='Are updated database configuration settings displayed below correct?'
           confirmationData={this.state.newDatabaseProperties}
@@ -183,7 +192,7 @@ class ManageDatabaseConfiguration extends Component {
         </Modal.Footer>
       </Modal>,
 
-      <Modal show={this.state.successIsOpen} key="modifyDatabaseConfigurationSettingsSuccessModal">
+      <Modal show={this.state.successIsOpen} onHide={this.forceSuccessModalInteraction} key="modifyDatabaseConfigurationSettingsSuccessModal">
         <SuccessModalBody successMessage='The database configuration was succesfully modified! Click "Continue" to go back to the "Database Manager" screen.'>
         </SuccessModalBody>
 

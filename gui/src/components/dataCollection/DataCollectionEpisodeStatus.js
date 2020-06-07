@@ -46,7 +46,7 @@ class DataCollectionEpisodeStatus extends Component {
       var lineColor = "";
 
       switch (
-        i // Get a color for the line
+      i // Get a color for the line
       ) {
         case 0:
           lineColor = "blue";
@@ -70,7 +70,7 @@ class DataCollectionEpisodeStatus extends Component {
           // Can't go on forever, so generate random color from here
           var letters = "0123456789ABCDEF";
           var color = "#";
-          for (var i = 0; i < 6; i++) {
+          for (var j = 0; j < 6; j++) {
             color += letters[Math.floor(Math.random() * 16)];
           }
           lineColor = color;
@@ -81,7 +81,7 @@ class DataCollectionEpisodeStatus extends Component {
         <Line
           dataKey={
             this.state.selectedLine === "all" ||
-            this.state.selectedLine === this.state.devices[i]
+              this.state.selectedLine === this.state.devices[i]
               ? this.state.devices[i]
               : "none"
           }
@@ -172,7 +172,7 @@ class DataCollectionEpisodeStatus extends Component {
             <Line
               dataKey={
                 this.state.selectedLine === "all" ||
-                this.state.selectedLine === this.state.devices[i]
+                  this.state.selectedLine === this.state.devices[i]
                   ? this.state.devices[i]
                   : this.state.devices[i] + " "
               }

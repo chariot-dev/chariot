@@ -33,6 +33,7 @@ class AddNetwork extends Component {
 
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
     this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
+    this.forceSuccessModalInteraction = this.forceSuccessModalInteraction.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -50,6 +51,10 @@ class AddNetwork extends Component {
 
   hideConfirmationModal(event) {
     this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
+  }
+
+  forceSuccessModalInteraction(event) {
+    return; // Do nothing because need user to click "yes" or "no"
   }
 
   toggleErrorModal = () => {
@@ -131,7 +136,7 @@ class AddNetwork extends Component {
         </Modal.Footer>
       </Modal>,
 
-      <Modal show={this.state.successIsOpen} key="addNetworkSuccessModal">
+      <Modal show={this.state.successIsOpen} onHide={this.forceSuccessModalInteraction} key="addNetworkSuccessModal">
         <SuccessModalBody successMessage="Your network was succesfully added! Would you like to add a device to this network as well?">
         </SuccessModalBody>
 

@@ -42,6 +42,8 @@ class AddDeviceHome extends Component {
     }
 
     this.handleChange = this.handleChange.bind(this);
+    this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
+    this.forceSuccessModalInteraction = this.forceSuccessModalInteraction.bind(this);
     this.handleDeviceTypeChange = this.handleDeviceTypeChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -74,6 +76,14 @@ class AddDeviceHome extends Component {
     }
 
     return deviceOptionsElement;
+  }
+
+  hideConfirmationModal(event) {
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
+  }
+
+  forceSuccessModalInteraction(event) {
+    return; // Do nothing because need user to click "continue"
   }
 
   /*
@@ -271,7 +281,7 @@ class AddDeviceHome extends Component {
         </Link>
       </div>,
 
-      <Modal show={this.state.confirmIsOpen} key="newDeviceConfirmModal">
+      <Modal show={this.state.confirmIsOpen} onHide={this.hideConfirmationModal} key="newDeviceConfirmModal">
 
         <ConfirmationModalBody
           confirmationQuestion={('Before ').concat(this.state.newDeviceTypeGeneralVals['Device Nickname'], ' is added to ', this.props.location.networkProps['Network Name'], ' please confirm that the information below is correct.')}
@@ -285,7 +295,7 @@ class AddDeviceHome extends Component {
         </Modal.Footer>
       </Modal>,
 
-      <Modal show={this.state.successIsOpen} key="registerSuccessModal">
+      <Modal show={this.state.successIsOpen} onHide={this.forceSuccessModalInteraction} key="registerSuccessModal">
         <SuccessModalBody successMessage="Your new device has been created and added to the network!">
         </SuccessModalBody>
         <Modal.Footer>

@@ -30,6 +30,8 @@ class DatabaseConnection extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleDatabaseTypeChange = this.handleDatabaseTypeChange.bind(this);
     this.hideTestSuccessModal = this.hideTestSuccessModal.bind(this);
+    this.hideTestSuccessModalOnOutsideClick = this.hideTestSuccessModalOnOutsideClick.bind(this);
+    this.forceSuccessModalInteraction = this.forceSuccessModalInteraction.bind(this);
     this.hideTestErrorModal = this.hideTestErrorModal.bind(this);
   }
 
@@ -77,6 +79,14 @@ class DatabaseConnection extends Component {
   hideTestSuccessModal(event) {
     this.setState({ testSuccessIsOpen: false });
     event.preventDefault();
+  }
+
+  hideTestSuccessModalOnOutsideClick(event) {
+    this.setState({ testSuccessIsOpen: !this.state.testSuccessIsOpen });
+  }
+
+  forceSuccessModalInteraction(event) {
+    return; // Do nothing because need user to click "continue"
   }
 
   hideTestErrorModal(event) {
@@ -262,7 +272,7 @@ class DatabaseConnection extends Component {
 
       </div>,
 
-      <Modal show={this.state.successIsOpen} key="addDatabaseConfigSuccessModal">
+      <Modal show={this.state.successIsOpen} onHide={this.forceSuccessModalInteraction} key="addDatabaseConfigSuccessModal">
         <SuccessModalBody successMessage="The database configuration was succesfully added!">
         </SuccessModalBody>
 
@@ -280,7 +290,7 @@ class DatabaseConnection extends Component {
         </Modal.Footer>
       </Modal>,
 
-      <Modal show={this.state.testSuccessIsOpen} key="testDatabaseConfigSuccessModal">
+      <Modal show={this.state.testSuccessIsOpen} onHide={this.hideTestSuccessModalOnOutsideClick} key="testDatabaseConfigSuccessModal">
         <SuccessModalBody successMessage="Chariot connected to the database succesfully! To create the database configuration, please close this window and then click 'Create'.">
         </SuccessModalBody>
 

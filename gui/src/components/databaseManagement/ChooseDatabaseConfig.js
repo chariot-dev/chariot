@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
-import socketIOClient from "socket.io-client";
 
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 import SuccessModalBody from '../shared/SuccessModalBody';
