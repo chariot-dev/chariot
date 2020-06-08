@@ -6,6 +6,8 @@ import showPasswordImg from "../images/showPassword.PNG";
 
 import '../../App.css';
 
+const loginUrl = 'http://localhost:5000/chariot/api/v1.0/login';
+
 class Login extends Component {
   constructor(props) {
     super(props);
