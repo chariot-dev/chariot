@@ -66,3 +66,4 @@ Werkzeug==0.16.0
 wrapt==1.11.2
 zipp==0.6.0
 zope.interface==5.0.2
+Flask-Pymongo==2.3.0
