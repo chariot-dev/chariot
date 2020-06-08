@@ -82,5 +82,29 @@ class NoIdentifierError(Exception):
         return self.message
 
 
-# __all__ = ['DatabaseConnectionError', 'DuplicateNameError', 'ItemNotSupported', 'NameNotFoundError', 'NoIdentifierError',
-#     'DeviceNotConnectedError', 'InCollectionEpisodeError', 'NotInCollectionEpisodeError', 'FailedToBeginCollectionError']
+class LoginFailure(Exception):
+    status_code = 400
+
+    def __init__(self, msg: str, errCode: int = None):
+        self.message = msg
+        if errCode is not None:
+            self.status_code = errCode
+
+    def __str__(self):
+        return self.message
+
+
+class AuthenticationFailure(Exception):
+    status_code = 401
+
+    def __init__(self, msg: str, errCode: int = None):
+        self.message = msg
+        if errCode is not None:
+            self.status_code = errCode
+
+    def __str__(self):
+        return self.message
+
+# __all__ = ['DatabaseConnectionError', 'DuplicateNameError', 'ItemNotSupported', 'NameNotFoundError',
+# 'NoIdentifierError', 'DeviceNotConnectedError', 'InCollectionEpisodeError', 'NotInCollectionEpisodeError',
+# 'FailedToBeginCollectionError']

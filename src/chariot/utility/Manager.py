@@ -55,3 +55,7 @@ class Manager(ABC):
         # update collection, make new key and delete the old one
         self.collection[newName] = self.collection[toFind]
         del self.collection[toFind]
+
+    # Clear all of the collection
+    def _clearCollection(self) -> None:
+        self.collection.clear()

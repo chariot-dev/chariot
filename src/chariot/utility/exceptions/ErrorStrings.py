@@ -8,3 +8,5 @@ class ErrorStrings(Enum):
     ERR_Item_Not_Supported = 'The {0} type {1} is not supported by Chariot'
     ERR_Generic_Device_Template = 'Could not open file {0}'
     Err_General_Id = 'id'
+    ERR_Login_Failed = 'The credentials are invalid'
+    ERR_Not_Authenticated = 'Please login before attempting to access this resource.'

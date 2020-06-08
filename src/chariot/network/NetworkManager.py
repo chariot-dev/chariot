@@ -6,7 +6,6 @@ from chariot.utility import Manager
 class _NetworkManager(Manager):
 
     def __init__(self):
-        # TODO: load all networks for a user upon instantiation
         self.collection: Dict[str, Network] = {}
 
     def addNetwork(self, network: Network) -> None:
@@ -34,14 +33,23 @@ class _NetworkManager(Manager):
         allNetworks = []
 
         for key in self.collection:
+            description: str = ""
+            try:
+                description = self._retrieveFromCollection(key).getDescription()
+            except:
+                pass
+
             networkSpecifics: Dict[str, str] = \
                 {'NetworkName': key,
-                 'Description': self._retrieveFromCollection(key).getDescription(),
+                 'Description': description,
                  'Devices': self._retrieveFromCollection(key).getDeviceNames()
                  }
             allNetworks.append(networkSpecifics)
 
         return allNetworks
+
+    def clearCollection(self):
+        self._clearCollection()
 
 
 # return a singleton instance

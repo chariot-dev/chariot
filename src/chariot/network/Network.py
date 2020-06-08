@@ -2,7 +2,7 @@ from typing import Dict, List, Optional, Tuple
 from chariot.device.adapter import DeviceAdapter
 from chariot.network.configuration.NetworkConfiguration import NetworkConfiguration
 from chariot.utility.JSONTypes import JSONObject
-from chariot.utility import Manager
+from chariot.utility import Manager, TypeStrings
 
 
 class Network(Manager):
@@ -63,7 +63,7 @@ class Network(Manager):
         # add each deviceId as key and the configuration as value
         # TODO: devices should be under a nested dict 'devices'
         for key, device in self.collection.items():
-            network[key] = device.toDict()
+            network[TypeStrings.Device_Type.value] = device.toDict()
 
         return network
 
@@ -78,6 +78,5 @@ class Network(Manager):
             raise AssertionError(message)
         self._config.updateConfig(config)
 
-    # importDeviceConfig
-    # exportNetwork - again seems like a utility method
-    # saveNetwork - idea is to save this network configuration to the UserAccount
+    def clearCollection(self):
+        self._clearCollection()
