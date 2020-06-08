@@ -30,9 +30,8 @@ class Login extends Component {
 
   handleSubmit(event) {
     // Verify account credentials for correctness first
-    this.setState({ loginSuccess: true });
+    this.login();
     event.preventDefault();
-    this.props.history.push(`/welcome`);
   }
 
   changePasswordVisibility() {
@@ -70,7 +69,7 @@ class Login extends Component {
       // If post was successful, update state and display success modal
       () => {
         that.setState({ loginSuccess: true });
-        //this.props.history.push(`/welcome`);
+        this.props.history.push(`/welcome`);
       },
       // If post was unsuccessful, update state and display error modal
       (error) => {

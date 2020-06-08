@@ -14,7 +14,7 @@ from chariot.database.writer import DatabaseWriter
 from chariot.utility import PayloadParser
 from chariot.network import Network, NetworkManager
 from chariot.utility.exceptions import NameNotFoundError, DuplicateNameError, ItemNotSupported, DatabaseConnectionError, \
-    NoIdentifierError, LoginFailure, AuthenticationFailure
+    NoIdentifierError, LoginFailure, AuthenticationFailure, ErrorStrings
 from chariot.network.configuration import NetworkConfiguration
 from chariot.database import DatabaseManager
 from chariot.utility import TypeStrings
@@ -114,6 +114,8 @@ def login():
     username = requestContent.get("username")
     password = requestContent.get("password")
 
+    print("got response of {}".format(requestContent))
+
     # authenticate username/password
     loginUser = users.find_one({"username": username})
 
@@ -122,6 +124,8 @@ def login():
         config = loginUser
         del config["_id"]
         session["user"] = loginUser["username"]
+        print("I was able to login")
+        print("my session is {}".format(session))
 
         # fill the NetworkManager and DatabaseManager with configurations
         try:
@@ -187,7 +191,6 @@ def login():
                 DatabaseManager.addDbWriter(dbWriter)
         except KeyError:
             pass  # no db configurations found for user
-
 
     else:
         raise LoginFailure(ErrorStrings.ERR_Login_Failed.value, 401)
@@ -727,6 +730,7 @@ def handleAuthFailure(error):
     res = jsonify(toDict(error.message))
     res.status_code = error.status_code
     return res
+
 
 def getCurrentUserName():
     userName = session["user"]
