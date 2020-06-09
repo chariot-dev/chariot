@@ -16,7 +16,8 @@ class Login extends Component {
       password: "",
       passwordVisible: false,
       passwordImg: hiddenPasswordImg,
-      loginSuccess: false
+      loginSuccess: false,
+      errorMessage: ""
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -47,7 +48,6 @@ class Login extends Component {
 
     login = () => {
     // Post request's body
-    var that = this;
     var data = {
       "username": this.state.username,
       "password": this.state.password
@@ -64,23 +64,25 @@ class Login extends Component {
 
     // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
     fetch(loginUrl, requestOptions)
-    .then(res => res.json())
     .then(
-      // If post was successful, update state and display success modal
-      () => {
-        that.setState({ loginSuccess: true });
-        this.props.history.push(`/welcome`);
-      },
-      // If post was unsuccessful, update state and display error modal
-      (error) => {
-        // Once error message is set, then launch the error modal
-        this.setState({
-          errorMessage: error.message
-        }, () => {
-          this.setState({ errorIsOpen: !this.state.errorIsOpen });
-        });
-      }
-    )
+      (res) => {
+        if (res.status !== 200) {
+          return res.json(); // Return the response to the next then()
+        }
+        else {
+          this.setState({ loginSuccess: true }); // Set to true so test connection success modal appears
+          this.props.history.push(`/welcome`)
+          return; // Since going to then(), return null since no need to parse response
+        }
+    })
+    .then(
+      (resJson) => {
+        if (resJson) { // If the response exists
+          this.setState({ errorMessage: resJson.message }, () => { // Set the error message
+            this.setState({ loginSuccess: false }); // Then set test error modal to true
+          });
+        }
+    })
   };
 
   render() {

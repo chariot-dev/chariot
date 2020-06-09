@@ -12,8 +12,60 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 
 import './Welcome.css';
+import hiddenPasswordImg from "../images/hiddenPassword.PNG";
+
+const logoutUrl = 'http://localhost:5000/chariot/api/v1.0/logout';
 
 class Welcome extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+      errorMessage: "",
+      logoutSuccess: false
+    }
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(event) {
+    this.logout();
+    event.preventDefault();
+  }
+
+
+  logout = () => {
+
+    // Post request options
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    };
+
+    // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
+    fetch(logoutUrl, requestOptions)
+    .then(
+      (res) => {
+        if (res.status !== 200) {
+          return res.json(); // Return the response to the next then()
+        }
+        else {
+          //successful logout
+          this.props.history.push(`/welcome`);
+          return; // Since going to then(), return null since no need to parse response
+        }
+    })
+    .then(
+      (resJson) => {
+        if (resJson) { // If the response exists
+          this.setState({ errorMessage: resJson.message }, () => { // Set the error message
+            this.setState({ logoutSuccess: false }); // Then set test error modal to true
+          });
+        }
+    })
+  };
 
   render() {
     return (
@@ -26,7 +78,7 @@ class Welcome extends Component {
         </div>
         <div className="accountInfo">
           <Link to="/">
-            <Button className="logout-button" variant="primary">Log Out</Button>
+            <Button className="logout-button" variant="primary" type="submit">Log Out</Button>
           </Link>
         </div>
         <br></br>
