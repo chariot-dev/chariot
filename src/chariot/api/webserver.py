@@ -114,8 +114,6 @@ def login():
     username = requestContent.get("username")
     password = requestContent.get("password")
 
-    print("got response of {}".format(requestContent))
-
     # authenticate username/password
     loginUser = users.find_one({"username": username})
 
@@ -124,8 +122,6 @@ def login():
         config = loginUser
         del config["_id"]
         session["user"] = loginUser["username"]
-        print("I was able to login")
-        print("my session is {}".format(session))
 
         # fill the NetworkManager and DatabaseManager with configurations
         try:
@@ -391,14 +387,15 @@ def modifyDevice():
 
     # remove networkName and deviceType key so that updating configuration does not raise an error
     del requestContent[TypeStrings.Network_Identifier.value]
-    del requestContent["deviceType"]
+    if "deviceType" in requestContent:
+        del requestContent["deviceType"]
 
     NetworkManager.getNetwork(networkName).getDevice(deviceName).updateConfig(requestContent)
 
     # if applicable, modify collection so the new device name is in collection and old one is deleted
     if newDeviceName:
         NetworkManager.getNetwork(networkName).replaceDevice(deviceName, newDeviceName)
-        users.update_one({"username": getCurrentUserName(), "network.networkName": networkName},
+        users.update_one({"username": getCurrentUserName(), "network.device.deviceId": deviceName},
                          {'$set': {TypeStrings.Device_Type.value + ".$":
                                        NetworkManager.getNetwork(networkName).getDevice(newDeviceName).toDict()}})
     else:
@@ -507,7 +504,8 @@ def modifyDatabaseConfiguration():
         del requestContent[parser.getNewDbIdStr()]
 
     # delete the type so validation passes
-    del requestContent["type"]
+    if "type" in requestContent:
+        del requestContent["type"]
     # at this point, 'newDbId' is not a key, so validate configuration and update
     DatabaseManager.getDbWriter(dbId).updateConfig(requestContent)
 
