@@ -1,6 +1,6 @@
-from chariot.configuration import Configuration
-from chariot.utility.JSONTypes import JSONDict, JSONObject
 from typing import Dict, Type
+from chariot.configuration import Configuration
+from chariot.utility.JSONTypes import JSONObject
 
 
 class NetworkConfiguration(Configuration):

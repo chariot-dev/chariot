@@ -1,14 +1,31 @@
+# vscode
+.vscode/
+
 # python3 venv
 bin/
 include/
 lib/
 lib64
+Scripts/
 pyvenv.cfg
 share/
 .mypy_cache/
 .tox
 chariot.egg-info
+.eggs
 
 # python
 *.py[cod]
 __pycache__/
+*.pyc
+
+#pytest
+.coverage
+
+#modules
+gui/node_modules/
+
+# Test folder
+/src/testing
+
+node_modules/

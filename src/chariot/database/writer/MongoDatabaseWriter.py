@@ -4,7 +4,7 @@ from pymongo.collection import Collection
 from typing import Dict, List, Optional
 from chariot.utility.JSONTypes import JSONObject
 from chariot.database.writer import DatabaseWriter
-from chariot.database.configuration import DatabaseConfiguration, MongoDatabaseConfiguration
+from chariot.database.configuration import MongoDatabaseConfiguration
 
 
 class MongoDatabaseWriter(DatabaseWriter):
@@ -15,12 +15,12 @@ class MongoDatabaseWriter(DatabaseWriter):
 
     def _connect(self):
         connectStr: str = 'mongodb://'
-        if hasattr(self.config, 'username'):
-            connectStr += f'{self.config.username}:{self.config.password}@'
-        connectStr += f'{self.config.host}:{self.config.port}/{self.config.databaseName}'
+        if hasattr(self._config, 'username'):
+            connectStr += f'{self._config.username}:{self._config.password}@'
+        connectStr += f'{self._config.host}:{self._config.port}/{self._config.databaseName}'
         self.client = MongoClient(
             connectStr,
-            serverSelectionTimeoutMS=self.config.timeoutMS)
+            serverSelectionTimeoutMS=self._config.timeoutMS)
         self.client.server_info()  # This will raise error if connection invalid
 
     def _disconnect(self):
@@ -28,11 +28,11 @@ class MongoDatabaseWriter(DatabaseWriter):
         self.client = None
 
     def _initializeTable(self):
-        database: Database = self.client[self.config.databaseName]
-        self.table = database[self.config.tableName]
+        database: Database = self.client[self._config.databaseName]
+        self.table = database[self._config.tableName]
 
-    def _insertOne(self, dataPoint: Dict[str, JSONObject]):
-        self.table.insert_one(dataPoint)
+    def _insertOne(self, record: Dict[str, JSONObject]):
+        self.table.insert_one(record)
 
-    def _insertMany(self, dataPoints: List[Dict[str, JSONObject]]):
-        self.table.insert_many(dataPoints)
+    def _insertMany(self, records: List[Dict[str, JSONObject]]):
+        self.table.insert_many(records)

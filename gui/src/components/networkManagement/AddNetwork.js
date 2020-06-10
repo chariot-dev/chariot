@@ -16,7 +16,6 @@ import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
 const postCreateNetworkBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
-const xhr = new XMLHttpRequest();
 
 class AddNetwork extends Component {
   constructor(props) {
@@ -29,10 +28,12 @@ class AddNetwork extends Component {
       isSubmitted: false,
       confirmIsOpen: false,
       successIsOpen: false,
-      errorIsOpen: false
+      errorIsOpen: false,
+      errorMessage: ''
     }
 
     this.toggleConfirmationModal = this.toggleConfirmationModal.bind(this);
+    this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
   
@@ -44,10 +45,12 @@ class AddNetwork extends Component {
   }
 
   toggleConfirmationModal(event) {
-    this.setState({
-      confirmIsOpen: !this.state.confirmIsOpen
-    });
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
     event.preventDefault();
+  }
+
+  hideConfirmationModal(event) {
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });   
   }
 
   toggleErrorModal = () => {
@@ -60,31 +63,39 @@ class AddNetwork extends Component {
   }
 
   createNetworkAndToggleSuccessModal = () => {
-    xhr.open('POST', postCreateNetworkBaseUrl);
-    xhr.setRequestHeader("Content-Type", "application/json");
-
-    xhr.onreadystatechange = () => { // Call a function when the state changes.
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          this.setState({
-            confirmIsOpen: false
-          });
-          this.setState({
-            successIsOpen: !this.state.successIsOpen
-          });
-        }
-        else {
-          this.setState({ errorIsOpen: !this.state.errorIsOpen });
-        }
-      }
-    }
-
+    // Post request's body
     var data = {
       "networkName": this.state.networkProperties["Network Name"],
       "description": this.state.networkProperties["Network Description"]
     }
 
-    xhr.send(JSON.stringify(data));
+    // Post request options
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    };
+
+    // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
+    fetch(postCreateNetworkBaseUrl, requestOptions)
+    .then(res => res.json())
+    .then(
+      // If post was successful, update state and display success modal
+      () => {
+        this.setState({ confirmIsOpen: false });
+        this.setState({ successIsOpen: !this.state.successIsOpen });
+      },
+      // If post was unsuccessful, update state and display error modal
+      (error) => {
+        // Once error message is set, then launch the error modal
+        this.setState({
+          errorMessage: error.message 
+        }, () => {
+          this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
+          this.setState({ errorIsOpen: !this.state.errorIsOpen });
+        });
+      }
+    )
   }
 
   render() {
@@ -95,10 +106,11 @@ class AddNetwork extends Component {
           
           <form id="createNetworkForm" onSubmit={this.toggleConfirmationModal}>
             <div className="form-group">
+              <div className="requiredStar">*</div>
               Network Name: <input required className="form-control" id="networkNameInput" name="Network Name" onChange={this.handleChange}/>
             </div>
             <div className="form-group">
-              Network Description: <textarea required className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
+              Network Description: <textarea className="form-control" id="networkDescriptionInput" rows="5" name="Network Description" onChange={this.handleChange}></textarea>
             </div>
             <Link to="/networkManager">
               <Button variant="primary" className="float-left footer-button">Back</Button>
@@ -107,7 +119,7 @@ class AddNetwork extends Component {
         </form>
       </div>,
 
-      <Modal show={this.state.confirmIsOpen} key="addNetworkConfirmation">
+      <Modal show={this.state.confirmIsOpen} onHide={this.hideConfirmationModal} key="addNetworkConfirmation">
           <ConfirmationModalBody
             confirmationQuestion='Is this information for your network correct?'
             confirmationData = {this.state.networkProperties}
@@ -128,15 +140,14 @@ class AddNetwork extends Component {
           <Link to="/networkManager">
             <Button variant="primary" className="float-left">No</Button>
           </Link>
-          <Link to={{pathname:'/addDeviceHome', networkProps:{'Network Name': this.state.networkProperties['Network Name']} }}>
+          <Link to={{ pathname:'/addDeviceHome', networkProps:{'Network Name': this.state.networkProperties['Network Name']} }}>
             <Button variant="primary" className="float-right">Yes</Button>
           </Link>
         </Modal.Footer>
       </Modal>,
 
       <Modal show={this.state.errorIsOpen} key="addNetworkErrorModal">
-
-        <ErrorModalBody errorMessage="Your network was not created. Please go back, verify that the information is correct, and then try again.">
+        <ErrorModalBody errorMessage={this.state.errorMessage + ". Please ensure that the server is running, the inputted values are valid, and try again." }>
         </ErrorModalBody>
 
         <Modal.Footer>

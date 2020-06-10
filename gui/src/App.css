@@ -34,6 +34,11 @@
   margin-top: 10px;
 }
 
+.deviceStatusImg {
+  height: 25px;
+  width: 25px;
+}
+
 .container {
   padding-top: 30px;
 }
@@ -96,6 +101,15 @@
   padding-bottom: 20px;
 }
 
+.deviceCreationFormCheckbox {
+  width: 25px; 
+  height: 25px;
+  vertical-align: bottom;
+  margin-right: 6px;
+  margin-bottom: -2px;
+  *overflow: hidden;
+}
+
 .successConfirmationImg {
   float: left;
   height: 50px;
@@ -112,4 +126,10 @@
 
 .button-mid-bottom {
   margin-left: 37%;
+}
+
+.requiredStar {
+  color: red;
+  font-size: 21px;
+  display:inline-block;
 }

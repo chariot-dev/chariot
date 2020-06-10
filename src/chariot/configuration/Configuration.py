@@ -17,7 +17,9 @@ class Configuration(ABC):
         for key in self.requiredFields:
             yield(key, getattr(self, key))
         for key in self.optionalFields:
-            yield(key, getattr(self, key, None))
+            val = getattr(self, key, None)
+            if val is not None:
+                yield(key, val)
 
     def __str__(self):
         output: JSONDict = dict(self)
@@ -68,6 +70,3 @@ class Configuration(ABC):
     @abstractmethod
     def getIdField(self) -> str:
         pass
-
-
-__all__ = ['Configuration']
