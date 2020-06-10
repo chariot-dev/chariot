@@ -33,46 +33,46 @@ class DeleteDatabase extends Component {
 
     this.hideErrorModal = this.hideErrorModal.bind(this);
     this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
-  } 
+  }
 
   // Get all db configs before rendering component
-  componentDidMount () {
+  componentDidMount() {
     fetch(dbConfigsBaseUrl + "/all")
-    .then(res => res.json())
-    .then(
-      // On success
-      (receivedDBConfigs) => {
-        var dbConfigJson = receivedDBConfigs; // Response is a JSON OBJECT for this one, not JSON ARRAY like the others
-        var updatedDatabaseConfigurationsJsonArray = this.state.existingDatabaseConfigurations;
+      .then(res => res.json())
+      .then(
+        // On success
+        (receivedDBConfigs) => {
+          var dbConfigJson = receivedDBConfigs; // Response is a JSON OBJECT for this one, not JSON ARRAY like the others
+          var updatedDatabaseConfigurationsJsonArray = this.state.existingDatabaseConfigurations;
 
-        for (var key in dbConfigJson) {
-          updatedDatabaseConfigurationsJsonArray.push(dbConfigJson[key]);
+          for (var key in dbConfigJson) {
+            updatedDatabaseConfigurationsJsonArray.push(dbConfigJson[key]);
+          }
+
+          this.setState({ existingDatabaseConfigurations: updatedDatabaseConfigurationsJsonArray });
+
+        },
+        // On error
+        (error) => {
+          console.log(error.message);
         }
-
-        this.setState({ existingDatabaseConfigurations: updatedDatabaseConfigurationsJsonArray });
-
-      },
-      // On error
-      (error) => {
-        console.log(error.message);
-      }
-    )
+      )
   }
 
 
   hideErrorModal(event) {
-    this.setState({ errorIsOpen: !this.state.errorIsOpen });    
+    this.setState({ errorIsOpen: !this.state.errorIsOpen });
     event.preventDefault();
   }
 
   hideConfirmationModal(event) {
-    this.setState({ confirmIsOpen: !this.state.confirmIsOpen }); 
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });
   }
 
 
   deleteConfirmation(selectedDatabaseConfigurationToDelete) {
-    this.setState({confirmIsOpen: true});
-    this.setState({selectedDatabaseConfigurationToDelete: selectedDatabaseConfigurationToDelete});
+    this.setState({ confirmIsOpen: true });
+    this.setState({ selectedDatabaseConfigurationToDelete: selectedDatabaseConfigurationToDelete });
   }
 
 
@@ -84,17 +84,17 @@ class DeleteDatabase extends Component {
     };
 
     fetch(dbConfigsBaseUrl + "?dbId=" + this.state.selectedDatabaseConfigurationToDelete, requestOptions)
-    .then(
-      (res) => {
-        if (res.status === 400) { // If not 200, something went wrong, so go to the next then()
-          return res.json();
-        }
-        else { // If a 400 wasn't returned, then the api call was successful
-          this.setState({ confirmIsOpen: false });
-          this.setState({ successIsOpen: !this.state.successIsOpen });
-          return; // Since going to then(), return null since no need to parse response
-        }
-      })
+      .then(
+        (res) => {
+          if (res.status === 400) { // If not 200, something went wrong, so go to the next then()
+            return res.json();
+          }
+          else { // If a 400 wasn't returned, then the api call was successful
+            this.setState({ confirmIsOpen: false });
+            this.setState({ successIsOpen: !this.state.successIsOpen });
+            return; // Since going to then(), return null since no need to parse response
+          }
+        })
       // On error
       .then(
         (resJson) => {
@@ -102,7 +102,7 @@ class DeleteDatabase extends Component {
             this.setState({ confirmIsOpen: false });
             this.setState({ errorMessage: resJson.message }, () => { // Set the error message
               this.setState({ errorIsOpen: true }); // Then set test error modal to true
-            }); 
+            });
           }
         }
       )
@@ -116,14 +116,15 @@ class DeleteDatabase extends Component {
         <p className="screenInfo">
           Select a database configuration to delete.
         </p>
-        
+
         {this.state.existingDatabaseConfigurations.length > 0 ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingDatabaseConfigurations} withLinks={false} type="deleteDatabase" deleteDatabaseConfiguration={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : <p>No existing database configurations were found.</p>}
 
         <Link to="/databaseManager">
           <Button variant="primary" className="float-left footer-button">Back</Button>
         </Link>
       </div>,
-      <Modal show={this.state.confirmIsOpen} onHide={this.hideConfirmationModal} key="datababseDeletionConfirmModal">
+
+      <Modal show={this.state.confirmIsOpen} onHide={this.hideConfirmationModal} key="databaseDeletionConfirmModal">
         <Modal.Body>
           To confirm the deletion of the database configuration for {this.state.selectedDatabaseConfigurationToDelete}, click 'Yes'.
         </Modal.Body>
@@ -135,25 +136,25 @@ class DeleteDatabase extends Component {
 
       <Modal show={this.state.successIsOpen} key="databaseConfigurationDeletionSuccessModal">
 
-      <SuccessModalBody successMessage="The database configuration has been deleted!">
-      </SuccessModalBody>
+        <SuccessModalBody successMessage="The database configuration has been deleted!">
+        </SuccessModalBody>
 
-      <Modal.Footer>
-        <Link to="/databaseManager">
-          <Button variant="primary" className="float-right">Continue</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>,
+        <Modal.Footer>
+          <Link to="/databaseManager">
+            <Button variant="primary" className="float-right">Continue</Button>
+          </Link>
+        </Modal.Footer>
+      </Modal>,
 
-    <Modal show={this.state.errorIsOpen} key="databaseConfigurationDeletionErrorModal">
+      <Modal show={this.state.errorIsOpen} key="databaseConfigurationDeletionErrorModal">
 
-      <ErrorModalBody errorMessage={this.state.errorMessage}>
-      </ErrorModalBody>
+        <ErrorModalBody errorMessage={this.state.errorMessage}>
+        </ErrorModalBody>
 
-      <Modal.Footer>
-        <Button variant="primary" className="float-left" onClick={this.hideErrorModal}>OK</Button>
-      </Modal.Footer>
-    </Modal>
+        <Modal.Footer>
+          <Button variant="primary" className="float-left" onClick={this.hideErrorModal}>OK</Button>
+        </Modal.Footer>
+      </Modal>
 
     ]
   }

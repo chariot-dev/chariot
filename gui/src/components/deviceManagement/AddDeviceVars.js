@@ -3,16 +3,15 @@
 
   This component is shown inside the AddDeviceHome component containing the dynamically generated
   configuration fields of a device depending on the user's choice of device.
-
 */
 
 import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 
 class AddDeviceVars extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
-    
+
     // Initializing newDeviceTypeConfigVals (the json to hold the config values of the device-specific parameters)
     var deviceConfig = props.params.newDeviceTypeGeneralVals.newDeviceTypeConfig[props.params.newDeviceTypeGeneralVals['Device Type']];
     var deviceSettings = deviceConfig["settings"];
@@ -110,7 +109,7 @@ class AddDeviceVars extends Component {
         <div className="form-group" key={key}>
           {curFieldIsRequired ? <div className="requiredStar">*</div> : ""}
           {valueType === "checkbox" ? null : key}
-          <input type={valueType}  required={curFieldIsRequired} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={key} onChange={this.handleChange}/>
+          <input type={valueType} required={curFieldIsRequired} className={valueType === "checkbox" ? 'deviceCreationFormCheckbox' : 'form-control'} id={curFieldAlias} name={key} onChange={this.handleChange} />
           {valueType === "checkbox" ? key : null}
         </div>
       );
