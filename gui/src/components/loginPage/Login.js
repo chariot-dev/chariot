@@ -23,7 +23,7 @@ class Login extends Component {
   }
 
   handleChange(event) {
-    this.setState({[event.target.name]: event.target.value});
+    this.setState({ [event.target.name]: event.target.value });
   }
 
   handleSubmit(event) {
@@ -35,12 +35,12 @@ class Login extends Component {
 
   changePasswordVisibility() {
     if (this.state.passwordImg === hiddenPasswordImg) {
-      this.setState({passwordImg: showPasswordImg});
-      this.setState({passwordVisible: true});
-    } 
+      this.setState({ passwordImg: showPasswordImg });
+      this.setState({ passwordVisible: true });
+    }
     else {
-      this.setState({passwordImg: hiddenPasswordImg});
-      this.setState({passwordVisible: false});
+      this.setState({ passwordImg: hiddenPasswordImg });
+      this.setState({ passwordVisible: false });
     }
   }
 
@@ -66,7 +66,7 @@ class Login extends Component {
                   <img id="passwordVisibilityImg" src={this.state.passwordImg} alt="Hide/Show Password" onClick={this.changePasswordVisibility}></img>
                 </div>
                 <div>
-                  <input type="checkbox" id="rememberMe"/> Remember Me
+                  <input type="checkbox" id="rememberMe" /> Remember Me
                 </div>
                 <Button className="login-button" variant="primary" type="submit">
                   Login
@@ -77,17 +77,17 @@ class Login extends Component {
                 Dont have an account? <Link to="/register" id="createAccountLink"> Create one here</Link>
               </div>
               <div>
-                <Link to="/" id="forgotPasswordLink"> 
+                <Link to="/" id="forgotPasswordLink">
                   Forgot password?
                 </Link>
-              </div>  
+              </div>
             </div>
           </div>
         </div>
       </div>
     );
   }
-  
+
 }
 
 

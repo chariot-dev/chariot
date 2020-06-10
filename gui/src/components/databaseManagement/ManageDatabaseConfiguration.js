@@ -113,7 +113,7 @@ class ManageDatabaseConfiguration extends Component {
     this.setState({ newDatabaseProperties: updatedDatabaseProperties });
 
     if (this.state.newDatabaseProperties['dbId'] !== this.state.originalDatabaseId) {
-      var temp = [...this.state.newDatabaseProperties];
+      var temp = this.state.newDatabaseProperties;
       temp['newDbId'] = this.state.newDatabaseProperties['dbId'];
       temp['dbId'] = this.state.originalDatabaseId;
       this.setState({ newDatabaseProperties: temp });

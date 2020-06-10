@@ -245,7 +245,8 @@ class DataCollectionEpisodeStatus extends Component {
         <p>
           Data collection episode for {this.state.chosenNetwork}. To view device
           data individually, click on the desired device's name in the legend.
-          To view all, click on that device name again.
+          To view all, click on that device name again. To end the data collection
+          episode, click on the "End Data Collection" button.
         </p>
 
         {response ? this.generateVisualizer() : <p>{this.state.dceStatus}</p>}

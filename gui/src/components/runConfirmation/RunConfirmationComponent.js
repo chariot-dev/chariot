@@ -155,6 +155,7 @@ class RunConfirmationComponent extends Component {
             />
           </div>
           <div className="form-group">
+            <div className="requiredStar">*</div>
             Configuration Name:{" "}
             <input
               className="form-control"
