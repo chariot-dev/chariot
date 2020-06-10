@@ -1,10 +1,8 @@
 import requests
-import json
-from queue import Queue 
 from base64 import b64encode
 from json import dumps
 from time import sleep
-from typing import Dict, Union
+from typing import Dict, Optional
 from chariot.utility.JSONTypes import JSONDict, JSONObject
 from chariot.device.adapter import DeviceAdapter
 from chariot.device.configuration import ImpinjXArrayConfiguration
@@ -27,7 +25,7 @@ class ItemsenseSession:
 class ImpinjXArrayAdapter(DeviceAdapter):
     def __init__(self, config: ImpinjXArrayConfiguration):
         super().__init__(config)
-        self.session: Union['ItemsenseSession', None] = None
+        self.session: Optional['ItemsenseSession'] = None
 
     def _buildJobInfo(self) -> Dict[str, JSONObject]:
         jobInfo: Dict[str, str] = {}
@@ -81,7 +79,7 @@ class ImpinjXArrayAdapter(DeviceAdapter):
 
     def _getToken(self, connectUrl: str, authUsername: str) -> str:
         tokenUrl: str = f'{connectUrl}/authentication/v1/token/{authUsername}'
-        response: requests.Response = requests.put(tokenUrl, { 'Authorization': tokenUrl })
+        response: requests.Response = requests.put(tokenUrl, {'Authorization': tokenUrl})
         token: str = response.json()['token']
         return token
 
@@ -96,63 +94,49 @@ class ImpinjXArrayAdapter(DeviceAdapter):
     def _revokeAuthToken(self) -> None:
         revokeUrl = f'{self.session.connectUrl}/authentication/v1/revokeToken'
         tokenData: Dict[str, str] = {'token': self.sesion.token}
-        response: requests.Response = requests.put(
+        requests.put(
             revokeUrl,
-            data=json.dumps(tokenData),
+            data=dumps(tokenData),
             headers=self.session.basicAuthHeaders
-            )
+        )
         return
 
     def _stopItemsenseJob(self) -> None:
         stopUrl = f'{self.session.connectUrl}/control/v1/jobs/stop/{self.session.jobId}'
-        response: requests.Response = requests.post(stopUrl, headers=self.session.tokenAuthHeaders)
+        requests.post(stopUrl, headers=self.session.tokenAuthHeaders)
         return
 
-    def beginDataCollection(self, errorQueue: Queue) -> None:
-        self.inCollectionEpisode = True
-        while self.inCollectionEpisode:
+    def _startDataCollection(self) -> None:
+        while self._inCollectionEpisode:
             if not self.connected:
-                # raise DeviceNotConnected(?)Error
-                stackTrace = self._generateStackTrace(AssertionError('Device was not connected'))
-                errorQueue.put(stackTrace, block=True)
-                self.stopDataCollection()
-                # or continue? makes no difference
-                break
+                # raise DeviceNotConnectedError()
+                raise AssertionError
 
             collectedAllPages: bool = False
             while not collectedAllPages:
-                try:
-                    response: requests.Response = requests.get(
-                        self.session.dataRequestUrl,
-                        data = dumps(self.session.dataRequestBody),
-                        headers = self.session.tokenAuthHeaders
-                        )
-                    jsonData: JSONDict = response.json()
-                    self.dataQueue.put(jsonData, block=True)
-                    if 'nextPageMarker' in jsonData:
-                        self.session.dataRequestBody['pageMarker'] = jsonData['nextPageMarker']
-                    else:
-                        collectedAllPages = True
-                except Exception as err:
-                    stackTrace = self._generateStackTrace(err)
-                    errorQueue.put(stackTrace, block=True)
-                sleep(self._config.pollDelay)
+                response: requests.Response = requests.get(
+                    self.session.dataRequestUrl,
+                    data=dumps(self.session.dataRequestBody),
+                    headers=self.session.tokenAuthHeaders
+                )
+                jsonData: JSONDict = response.json()
+                self._reportData(jsonData)
+                if 'nextPageMarker' in jsonData:
+                    self.session.dataRequestBody['pageMarker'] = jsonData['nextPageMarker']
+                else:
+                    collectedAllPages = True
+            sleep(self._config.pollDelay)
         self.session.dataRequestBody.pop('nextPageMarker', None)
 
     # any procedures necessary to start capturing data from the device
-    def connect(self) -> None:
+    def _connect(self) -> None:
         self._buildSession()
-        self.connected = True
 
     # gracefully close the connection to the device
-    def disconnect(self) -> None:
-        if not self.connected:
-            # raise DeviceNotConnected(?)Error
-            raise AssertionError
+    def _disconnect(self) -> None:
         self._stopItemsenseJob()
         self._revokeAuthToken()
         self.session = None
-        self.connected = False
 
 
-__all__=['ImpinjXArrayAdapter']
+__all__ = ['ImpinjXArrayAdapter']

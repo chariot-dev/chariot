@@ -14,9 +14,11 @@ import Modal from 'react-bootstrap/Modal';
 
 import NetworkDeviceCellScreenTemplate from '../shared/NetworkDeviceCellScreenTemplate';
 
+import SuccessModalBody from '../shared/SuccessModalBody';
+import ErrorModalBody from '../shared/ErrorModalBody';
+
 const getAllNetworksBaseUrl = 'http://localhost:5000/chariot/api/v1.0/networks/all';
 const deleteNetworkBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network';
-const xhr = new XMLHttpRequest();
 
 class DeleteNetwork extends Component {
   constructor(props) {
@@ -25,73 +27,88 @@ class DeleteNetwork extends Component {
       existingNetworks: [],
       confirmIsOpen: false,
       selectedNetworkToDelete: null,
-      successIsOpen: false
+      successIsOpen: false,
+      errorIsOpen: false,
+      errorMessage: ""
     }
 
+    this.hideErrorModal = this.hideErrorModal.bind(this);
     this.hideConfirmationModal = this.hideConfirmationModal.bind(this);
+
   } 
 
   componentDidMount() {
-    xhr.open('GET', getAllNetworksBaseUrl);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    fetch(getAllNetworksBaseUrl)
+    .then(res => res.json())
+    .then(
+      // On success
+      (result) => {
+        var responseJsonArray = result; // Response is a dictionary  
 
-    // Once a response is received
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          var responseJsonArray = JSON.parse(xhr.response); // Response is a dictionary 
+        var updatedNetworksJsonArray = this.state.existingNetworks;
 
-          var updatedNetworksJsonArray = this.state.existingNetworks; 
-
-          for (var i = 0; i < responseJsonArray.length; i++) {
-            updatedNetworksJsonArray.push(responseJsonArray[i]);
-          }
-
-          this.setState({ existingNetworks: updatedNetworksJsonArray });
+        for (var i = 0; i < responseJsonArray.length; i++) {
+          updatedNetworksJsonArray.push(responseJsonArray[i]);
         }
+
+        this.setState({ existingNetworks: updatedNetworksJsonArray });
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
       }
-    }
-    
-    xhr.send();
+    )
   }
 
 
   deleteConfirmation(selectedNetwork) {
     this.setState({confirmIsOpen: true});
     this.setState({selectedNetworkToDelete: selectedNetwork});
-    console.log(selectedNetwork)
   }
 
 
   hideConfirmationModal(event) {
-    this.setState({
-      confirmIsOpen: !this.state.confirmIsOpen
-    });    
+    this.setState({ confirmIsOpen: !this.state.confirmIsOpen });    
+    event.preventDefault();
+  }
+
+  hideErrorModal(event) {
+    this.setState({ errorIsOpen: !this.state.errorIsOpen });    
     event.preventDefault();
   }
 
 
   toggleSuccessModal = () => {
-    xhr.open('DELETE', deleteNetworkBaseUrl + "?NetworkName=" + this.state.selectedNetworkToDelete);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    // Delete request options
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    };
 
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-        if (xhr.status === 200) {
-          this.setState({
-            confirmIsOpen: false
-          });
-          this.setState({
-            successIsOpen: !this.state.successIsOpen
-          });      
+    fetch(deleteNetworkBaseUrl + "?networkName=" + this.state.selectedNetworkToDelete, requestOptions)
+    // On success
+    .then(
+      (res) => {
+        if (res.status === 400) { // If not 200, something went wrong, so go to the next then()
+          return res.json();
         }
-        else {
-          console.log("ERROR");
+        else { // If a 400 wasn't returned, then the api call was successful
+          this.setState({ confirmIsOpen: false });
+          this.setState({ successIsOpen: !this.state.successIsOpen });
+          return; // Since going to then(), return null since no need to parse response
         }
+      })
+      // On error
+      .then(
+        (resJson) => {
+          if (resJson) { // If the response exists (coming from 400 error)
+            this.setState({ confirmIsOpen: false });
+            this.setState({ errorMessage: resJson.message }, () => { // Set the error message
+              this.setState({ errorIsOpen: true }); // Then set test error modal to true
+            }); 
+          }
       }
-    }
-
-    xhr.send();
+    )
   }
 
 
@@ -103,9 +120,7 @@ class DeleteNetwork extends Component {
           Select a network to delete. Deleting a network will also delete its corresponding devices.
         </p>
 
-        {/* {this.state.existingNetworkNames ? this.createNetworkLinks() : null} */}
-
-        {this.state.existingNetworks ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="delete" deleteNetwork={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : null}
+        {this.state.existingNetworks.length > 0 ? <NetworkDeviceCellScreenTemplate dataJson={this.state.existingNetworks} withLinks={false} type="delete" deleteNetwork={this.deleteConfirmation.bind(this)}></NetworkDeviceCellScreenTemplate> : <p>No existing networks were found.</p>}
         
         <Link to="/networkManager">
           <Button variant="primary" className="float-left footer-button">Back</Button>
@@ -117,17 +132,30 @@ class DeleteNetwork extends Component {
           To confirm the deletion of the network, {this.state.selectedNetworkToDelete}, click 'Yes'.
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" className="float-left" onClick={this.handleSubmit}>No</Button>
+          <Button variant="primary" className="float-left" onClick={this.hideConfirmationModal}>No</Button>
           <Button variant="primary" className="float-right" onClick={this.toggleSuccessModal}>Yes</Button>
         </Modal.Footer>
       </Modal>,
 
       <Modal show={this.state.successIsOpen} key="networkDeletionSuccessModal">
-        <Modal.Body>The network has been deleted!</Modal.Body>
+
+        <SuccessModalBody successMessage="The network has been deleted!">
+        </SuccessModalBody>
+
         <Modal.Footer>
           <Link to="/welcome">
             <Button variant="primary" className="float-right">Continue</Button>
           </Link>
+        </Modal.Footer>
+      </Modal>,
+
+      <Modal show={this.state.errorIsOpen} key="networkDeletionErrorModal">
+
+        <ErrorModalBody errorMessage={this.state.errorMessage}>
+        </ErrorModalBody>
+
+        <Modal.Footer>
+          <Button variant="primary" className="float-left" onClick={this.hideErrorModal}>OK</Button>
         </Modal.Footer>
       </Modal>
     ]

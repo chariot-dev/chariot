@@ -20,9 +20,9 @@ import ConfirmationModalBody from '../shared/ConfirmationModalBody';
 import SuccessModalBody from '../shared/SuccessModalBody';
 import ErrorModalBody from '../shared/ErrorModalBody';
 
+const getSupportedDeviceTypesBaseUrl = 'http://localhost:5000/chariot/api/v1.0'
 const getDeviceConfigBaseUrl = 'http://localhost:5000/chariot/api/v1.0/network/device/config';
 const postDeviceCreationBaseUrl = "http://localhost:5000/chariot/api/v1.0/network/device";
-const xhr = new XMLHttpRequest();
 
 class AddDeviceHome extends Component {
   constructor(props) {
@@ -31,17 +31,49 @@ class AddDeviceHome extends Component {
       newDeviceTypeGeneralVals: {
         newDeviceTypeConfig: null
       },
+      supportedDeviceTypes: [],
       showDeviceSpecificSettings: false, // Whether or not the type of device has been chosen by the user already
       isSubmitted: false, // Whether or not the device information is ready to be sent to the server
       confirmIsOpen: false, // Is the confirm modal open?
       successIsOpen: false, // Is the success modal open?
       errorIsOpen: false, // Is the error modal open?
+      errorMessage: '', // Error messagae to be displayed, if necessary
       deviceState: {} // All configuration setting values for the device (From AddDeviceHome and AddDeviceVars)
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleDeviceTypeChange = this.handleDeviceTypeChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  // Gets supported device types when page initially loads in order to dynamically fill in select-menu
+  componentDidMount() {
+    fetch(getSupportedDeviceTypesBaseUrl + "/network/device/supportedDevices")
+    .then(res => res.json())
+    .then(
+      // On success
+      (result) => {
+        var tempSupportedDeviceTypes = [];
+        for (var key in result) {
+          tempSupportedDeviceTypes.push(key);
+        }
+        this.setState({supportedDeviceTypes: tempSupportedDeviceTypes});
+      },
+      // On error
+      (error) => {
+        console.log(error.message);
+      }
+    )
+  }
+
+  getSupportedDeviceTypeOptions = () => {
+    var deviceOptionsElement = [];
+
+    for (var k = 0; k < this.state.supportedDeviceTypes.length; k++) {
+      deviceOptionsElement.push(<option>{this.state.supportedDeviceTypes[k]}</option>);
+    }
+
+    return deviceOptionsElement;
   }
 
   /*
@@ -54,64 +86,51 @@ class AddDeviceHome extends Component {
     this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }); // Update the state
   }
 
-
   /*
     As the device type the user selects changes, update that in the state.
   */
   handleDeviceTypeChange(event) {
-    console.log("------------------- changed -------------------");
     var lastDeviceType = this.state.newDeviceTypeGeneralVals['Device Type'];
     
-    if (lastDeviceType !== event.target.value) {
+    if (lastDeviceType !== event.target.value) { // If device type was changed
       var updatedNewDeviceTypeGeneralVals = this.state.newDeviceTypeGeneralVals; // Store from current state
       updatedNewDeviceTypeGeneralVals[event.target.name] = event.target.value; // Update the json with the new device type
 
       // State is update asynchronousyly, so run function after state is updated
       this.setState({ newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals }, function () {
-        console.log(this.state.newDeviceTypeGeneralVals);
+        // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
+        fetch(getDeviceConfigBaseUrl + "?deviceId=" + this.state.newDeviceTypeGeneralVals['Device Type'])
+        .then(res => res.json())
+        .then(
+          // If post was successful, update state and display success modal
+          (result) => {
+            var responseJson = result;
+            updatedNewDeviceTypeGeneralVals['newDeviceTypeConfig'] = responseJson;
 
-        xhr.open('GET', getDeviceConfigBaseUrl + "?deviceId=" + this.state.newDeviceTypeGeneralVals['Device Type']);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        
-        // Once a response is received
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState === XMLHttpRequest.DONE) { // Once the request is done
-              var responseJson = JSON.parse(xhr.response);
-
-              console.log(responseJson);
-
-              console.log(updatedNewDeviceTypeGeneralVals);
-
-              updatedNewDeviceTypeGeneralVals['newDeviceTypeConfig'] = responseJson;
-
-              console.log(updatedNewDeviceTypeGeneralVals);
-
-              // Store the device's config file to the state
-              this.setState({newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals});
-              this.setState({showDeviceSpecificSettings: true}); // Will cause render to update device-specific section
+            // Store the device's config file to the state
+            this.setState({newDeviceTypeGeneralVals: updatedNewDeviceTypeGeneralVals});
+            this.setState({showDeviceSpecificSettings: true}); // Will cause render to update device-specific section
+          },  
+          // If post was unsuccessful, update state and display error modal
+          (error) => {
+            console.log(error.message);
           }
-        }
+        )
 
-        xhr.send(); // Send the request to the url with set headers
-
-        this.setState({ showDeviceSpecificSettings: false}); // Reset to false after render to get ready for next render
+        this.setState({ showDeviceSpecificSettings: false}); // Reset to false after render to get ready for next render (if user changes device type)
       });
     }
   }
 
   handleNewDeviceCreation = (submittedDeviceSpecificState) => {
-    console.log(submittedDeviceSpecificState);
     this.setState ({ deviceState: submittedDeviceSpecificState }, () => {
-      console.log(this.state.deviceState);
+      // Update state to launch confirmation modal
+      this.setState({
+        isSubmitted: !this.state.isSubmitted,
+        confirmIsOpen: !this.state.confirmIsOpen
+      }); 
     });
-
-    // Update state to launch confirmation modal
-    this.setState({
-      isSubmitted: !this.state.isSubmitted,
-      confirmIsOpen: !this.state.confirmIsOpen
-    }); 
   }
-
 
   /*
     Function that launches the success modal after the user confirms the device
@@ -119,67 +138,79 @@ class AddDeviceHome extends Component {
     server to create the new device.
   */
  toggleSuccessModal = () => {
-    xhr.open('POST', postDeviceCreationBaseUrl, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-
-    xhr.onreadystatechange = () => {// Call a function when the state changes.
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          this.setState({ confirmIsOpen: false });
-          this.setState({ successIsOpen: !this.state.successIsOpen });
-        }
-      }
-    }    
-    
     var data = {};
     data["networkName"] = this.props.location.networkProps["Network Name"];
     data["deviceType"] = this.state.deviceState.newDeviceTypeGeneralVals['Device Type'];
 
-    console.log(this.props.location.networkProps);
-    console.log(this.state.deviceState.newDeviceTypeConfigVals);
-
     for (var key in this.state.deviceState.newDeviceTypeConfigVals) {
-      console.log(key);
-      console.log(this.state.deviceState.newDeviceTypeConfigVals[key]);
-
       var fieldVal = this.state.deviceState.newDeviceTypeConfigVals[key].value;
 
       //only add to data if the value is not empty
       if (fieldVal !== "") {
-          //TODO: find a better way to do this
-          var curFieldId = this.state.deviceState.newDeviceTypeConfigVals[key].alias;
-          var fieldType = this.state.deviceState.newDeviceTypeConfigVals[key].inputType;
-          if (fieldType === "number") {
-              fieldVal = parseInt(fieldVal)
-          }
-          else if (fieldType === "checkbox") {
-              fieldVal = document.getElementById(curFieldId).checked;
-          }
-          else if (fieldType === "numberArray") {
-              var inputValues = fieldVal.split(" ");
-              //again need to verify that all values will be ints
-              var arr = [];
+        var curFieldId = this.state.deviceState.newDeviceTypeConfigVals[key].alias;
+        var fieldType = this.state.deviceState.newDeviceTypeConfigVals[key].inputType;
 
-              inputValues.forEach(function (item) {
-                  arr.push(parseInt(item))
-              });
+        if (fieldType === "number") {
+            fieldVal = parseInt(fieldVal)
+        }
+        else if (fieldType === "checkbox") {
+            fieldVal = document.getElementById(curFieldId).checked;
+        }
+        else if (fieldType === "numberArray") {
+            var inputValues = fieldVal.split(" ");
 
-              fieldVal = arr;
-          }
-          data[curFieldId] = fieldVal;
+            //again need to verify that all values will be ints
+            var arr = [];
+
+            inputValues.forEach(function (item) {
+                arr.push(parseInt(item))
+            });
+
+            fieldVal = arr;
+        }
+        
+        data[curFieldId] = fieldVal;
       }
     }
 
-    xhr.send(JSON.stringify(data));
+    // Post request options
+
+    console.log(data)
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    };
+
+    // Execute the post request to 'postCreateNetworkBaseUrl' with 'requestOptions' using fetch
+    fetch(postDeviceCreationBaseUrl, requestOptions)
+    .then(res => res.json())
+    .then(
+      // If post was successful, update state and display success modal
+      () => {
+      this.setState({
+        confirmIsOpen: false
+      });
+      this.setState({
+        successIsOpen: !this.state.successIsOpen
+      });
+      },
+      // If post was unsuccessful, update state and display error modal
+      (error) => {
+      // Once error message is set, then launch the error modal
+      this.setState({
+        errorMessage: error.message 
+      }, () => {
+        this.setState({ errorIsOpen: !this.state.errorIsOpen });
+      });
+      }
+    )  
   }
 
+
   toggleErrorModal = () => {
-    this.setState({
-      confirmIsOpen: false
-    });
-    this.setState({
-      errorIsOpen: !this.state.errorIsOpen
-    });
+    this.setState({ confirmIsOpen: false });
+    this.setState({ errorIsOpen: !this.state.errorIsOpen });
   }
 
 
@@ -200,7 +231,6 @@ class AddDeviceHome extends Component {
 
   parseConfirmationData = () => {
     var confirmationDataJson = {};
-
     confirmationDataJson['Device Type'] = this.state.newDeviceTypeGeneralVals['Device Type'];
 
     for (var key in this.state.deviceState.newDeviceTypeConfigVals) {
@@ -226,11 +256,11 @@ class AddDeviceHome extends Component {
         <p className="screenInfo">Please fill in the configuration fields for your new device.</p>
 
         <form id="createDeviceForm">
+
           <div className="form-group">
               <select required className="form-control" id="Device Type Select" name="Device Type" onChange={this.handleDeviceTypeChange}>
                 <option selected disabled hidden value="">Select a Device Type</option>
-                <option>ImpinjSpeedwayR420</option>
-                <option>ImpinjXArray</option>
+                {this.getSupportedDeviceTypeOptions()}
               </select>
           </div>
 
@@ -239,7 +269,7 @@ class AddDeviceHome extends Component {
         </form>
 
         <Link to="/networkManager">
-          <Button variant="primary" className="float-left footer-button">Back</Button>
+          <Button variant="primary" className="float-left footer-button">Cancel</Button>
         </Link>
       </div>,
 
@@ -269,7 +299,7 @@ class AddDeviceHome extends Component {
 
       <Modal show={this.state.errorIsOpen} key="addDeviceErrorModal">
 
-        <ErrorModalBody errorMessage="Your device was not added to the network. Please go back, verify that the information is correct, and then try again.">
+        <ErrorModalBody errorMessage={this.state.errorMessage + ". Please go back, verify that the information is correct, and then try again."}>
         </ErrorModalBody>
 
         <Modal.Footer>

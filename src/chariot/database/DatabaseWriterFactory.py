@@ -3,17 +3,19 @@ from os import path
 from chariot.utility.JSONTypes import JSONDict
 from json import load
 from chariot.utility.exceptions.ErrorStrings import ErrorStrings
-from chariot.utility.exceptions.CustomExceptions import ItemNotSupported
+from chariot.utility.exceptions.ChariotExceptions import ItemNotSupported
 from chariot.database.writer import DatabaseWriter, MongoDatabaseWriter, MySQLDatabaseWriter
 from chariot.database.configuration import DatabaseConfiguration
 from chariot.utility import AbstractFactory
+from test.testutils import TestDatabaseWriter
 
 
 class _DatabaseWriterFactory(AbstractFactory):
     def __init__(self):
         self.instanceMap: Dict[str, Type[DatabaseWriter]] = {
             'MongoDB': MongoDatabaseWriter,
-            'MySQL': MySQLDatabaseWriter
+            'MySQL': MySQLDatabaseWriter,
+            'TestDB': TestDatabaseWriter,
         }
         self.instanceName: str = 'database'
         self.typeField: str = 'type'
@@ -26,10 +28,10 @@ class _DatabaseWriterFactory(AbstractFactory):
             raise ItemNotSupported(
                 ErrorStrings.ERR_Generic_Device_Template.value.format("/templates/GenericRequiredFields.json")
             )
-    
+
     def getInstance(self, config: DatabaseConfiguration) -> DatabaseWriter:
         return super().getInstance(config)
-    
+
     def getsupportedDatabases(self) -> JSONDict:
         # update each device configuration with generic required fields
         fullDb: Dict[str, DatabaseConfiguration] = {}
@@ -37,7 +39,7 @@ class _DatabaseWriterFactory(AbstractFactory):
         for db in self.instanceMap.keys():
             fullDb.update(self.getSpecifiedDbTemplate(db))
         return fullDb
-    
+
     def getDbInformation(self, dbName: str) -> JSONDict:
         if dbName not in self.instanceMap.keys():
             raise ItemNotSupported(ErrorStrings.ERR_Item_Not_Supported.value.format(self.instanceName, dbName))
@@ -52,7 +54,7 @@ class _DatabaseWriterFactory(AbstractFactory):
                 # now combine the specified device template with that of the generic template
                 specificDb = load(dbTemplate)
                 return self.combineConfigWithGeneric(specificDb, dbName)
-        except:
+        except FileNotFoundError:
             raise ItemNotSupported(ErrorStrings.ERR_Item_Not_Supported.value.format(self.instanceName, dbName))
 
     # use this method to combine settings from a specific configuration instance with the generic required fields
