@@ -61,7 +61,7 @@ typing-extensions==3.7.4.1
 urllib3==1.25.8
 virtualenv==16.7.9
 wcwidth==0.1.8
-websockets==8.1
+websockets==9.1
 Werkzeug==0.16.0
 wrapt==1.11.2
 zipp==0.6.0
