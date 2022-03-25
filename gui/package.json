@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.4.0",
-    "electron": "^7.1.2",
+    "electron": "^13.6.6",
     "electron-is-dev": "^1.1.0",
     "electron-utils": "^1.0.9",
     "react": "^16.12.0",
